@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Gestão de Tempo e Produtividade</title>
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -139,168 +140,6 @@
         .welcome-tip { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 20px; }
         @keyframes fadeInUp { to { transform: translateY(0); opacity: 1; } }
 
-        /* --- STYLES FOR THE CONSUMO TOOL --- */
-        #tabConsumo {
-            margin-top: 10px;
-        }
-        #tabConsumo .container-consumo {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            color: #1a2530;
-        }
-        #tabConsumo header.header-consumo {
-            text-align: center;
-            border-bottom: 3px solid #2b6cb0;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            position: relative;
-            background: transparent;
-            box-shadow: none;
-            display: block;
-        }
-        #tabConsumo header.header-consumo h1 {
-            margin: 0;
-            color: #2b6cb0;
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        #tabConsumo .btn-admin {
-            position: absolute;
-            right: 0;
-            top: 5px;
-            background: #4a5568;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        #tabConsumo .btn-admin:hover { background: #2d3748; }
-        
-        #tabConsumo .admin-panel {
-            background: #fffaf0;
-            border: 2px dashed #dd6b20;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            display: none;
-        }
-        #tabConsumo .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        #tabConsumo .section-title {
-            background: #2b6cb0;
-            color: white;
-            padding: 10px 15px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 6px 6px 0 0;
-            margin: 20px 0 0 0;
-        }
-        #tabConsumo .config-panel {
-            background: #edf2f7;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        #tabConsumo .grid-inputs-unicos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        #tabConsumo .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 10px;
-        }
-        #tabConsumo .form-group label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #4a5568;
-        }
-        #tabConsumo select, #tabConsumo input[type="text"], #tabConsumo input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            background: #fff;
-            font-size: 14px;
-        }
-        #tabConsumo input:focus, #tabConsumo select:focus { border-color: #2b6cb0; outline: none; }
-        
-        #tabConsumo .grid-produto {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        #tabConsumo .table-responsive {
-            overflow-x: auto;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-        #tabConsumo table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-        #tabConsumo th, #tabConsumo td {
-            border: 1px solid #e2e8f0;
-            padding: 8px 12px;
-            text-align: center;
-            font-size: 13px;
-            color: #1a2530;
-        }
-        #tabConsumo th { background-color: #edf2f7; color: #2d3748; font-weight: 700; }
-        #tabConsumo .part-header { font-weight: bold; color: #2b6cb0; background: #f7fafc; text-align: left; }
-        #tabConsumo .input-table { width: 85px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: center; }
-        #tabConsumo .unit-label { font-size: 11px; color: #718096; display: block; margin-top: 2px; }
-        
-        #tabConsumo .dashboard {
-            margin-top: 30px;
-            border-top: 2px dashed #cbd5e0;
-            padding-top: 25px;
-        }
-        #tabConsumo .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 15px;
-        }
-        #tabConsumo .card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid #4a5568;
-            box-shadow: none;
-            margin-bottom: 0;
-        }
-        #tabConsumo .card.destaque-c { border-left-color: #dd6b20; background: #fffaf0; }
-        #tabConsumo .card.destaque-v { border-left-color: #3182ce; background: #ebf8ff; }
-        #tabConsumo .card.destaque-e { border-left-color: #38a169; background: #f0fff4; }
-        #tabConsumo .card.destaque-t { border-left-color: #805ad5; background: #faf5ff; }
-        #tabConsumo .card.prod-info { border-left-color: #4a5568; background: #f7fafc; grid-column: 1 / -1; }
-        #tabConsumo .card-title { font-size: 11px; text-transform: uppercase; color: #718096; font-weight: bold; margin-bottom: 5px; }
-        #tabConsumo .card-value { font-size: 18px; font-weight: bold; color: #2d3748; }
-        #tabConsumo .card-sub { font-size: 11px; color: #a0aec0; margin-top: 4px; }
-        #tabConsumo .badge-perda { background: #feebc8; color: #c05621; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
-        #tabConsumo .badge-perda.v-e { background: #e2e8f0; color: #4a5568; }
-        #tabConsumo .badge-perda.t-p { background: #e9d8fd; color: #6b46c1; }
-
         /* Estilos do filtro avançado */
         .filter-container {
             display: flex;
@@ -327,6 +166,152 @@
             height: 18px;
             cursor: pointer;
         }
+    
+        /* --- NOVA FERRAMENTA DE COMPOSIÇÃO E CONSUMO --- */
+
+        #ccRoot { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; font-size: 13px; }
+        #ccRoot, #ccRoot * { box-sizing: border-box; }
+        
+        .cc-nav-tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #ccc; }
+        .cc-nav-tab { padding: 8px 16px; background: #e0e0e0; cursor: pointer; border-radius: 4px 4px 0 0; font-weight: bold; }
+        .cc-nav-tab.active { background: #0d6efd; color: white; }
+
+        .cc-container { background-color: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 15px; margin-bottom: 20px; }
+
+        /* Barra de Parâmetros Escondida por Padrão */
+        .cc-params-bar {
+            background-color: #e7f1ff; border: 1px solid #b6d4fe; border-radius: 4px; padding: 10px 15px; margin-bottom: 15px;
+            display: none; /* Inicia oculta */
+            gap: 20px; align-items: center; flex-wrap: wrap;
+        }
+        .cc-params-bar.visible { display: flex; }
+        .cc-params-bar h4 { font-size: 12px; color: #084298; display: flex; align-items: center; gap: 5px; }
+        .cc-param-group { display: flex; align-items: center; gap: 6px; }
+        .cc-param-group label { font-size: 11px; font-weight: 600; color: #084298; }
+        .cc-param-group input { width: 70px; height: 26px; padding: 2px 5px; text-align: center; border: 1px solid #084298; border-radius: 3px; font-weight: bold; }
+
+        .cc-top-bar { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }
+        .cc-form-group-container { display: flex; gap: 12px; align-items: flex-end; flex-grow: 1; flex-wrap: wrap; }
+        .cc-form-group { display: flex; flex-direction: column; }
+        .cc-form-group.code { width: 120px; }
+        .cc-form-group.desc { flex-grow: 1; min-width: 180px; }
+        .cc-form-group.select-type { width: 140px; }
+        .cc-form-group.variacao-select { width: 220px; }
+
+        .cc-form-group label { font-size: 11px; color: #444; margin-bottom: 4px; font-weight: 600; }
+        .cc-form-group input, .cc-form-group select { height: 30px; padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; outline: none; width: 100%; background-color: #fff; }
+
+        .cc-btn-action { height: 32px; color: white; border: none; border-radius: 4px; padding: 0 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+        .cc-btn-toggle-params { background-color: #6c757d; }
+        .cc-btn-load { background-color: #0d6efd; }
+        .cc-btn-save-db { background-color: #198754; }
+        .cc-btn-print { background-color: #0dcaf0; color: #000; font-weight: bold; }
+
+        .cc-section-title { font-size: 13px; font-weight: 700; color: #0d6efd; margin: 15px 0 10px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .cc-table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; }
+        #ccRoot table { width: 100%; border-collapse: collapse; text-align: left; background-color: #fff; font-size: 12px; }
+        #ccRoot th, #ccRoot td { padding: 6px; border-right: 1px solid #eee; border-bottom: 1px solid #eee; vertical-align: middle; }
+        #ccRoot th { background-color: #f4f6f8; font-weight: 600; color: #444; font-size: 11px; text-align: center; }
+        .cc-text-center { text-align: center; }
+        .cc-text-right { text-align: right; }
+        .cc-table-input { text-align: right; height: 26px; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; width: 100%; }
+        .cc-table-select { height: 26px; border: 1px solid #ccc; border-radius: 3px; padding: 2px 4px; width: 100%; font-size: 11px; }
+
+        .cc-multi-input-container { display: flex; flex-direction: column; gap: 4px; }
+        .cc-input-row { display: flex; align-items: center; gap: 3px; }
+        .cc-color-label { font-size: 9px; font-weight: bold; color: #0d6efd; background-color: #e7f1ff; padding: 2px; border-radius: 3px; white-space: nowrap; display: none; }
+
+        .cc-insumo-row-container { display: flex; flex-direction: column; gap: 4px; }
+        .cc-insumo-item-row { display: flex; align-items: center; gap: 4px; }
+
+        .cc-btn-add-item, .cc-btn-remove-item { border: none; border-radius: 3px; width: 22px; height: 24px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; }
+        .cc-btn-add-item { background-color: #198754; }
+        .cc-btn-remove-item { background-color: #dc3545; }
+
+        .cc-col-total { font-weight: bold; background-color: #f8fafc; }
+        .cc-highlight-espuma-carpete { background-color: #fcf8e3 !important; }
+        .cc-subtotal-insumo { font-weight: bold; color: #0d6efd; font-size: 11px; margin-top: 2px; }
+
+        .cc-view-section { display: none; }
+        .cc-view-section.active { display: block; }
+
+        /* ESTILOS EXCLUSIVOS PARA IMPRESSÃO */
+        @media print {
+            #ccRoot { background-color: #fff; padding: 0; font-size: 10pt; }
+            .cc-nav-tabs, .cc-btn-action, .cc-params-bar, .no-print { display: none !important; }
+            .cc-container { box-shadow: none; padding: 0; margin-bottom: 10px; }
+            .cc-view-section { display: none !important; }
+            .cc-view-section#abaRelatorio { display: block !important; }
+            table { border: 1px solid #000 !important; width: 100% !important; page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+            th { background-color: #eee !important; color: #000 !important; }
+            h2, h3 { color: #000 !important; }
+        }
+    
+    
+/* ===== RELATÓRIO EXECUTIVO / DIRETORIA ===== */
+.exec-report {
+    margin-bottom: 20px;
+}
+.exec-header {
+    display:flex; justify-content:space-between; align-items:flex-start; gap:20px;
+    flex-wrap:wrap; margin-bottom:18px;
+}
+.exec-title h2 { margin-bottom:5px; color:var(--secondary-color); }
+.exec-title p { color:#667085; font-size:.88rem; }
+.exec-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.exec-actions button {
+    border:0; border-radius:6px; padding:10px 14px; cursor:pointer;
+    font-weight:700; color:#fff;
+}
+.btn-exec-pdf { background:#c0392b; }
+.btn-exec-excel { background:#217346; }
+.exec-kpis {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px;
+    margin-bottom:16px;
+}
+.exec-kpi {
+    background:#fff; border:1px solid #e5e7eb; border-radius:9px; padding:15px;
+    box-shadow:0 2px 6px rgba(0,0,0,.04);
+}
+.exec-kpi .label { font-size:.72rem; text-transform:uppercase; color:#667085; font-weight:800; }
+.exec-kpi .value { font-size:1.65rem; font-weight:800; color:#26364a; margin-top:5px; }
+.exec-kpi .sub { font-size:.76rem; color:#667085; margin-top:4px; }
+.exec-positive { color:#18864b !important; }
+.exec-warning { color:#b7791f !important; }
+.exec-danger { color:#c0392b !important; }
+.exec-neutral { color:#2980b9 !important; }
+
+.exec-grid {
+    display:grid; grid-template-columns:1.25fr .75fr; gap:16px;
+}
+.exec-panel {
+    background:#fff; border:1px solid #e5e7eb; border-radius:9px; padding:16px;
+}
+.exec-panel h3 {
+    font-size:.98rem; color:#344054; margin-bottom:12px;
+}
+.exec-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+.exec-table th, .exec-table td {
+    padding:9px 7px; border-bottom:1px solid #eef0f3; text-align:left;
+}
+.exec-table th { color:#667085; font-size:.72rem; text-transform:uppercase; }
+.exec-table td.num, .exec-table th.num { text-align:center; }
+.exec-note {
+    margin-top:12px; padding:10px 12px; border-radius:7px;
+    background:#f8fafc; color:#667085; font-size:.76rem; line-height:1.4;
+}
+.exec-status {
+    display:inline-block; padding:4px 8px; border-radius:12px; font-size:.7rem; font-weight:800;
+}
+.exec-status.good { background:#e9f8ef; color:#18864b; }
+.exec-status.attention { background:#fff6df; color:#9a6700; }
+.exec-status.critical { background:#fdecec; color:#b42318; }
+.exec-chart-wrap { height:270px; position:relative; }
+@media(max-width:900px){ .exec-grid{grid-template-columns:1fr;} }
+
     </style>
 </head>
 <body>
@@ -357,7 +342,7 @@
     <div class="nav-tabs" id="adminTabs">
         <button id="btnTabPainel" class="tab-btn active" onclick="switchTab('painel')">Painel de Monitoramento Geral</button>
         <button id="btnTabRelatorios" class="tab-btn" onclick="switchTab('relatorios')">Relatórios &amp; Gráficos Estatísticos</button>
-        <button id="btnTabConsumo" class="tab-btn" onclick="switchTab('consumo')" style="display: none;">Calculadora de Consumo 📊</button>
+        <button id="btnTabConsumo" class="tab-btn" onclick="switchTab('consumo')" style="display: none;">Composição e Consumo 📊</button>
         <button id="btnTabGerenciamento" class="tab-btn" onclick="switchTab('gerenciamento')" style="display: none;">Gerenciar Equipe &amp; Backup</button>
     </div>
 
@@ -499,20 +484,151 @@
         <div class="panel-box" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h2>Indicadores de Produtividade do Setor</h2>
-                <p style="font-size: 0.85rem; color: #666;">Selecione a visualização de tempo do relatório.</p>
+                <p style="font-size: 0.85rem; color: #666;">Métricas baseadas em tarefas concluídas, tempo rastreado e jornada útil de 07:12 às 17:00, de segunda a sexta-feira.</p>
             </div>
             <div>
                 <select id="reportPeriod" class="form-control" style="width: 200px;" onchange="updateReportDashboard()">
                     <option value="hoje">Apenas Hoje</option>
                     <option value="semanal">Esta Semana (7 dias)</option>
                     <option value="quinzenal">Quinzena (15 dias)</option>
-                    <option value="mensal">Mês Atual (30 dias)</option>
+                    <option value="mensal" selected>Mês Atual</option>
                     <option value="anual">Visão Anual</option>
                 </select>
             </div>
         </div>
 
-        <div class="goals-section">
+        
+        <!-- ===== PAINEL EXECUTIVO PARA DIRETORIA ===== -->
+        <div class="panel-box exec-report">
+            <div class="exec-header">
+                <div class="exec-title">
+                    <h2>Relatório Executivo de Produtividade</h2>
+                    <p id="execPeriodLabel">Consolidado do período selecionado</p>
+                </div>
+                <div class="exec-actions">
+                    <button class="btn-exec-pdf" onclick="gerarRelatorioExecutivoPDF()">📄 Relatório Executivo PDF</button>
+                    <button class="btn-exec-excel" onclick="exportarRelatorioExecutivoExcel()">📊 Excel Executivo</button>
+                </div>
+            </div>
+
+            <div class="exec-kpis">
+                <div class="exec-kpi">
+                    <div class="label">Demandas recebidas</div>
+                    <div class="value exec-neutral" id="execRecebidas">0</div>
+                    <div class="sub" id="execRecebidasSub">no período</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Entregas concluídas</div>
+                    <div class="value exec-positive" id="execConcluidas">0</div>
+                    <div class="sub" id="execConcluidasSub">no período</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Cumprimento de prazo</div>
+                    <div class="value exec-positive" id="execSLA">0%</div>
+                    <div class="sub">meta de referência: 90%</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Backlog atual</div>
+                    <div class="value exec-warning" id="execBacklog">0</div>
+                    <div class="sub" id="execBacklogSub">demandas em aberto</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Atrasos ativos</div>
+                    <div class="value exec-danger" id="execAtrasadas">0</div>
+                    <div class="sub">prioridade de tratamento</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Variação de entregas</div>
+                    <div class="value exec-neutral" id="execVariacao">0%</div>
+                    <div class="sub" id="execVariacaoSub">vs. período anterior</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Horas em tarefas</div>
+                    <div class="value exec-neutral" id="execHorasTarefas">0h</div>
+                    <div class="sub" id="execHorasTarefasSub">tempo rastreado</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Ocupação produtiva</div>
+                    <div class="value exec-neutral" id="execOcupacao">0%</div>
+                    <div class="sub" id="execOcupacaoSub">tarefas / capacidade útil</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Tempo médio por tarefa</div>
+                    <div class="value exec-neutral" id="execTempoMedio">0m</div>
+                    <div class="sub" id="execTempoMedioSub">tarefas com tempo rastreável</div>
+                </div>
+                <div class="exec-kpi">
+                    <div class="label">Tarefas por hora</div>
+                    <div class="value exec-neutral" id="execTarefasHora">0</div>
+                    <div class="sub">produção por hora rastreada</div>
+                </div>
+            </div>
+
+            <div class="exec-grid">
+                <div class="exec-panel">
+                    <h3>📈 Evolução de entregas</h3>
+                    <div class="exec-chart-wrap"><canvas id="execTrendChart"></canvas></div>
+                    <div class="exec-note">
+                        A tendência considera as tarefas efetivamente concluídas e registradas no histórico.
+                        O indicador de prazo usa o campo de prazo da tarefa e a data registrada de conclusão.
+                    </div>
+                </div>
+
+                <div class="exec-panel">
+                    <h3>👥 Produtividade por colaborador</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="exec-table">
+                            <thead>
+                                <tr><th>Colaborador</th><th class="num">Entregas</th><th class="num">No prazo</th><th class="num">%</th></tr>
+                            </thead>
+                            <tbody id="execTeamBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="exec-note" id="execInterpretacao">
+                        O painel será atualizado conforme os registros do período.
+                    </div>
+                </div>
+            </div>
+
+            <div class="exec-panel" style="margin-top:16px;">
+                <h3>⏱️ Jornada, tempo produtivo e capacidade</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead>
+                            <tr>
+                                <th>Colaborador</th><th class="num">Dias úteis</th>
+                                <th class="num">Capacidade</th><th class="num">Tempo em tarefas</th>
+                                <th class="num">Ocupação</th><th class="num">Tarefas</th><th class="num">Tarefas/h</th><th class="num">Tempo médio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="execCapacityBody"></tbody>
+                    </table>
+                </div>
+                <div class="exec-note">
+                    Capacidade calculada em <strong>07:12–17:00, de segunda a sexta-feira</strong> = 9h48 por dia.
+                    O tempo produtivo considera somente intervalos registrados como <strong>início → pausa/fim</strong>.
+                    A partir desta versão, cada conclusão grava o horário exato. Registros antigos que não possuem horário de conclusão
+                    não são tratados como duração exata, evitando distorções nas métricas.
+                </div>
+            </div>
+
+            <div class="exec-panel" style="margin-top:16px;">
+                <h3>📊 Comparativo gerencial</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead>
+                            <tr>
+                                <th>Indicador</th><th class="num">Período atual</th>
+                                <th class="num">Período anterior</th><th class="num">Variação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="execCompareBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+<div class="goals-section">
             <div class="goal-card">
                 <div class="goal-header">
                     <span>🎯 Meta de Eficiência (No Prazo)</span>
@@ -603,152 +719,181 @@
     </div>
 
     <!-- TAB DA FERRAMENTA DE CONSUMO (RESTRITA A ADMIN E DIGITALIZADOR) -->
+    <!-- TAB DA NOVA FERRAMENTA DE COMPOSIÇÃO E CONSUMO (RESTRITA A ADMIN E DIGITALIZADOR) -->
     <div id="tabConsumo" style="display: none;">
-        <div class="container-consumo">
-            <header class="header-consumo">
-                <h1>Sistema de Consumo Automotiva</h1>
-                <button class="btn-admin" onclick="toggleAdminTool()">⚙️ Painel Admin</button>
-            </header>
+        <div id="ccRootWrapper"><div id="ccRoot">
 
-            <div class="admin-panel" id="painel-admin-tool">
-                <h3 style="margin: 0; color: #dd6b20;">⚙️ Configurações do Sistema (Apenas Administrador)</h3>
-                <div class="admin-grid">
-                    <div class="form-group">
-                        <label>Largura Padrão (cm):</label>
-                        <input type="number" id="cfg_largura" value="138" min="1" oninput="calcularTudo()">
-                    </div>
-                    <div class="form-group">
-                        <label>Perda Couro (%):</label>
-                        <input type="number" id="cfg_perda_couro" value="7" min="0" max="100" oninput="calcularTudo()">
-                    </div>
-                    <div class="form-group">
-                        <label>Perda Vinil/Espuma/Thermo (%):</label>
-                        <input type="number" id="cfg_perda_outros" value="5" min="0" max="100" oninput="calcularTudo()">
-                    </div>
+<div class="cc-nav-tabs no-print">
+    <div class="cc-nav-tab active" onclick="cc_trocarAba('cc_abaEdicao', this)"><i class="fa-solid fa-pen-to-square"></i> 1. Ficha de Edição</div>
+    <div class="cc-nav-tab" onclick="cc_trocarAba('cc_abaCadastros', this)"><i class="fa-solid fa-list-check"></i> 2. Banco de Dados</div>
+    <div class="cc-nav-tab" onclick="cc_trocarAba('cc_abaRelatorio', this)"><i class="fa-solid fa-chart-pie"></i> 3. Relatório Geral e Médias</div>
+</div>
+
+<div id="cc_abaEdicao" class="cc-view-section active">
+    <!-- BARRA DE PARÂMETROS OCULTA POR PADRÃO -->
+    <div class="cc-params-bar" id="cc_barParametros">
+        <h4><i class="fa-solid fa-sliders"></i> Parâmetros Globais de Cálculo:</h4>
+        <div class="cc-param-group">
+            <label for="paramLargura">Largura Material (m):</label>
+            <input type="number" id="cc_paramLargura" value="1.38" step="0.01" onchange="cc_recalcularTabelaPrincipal()">
+        </div>
+        <div class="cc-param-group">
+            <label for="paramQuebraCouro">Quebra Couro (%):</label>
+            <input type="number" id="cc_paramQuebraCouro" value="7" step="0.5" onchange="cc_recalcularTabelaPrincipal()">
+        </div>
+        <div class="cc-param-group">
+            <label for="paramQuebraVinil">Quebra Vinil (%):</label>
+            <input type="number" id="cc_paramQuebraVinil" value="5" step="0.5" onchange="cc_recalcularTabelaPrincipal()">
+        </div>
+    </div>
+
+    <div class="cc-container">
+        <div class="cc-top-bar">
+            <div class="cc-form-group-container">
+                <div class="cc-form-group cc-code">
+                    <label for="codigo">Código do Produto</label>
+                    <input type="text" id="cc_codigo" placeholder="Ex: TO.0145">
+                </div>
+                <div class="cc-form-group cc-desc">
+                    <label for="descricao">Descrição / Nome do Produto</label>
+                    <input type="text" id="cc_descricao" placeholder="Ex: Banco Hilux 2024">
+                </div>
+                <div class="cc-form-group cc-select-type">
+                    <label for="tipoCategoria">Tipo de Produto</label>
+                    <select id="cc_tipoCategoria">
+                        <option value="Kit">Kit</option>
+                        <option value="Piso">Piso</option>
+                        <option value="Banco Moto">Banco de Moto</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="cc-form-group cc-select-type">
+                    <label for="padraoCor">Padrão de Cor</label>
+                    <select id="cc_padraoCor">
+                        <option value="MONOCOLOR">Monocolor (1 Cor)</option>
+                        <option value="BICOLOR">Bicolor (+1 Cor)</option>
+                    </select>
+                </div>
+                <div class="cc-form-group cc-select-type">
+                    <label for="tipoKit">Personalização</label>
+                    <select id="cc_tipoKit">
+                        <option value="PADRAO">Padrão (Original)</option>
+                        <option value="PNC">PNC (Nas Centrais)</option>
+                        <option value="PAF">PAF (Até a Frente)</option>
+                        <option value="OUTRO">Outro</option>
+                    </select>
+                </div>
+                <div class="cc-form-group cc-variacao-select">
+                    <label for="selectVariacao">Configuração Carregada</label>
+                    <select id="cc_selectVariacao" onchange="cc_carregarConfiguracaoSelecionada()">
+                        <option value="">-- Selecione o Produto --</option>
+                    </select>
                 </div>
             </div>
-
-            <div class="config-panel" style="background: #edf2f7; border-left: 5px solid #4a5568;">
-                <h3 style="margin: 0 0 15px 0; color: #2c3e50;">📋 Identificação e Tipo de Produto</h3>
-                <div class="grid-produto">
-                    <div class="form-group">
-                        <label>Tipo de Produto:</label>
-                        <select id="prod_categoria" onchange="alternarFluxoCategoria()">
-                            <option value="KIT">Kit de Bancos / Acabamentos</option>
-                            <option value="PISO">Piso Automotivo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Código do Produto:</label>
-                        <input type="text" id="prod_codigo" placeholder="Ex: KIT-012" oninput="calcularTudo()">
-                    </div>
-                    <div class="form-group">
-                        <label>Nome do Produto / Modelo:</label>
-                        <input type="text" id="prod_nome" placeholder="Ex: Civic G10" oninput="calcularTudo()">
-                    </div>
-                    <div class="form-group" id="f-tipo-kit">
-                        <label>Tipo de Kit:</label>
-                        <select id="prod_tipo" onchange="calcularTudo()">
-                            <option value="Padrao">Padrão</option>
-                            <option value="Personalizado">Personalizado (Costura Programada)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="f-qtd-cores">
-                        <label>Quantidade de Cores do Kit:</label>
-                        <select id="prod_qtd_cores" onchange="renderizarCamposConsumoKit()">
-                            <option value="1">1 Cor</option>
-                            <option value="2">2 Cores</option>
-                            <option value="3">3 Cores</option>
-                            <option value="4">4 Cores</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-panel">
-                <h3 style="margin: 0 0 10px 0; color: #2c3e50;">1. Medição Geral de Materiais</h3>
-                <p style="margin: 0 0 15px 0; font-size: 13px; color: #718096;">Insira o comprimento de cada material em centímetros.</p>
-                
-                <div id="opcoes-corte-kit" style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px;">
-                    <div class="form-group" style="min-width: 250px;">
-                        <label>Possibilidade de Corte (Por Cor Selecionada):</label>
-                        <select id="tipo_corte" onchange="calcularTudo()">
-                            <option value="70/30">70/30 (70% Couro / 30% Vinil)</option>
-                            <option value="50/50">50/50 (50% Couro / 50% Vinil)</option>
-                            <option value="40/60">40/60 (40% Couro / 60% Vinil)</option>
-                            <option value="30/70">30/70 (30% Couro / 70% Vinil)</option>
-                            <option value="100V">100V (100% Vinil)</option>
-                            <option value="100C">100C (100% Couro)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="min-width: 150px;">
-                        <label>Utiliza Thermoflex?</label>
-                        <select id="usa_thermoflex" onchange="alternarThermoflex()">
-                            <option value="Nao">Não</option>
-                            <option value="Sim">Sim</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid-inputs-unicos" id="campos-consumo-kit"></div>
-
-                <div class="grid-inputs-unicos" id="campos-consumo-piso" style="display:none;">
-                    <div class="form-group"><label style="color:#3182ce;">Vinil Dublado com EVA - Comprimento (cm):</label><input type="number" id="alt_piso_eva" value="0" oninput="calcularTudo()"></div>
-                    <div class="form-group"><label style="color:#4a5568;">Vinil Sem Espuma (Piso) - Comprimento (cm):</label><input type="number" id="alt_piso_sem_esp" value="0" oninput="calcularTudo()"></div>
-                </div>
-            </div>
-
-            <div id="bloco-tabelas-kit">
-                <h3 class="section-title">2. Componentes Lineares dos Bancos (Metros Lineares)</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Parte do Kit</th><th>Guarnição J</th><th>Guarnição Seta</th><th>Velcro Original</th><th>Velcro Macho</th><th>Velcro Fêmea</th><th>Zíper</th><th>Paleta de Bolsa</th><th>Elástico</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpo-bancos"></tbody>
-                    </table>
-                </div>
-
-                <h3 class="section-title">3. Componentes Lineares de APC, Portas e Consoles (Metros Lineares)</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Parte do Kit</th><th>Guarnição J</th><th>Guarnição Seta</th><th>Velcro Original</th><th>Velcro Macho</th><th>Velcro Fêmea</th><th>Zíper</th><th>Elástico</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpo-apc"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div id="bloco-tabelas-piso" style="display:none;">
-                <h3 class="section-title">2. Componentes Lineares e Acessórios do Piso</h3>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Velcro Macho (m)</th><th>Velcro Fêmea (m)</th><th>Cadenino (m)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="number" class="input-table-piso" data-piso="VELCRO MACHO" value="0" oninput="calcularTudo()"></td>
-                                <td><input type="number" class="input-table-piso" data-piso="VELCRO FEMEA" value="0" oninput="calcularTudo()"></td>
-                                <td><input type="number" class="input-table-piso" data-piso="CADENINO" value="0" oninput="calcularTudo()"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="dashboard">
-                <h2>📊 Resumo Consolidado de Matéria-Prima (Com Margem de Perda)</h2>
-                <div class="dashboard-grid" id="dashboard-resultados"></div>
+            
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
+                <button type="button" class="cc-btn-action cc-btn-toggle-params" onclick="cc_toggleParametros()"><i class="fa-solid fa-sliders"></i> Parâmetros Globais</button>
+                <button type="button" class="cc-btn-action cc-btn-load" onclick="cc_buscarKitsPeloCodigo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                <button type="button" class="cc-btn-action cc-btn-save-db" onclick="cc_salvarConfiguracaoAtual()"><i class="fa-solid fa-floppy-disk"></i> Salvar Este Produto</button>
             </div>
         </div>
+
+        <!-- 1. CAMPOS DE CADASTRO DE COURO, VINIL, ESPUMA E CARPETE -->
+        <div class="cc-section-title"><i class="fa-solid fa-layer-group"></i> 1. Consumo de Matérias-Primas (Couro / Vinil x Espuma e Carpete)</div>
+        <div class="cc-table-responsive">
+            <table id="cc_mainTable">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">Composição</th>
+                        <th class="cc-text-right">Couro (m²)</th>
+                        <th class="cc-text-right cc-highlight-espuma-carpete">Espuma (Sep/m²)</th>
+                        <th class="cc-text-right cc-highlight-espuma-carpete">Carpete (Sep/m²)</th>
+                        <th class="cc-text-right">Vinil S/Espuma</th>
+                        <th class="cc-text-right">Vinil+Esp Fina</th>
+                        <th class="cc-text-right">Vinil+Esp Média</th>
+                        <th class="cc-text-right">Vinil+EVA</th>
+                        <th class="cc-text-right cc-col-total" style="width: 110px;">Líquido (Couro+Vinil)</th>
+                        <th class="cc-text-right cc-col-total" style="width: 110px; color: #0d6efd;">Bruto (Com Quebra)</th>
+                    </tr>
+                </thead>
+                <tbody id="cc_mainTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- 2. CADASTRO DE INSUMOS POR PEÇA -->
+        <div class="cc-section-title"><i class="fa-solid fa-scissors"></i> 2. Cadastro de Insumos (Por Peça / Aplicação)</div>
+        <div class="cc-table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 160px;">Insumo / Material</th>
+                        <th>Aplicações por Peça (Local | Metro Linear | Qtd Repetições)</th>
+                        <th style="width: 140px;" class="cc-text-right">Total Consumido</th>
+                    </tr>
+                </thead>
+                <tbody id="cc_insumosTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ABA 2: BANCO DE DADOS -->
+<div id="cc_abaCadastros" class="cc-view-section">
+    <div class="cc-container">
+        <div class="cc-section-title"><i class="fa-solid fa-boxes-stacked"></i> Todos os Produtos Cadastrados no Banco</div>
+        <div id="cc_listaBancoView" style="margin-top:10px;"></div>
+    </div>
+</div>
+
+<!-- ABA 3: RELATÓRIO GERAL E MÉDIAS DE CONSUMO -->
+<div id="cc_abaRelatorio" class="cc-view-section">
+    <div class="cc-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="cc-section-title" style="margin:0;"><i class="fa-solid fa-file-invoice"></i> Relatório Geral de Produtos e Média de Consumo</div>
+            <button class="cc-btn-action cc-btn-print no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir Relatório</button>
+        </div>
+
+        <!-- SEÇÃO 1: COMPARATIVO E MÉDIAS DE CONSUMO POR NOME DE PRODUTO -->
+        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-calculator"></i> 1. Média de Consumo entre Produtos com o Mesmo Nome</h3>
+        <div class="cc-table-responsive" style="margin-bottom: 25px;">
+            <table id="cc_tabelaMedias">
+                <thead>
+                    <tr>
+                        <th>Nome / Descrição do Produto</th>
+                        <th class="cc-text-center">Qtd de Cadastros/Códigos</th>
+                        <th class="cc-text-right">Média Líquida (m²)</th>
+                        <th class="cc-text-right" style="color: #0d6efd;">Média Bruta (m²)</th>
+                        <th>Códigos Relacionados</th>
+                    </tr>
+                </thead>
+                <tbody id="cc_tabelaMediasBody"></tbody>
+            </table>
+        </div>
+
+        <!-- SEÇÃO 2: DETALHAMENTO DE TODOS OS PRODUTOS CADASTRADOS -->
+        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-list"></i> 2. Listagem Detalhada de Todos os Registros</h3>
+        <div class="cc-table-responsive">
+            <table id="cc_tabelaRelatorioGeral">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição / Nome</th>
+                        <th>Tipo</th>
+                        <th>Cor / Personalização</th>
+                        <th class="cc-text-right">Líquido Total (m²)</th>
+                        <th class="cc-text-right" style="color: #0d6efd;">Bruto Total (m²)</th>
+                        <th class="cc-text-center">Atualizado Em</th>
+                    </tr>
+                </thead>
+                <tbody id="cc_tabelaRelatorioGeralBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+</div></div>
     </div>
 
     <div id="tabGerenciamento" style="display: none;">
@@ -1740,9 +1885,22 @@
 
         function finishTask(id) {
             const compTask = tasks.find(t => t.id === id); if (!compTask) return;
-            compTask.dateFinished = new Date().toISOString().split('T')[0];
+            const agora = new Date();
+            compTask.dateFinished = agora.toISOString().split('T')[0];
+            compTask.finishTime = agora.getTime();
+            compTask.finishedAt = agora.toISOString();
             compTask.onTime = compTask.dateFinished <= compTask.deadline;
-            compTask.userWhoFinished = currentUser; compTask.userWhoFinishedName = nomesExibicao[currentUser];
+            compTask.userWhoFinished = currentUser; 
+            compTask.userWhoFinishedName = nomesExibicao[currentUser];
+
+            if (!compTask.timeLogs) compTask.timeLogs = [];
+            // Fecha formalmente o rastreamento de tempo da tarefa.
+            compTask.timeLogs.push({
+                type: 'finish',
+                time: compTask.finishTime,
+                by: currentUser,
+                byName: nomesExibicao[currentUser]
+            });
 
             if (database) {
                 database.ref('tasks/historico/' + id).set(compTask).then(() => {
@@ -1809,7 +1967,7 @@
 
             while (ponteiro <= fimJanela) {
                 const diaSemana = ponteiro.getDay();
-                if (diaSemana >= 1 && diaSemana <= 6) {
+                if (diaSemana >= 1 && diaSemana <= 5) {
                     const inicioComercial = new Date(ponteiro); inicioComercial.setHours(hIn, mIn, 0, 0);
                     const fimComercial = new Date(ponteiro); fimComercial.setHours(hOut, mOut, 0, 0);
                     const maxStart = Math.max(startMs, inicioComercial.getTime()); const minEnd = Math.min(endMs, fimComercial.getTime());
@@ -1842,8 +2000,518 @@
             document.getElementById('goalDelayBar').style.width = `${Math.max(0, 100 - (tarefasAtrasadasSetor * 33))}%`;
         }
 
+
+        /* =========================================================
+           RELATÓRIO EXECUTIVO - MÉTRICAS QUINZENAIS E MENSAIS
+           ========================================================= */
+        let execTrendChart = null;
+
+        function execDateOnly(date) {
+            const d = new Date(date);
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        function execStartEnd(periodo, referenceDate = new Date()) {
+            const ref = execDateOnly(referenceDate);
+            let start, end;
+
+            if (periodo === 'quinzenal') {
+                if (ref.getDate() <= 15) {
+                    start = new Date(ref.getFullYear(), ref.getMonth(), 1);
+                    end = new Date(ref.getFullYear(), ref.getMonth(), 15, 23, 59, 59, 999);
+                } else {
+                    start = new Date(ref.getFullYear(), ref.getMonth(), 16);
+                    end = new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59, 999);
+                }
+            } else if (periodo === 'mensal') {
+                start = new Date(ref.getFullYear(), ref.getMonth(), 1);
+                end = new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59, 999);
+            } else if (periodo === 'semanal') {
+                const day = ref.getDay();
+                const diff = day === 0 ? -6 : 1 - day;
+                start = new Date(ref);
+                start.setDate(ref.getDate() + diff);
+                end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                end.setHours(23,59,59,999);
+            } else if (periodo === 'anual') {
+                start = new Date(ref.getFullYear(), 0, 1);
+                end = new Date(ref.getFullYear(), 11, 31, 23,59,59,999);
+            } else {
+                start = new Date(ref); start.setHours(0,0,0,0);
+                end = new Date(ref); end.setHours(23,59,59,999);
+            }
+            return {start, end};
+        }
+
+        function execPreviousPeriod(periodo, start, end) {
+            let prevStart, prevEnd;
+            const duration = end.getTime() - start.getTime();
+            if (periodo === 'mensal') {
+                prevStart = new Date(start.getFullYear(), start.getMonth()-1, 1);
+                prevEnd = new Date(start.getFullYear(), start.getMonth(), 0, 23,59,59,999);
+            } else if (periodo === 'quinzenal') {
+                if (start.getDate() === 1) {
+                    prevStart = new Date(start.getFullYear(), start.getMonth()-1, 16);
+                    prevEnd = new Date(start.getFullYear(), start.getMonth(), 0, 23,59,59,999);
+                } else {
+                    prevStart = new Date(start.getFullYear(), start.getMonth(), 1);
+                    prevEnd = new Date(start.getFullYear(), start.getMonth(), 15, 23,59,59,999);
+                }
+            } else if (periodo === 'semanal') {
+                prevEnd = new Date(start); prevEnd.setDate(start.getDate()-1); prevEnd.setHours(23,59,59,999);
+                prevStart = new Date(prevEnd); prevStart.setDate(prevEnd.getDate()-6); prevStart.setHours(0,0,0,0);
+            } else {
+                prevEnd = new Date(start.getTime()-1);
+                prevStart = new Date(prevEnd.getTime()-duration);
+            }
+            return {start:prevStart, end:prevEnd};
+        }
+
+        function execTaskCreatedDate(t) {
+            if (t.timestampCreated) return new Date(Number(t.timestampCreated));
+            // Compatibilidade com registros antigos sem timestampCreated.
+            if (t.dateFinished) return new Date(t.dateFinished + 'T12:00:00');
+            return null;
+        }
+
+        function execTaskFinishedDate(t) {
+            return t.dateFinished ? new Date(t.dateFinished + 'T12:00:00') : null;
+        }
+
+        function execTasksForPeriod(start, end) {
+            const all = [...(Array.isArray(tasks) ? tasks : []), ...(Array.isArray(historicTasks) ? historicTasks : [])];
+            const unique = new Map();
+            all.forEach(t => { if (t && t.id) unique.set(t.id, t); });
+            const allTasks = Array.from(unique.values());
+
+            const received = allTasks.filter(t => {
+                const d = execTaskCreatedDate(t);
+                return d && d >= start && d <= end;
+            });
+            const completed = allTasks.filter(t => {
+                const d = execTaskFinishedDate(t);
+                return d && d >= start && d <= end;
+            });
+            const onTime = completed.filter(t => t.onTime === true);
+            const late = completed.filter(t => t.onTime === false);
+
+            const today = execDateOnly(new Date());
+            const open = (Array.isArray(tasks) ? tasks : []).filter(t => t && !t.dateFinished);
+            const overdue = open.filter(t => t.deadline && execDateOnly(t.deadline) < today);
+
+            return {allTasks, received, completed, onTime, late, open, overdue};
+        }
+
+        function execPercent(a,b) {
+            return b > 0 ? Math.round((a / b) * 100) : 0;
+        }
+
+        function execVariation(current, previous) {
+            if (previous === 0) return current > 0 ? 100 : 0;
+            return Math.round(((current - previous) / previous) * 100);
+        }
+
+        function execFmtDate(d) {
+            return d.toLocaleDateString('pt-BR');
+        }
+
+        function execFmtPeriod(periodo, start, end) {
+            if (periodo === 'mensal') return start.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+            if (periodo === 'quinzenal') return `${execFmtDate(start)} a ${execFmtDate(end)}`;
+            if (periodo === 'semanal') return `${execFmtDate(start)} a ${execFmtDate(end)}`;
+            if (periodo === 'anual') return String(start.getFullYear());
+            return execFmtDate(start);
+        }
+
+        function execBuildTrend(data, start, end) {
+            const labels = [], values = [];
+            const cursor = new Date(start);
+
+            // Para mês, mostra dias; para quinzena, dias; para períodos longos,
+            // agrupa em blocos semanais para manter o gráfico legível.
+            const totalDays = Math.max(1, Math.round((end-start)/86400000)+1);
+            const stepDays = totalDays > 45 ? 7 : 1;
+
+            while (cursor <= end) {
+                const blockStart = new Date(cursor);
+                let blockEnd = new Date(cursor);
+                blockEnd.setDate(blockEnd.getDate() + stepDays - 1);
+                if (blockEnd > end) blockEnd = new Date(end);
+
+                const count = data.completed.filter(t => {
+                    const d = execTaskFinishedDate(t);
+                    return d && d >= blockStart && d <= new Date(blockEnd.getFullYear(),blockEnd.getMonth(),blockEnd.getDate(),23,59,59,999);
+                }).length;
+
+                labels.push(stepDays === 1 ? blockStart.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) :
+                    `${blockStart.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}–${blockEnd.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`);
+                values.push(count);
+
+                cursor.setDate(cursor.getDate()+stepDays);
+            }
+            return {labels, values};
+        }
+
+
+        /* ===== MÉTRICAS PRECISAS DE TEMPO POR TAREFA ===== */
+        const EXEC_JORNADA_IN = {h:7, m:12};
+        const EXEC_JORNADA_OUT = {h:17, m:0};
+
+        function execIsWeekday(d) {
+            const day = d.getDay();
+            return day >= 1 && day <= 5;
+        }
+
+        function execWorkingMinutesBetween(startMs, endMs) {
+            if (!startMs || !endMs || endMs <= startMs) return 0;
+            let total = 0;
+            let cursor = new Date(startMs);
+            const end = new Date(endMs);
+
+            while (cursor <= end) {
+                const day = cursor.getDay();
+                if (day >= 1 && day <= 5) {
+                    const ini = new Date(cursor);
+                    ini.setHours(EXEC_JORNADA_IN.h, EXEC_JORNADA_IN.m, 0, 0);
+                    const fim = new Date(cursor);
+                    fim.setHours(EXEC_JORNADA_OUT.h, EXEC_JORNADA_OUT.m, 0, 0);
+                    const a = Math.max(startMs, ini.getTime());
+                    const b = Math.min(endMs, fim.getTime());
+                    if (a < b) total += b - a;
+                }
+                cursor.setDate(cursor.getDate()+1);
+                cursor.setHours(0,0,0,0);
+            }
+            return Math.round(total / 60000);
+        }
+
+        function execTaskTrackedSegments(t, userKey) {
+            if (!t || !Array.isArray(t.timeLogs)) return {minutes:0, exact:false, started:false};
+            const logs = t.timeLogs
+                .filter(l => l && l.by === userKey && Number.isFinite(Number(l.time)))
+                .map(l => ({type:l.type, time:Number(l.time)}))
+                .sort((a,b)=>a.time-b.time);
+
+            let activeStart = null;
+            let minutes = 0;
+            let started = false;
+            let exact = false;
+
+            for (const log of logs) {
+                if (log.type === 'start') {
+                    activeStart = log.time;
+                    started = true;
+                } else if (log.type === 'pause' || log.type === 'finish') {
+                    if (activeStart !== null && log.time > activeStart) {
+                        minutes += execWorkingMinutesBetween(activeStart, log.time);
+                        if (log.type === 'finish') exact = true;
+                    }
+                    activeStart = null;
+                }
+            }
+
+            // Fallback para tarefa antiga que possui início mas não possui finishTime:
+            // não inventamos a duração; ela permanece "não exata".
+            return {minutes, exact, started};
+        }
+
+        function execTaskDurationForUser(t, userKey) {
+            return execTaskTrackedSegments(t, userKey);
+        }
+
+        function execBusinessDaysInclusive(start, end) {
+            let count = 0;
+            const d = new Date(start);
+            d.setHours(0,0,0,0);
+            const e = new Date(end);
+            e.setHours(0,0,0,0);
+            while (d <= e) {
+                if (execIsWeekday(d)) count++;
+                d.setDate(d.getDate()+1);
+            }
+            return count;
+        }
+
+        function execCapacityMinutes(start, end) {
+            return execBusinessDaysInclusive(start,end) * 588; // 9h48 por dia
+        }
+
+        function execEmployeeTimeMetrics(completed, userKey, start, end) {
+            const mine = completed.filter(t => t.userWhoFinished === userKey);
+            let tracked = 0, exactTasks = 0;
+            mine.forEach(t => {
+                const r = execTaskDurationForUser(t,userKey);
+                if (r.exact) {
+                    tracked += r.minutes;
+                    exactTasks++;
+                }
+            });
+            const capacity = execCapacityMinutes(start,end);
+            return {
+                tasks: mine.length,
+                tracked,
+                exactTasks,
+                capacity,
+                occupancy: capacity ? Math.round((tracked/capacity)*100) : 0,
+                avg: exactTasks ? Math.round(tracked/exactTasks) : 0
+            };
+        }
+
+        function updateExecutiveReport() {
+            const select = document.getElementById('reportPeriod');
+            if (!select) return;
+            const periodo = select.value;
+            const {start,end} = execStartEnd(periodo);
+            const prev = execPreviousPeriod(periodo,start,end);
+            const cur = execTasksForPeriod(start,end);
+            const old = execTasksForPeriod(prev.start,prev.end);
+
+            const sla = execPercent(cur.onTime.length, cur.completed.length);
+            const oldSla = execPercent(old.onTime.length, old.completed.length);
+            const variation = execVariation(cur.completed.length, old.completed.length);
+
+            const label = document.getElementById('execPeriodLabel');
+            if (label) label.innerText = `Período: ${execFmtPeriod(periodo,start,end)} | Comparação: ${execFmtPeriod(periodo,prev.start,prev.end)}`;
+
+            document.getElementById('execRecebidas').innerText = cur.received.length;
+            document.getElementById('execConcluidas').innerText = cur.completed.length;
+            document.getElementById('execSLA').innerText = `${sla}%`;
+            document.getElementById('execBacklog').innerText = cur.open.length;
+            document.getElementById('execAtrasadas').innerText = cur.overdue.length;
+            document.getElementById('execVariacao').innerText = `${variation > 0 ? '+' : ''}${variation}%`;
+            document.getElementById('execRecebidasSub').innerText = `${cur.received.length} entradas registradas`;
+            document.getElementById('execConcluidasSub').innerText = `${cur.onTime.length} no prazo | ${cur.late.length} fora do prazo`;
+            document.getElementById('execBacklogSub').innerText = `${cur.open.filter(t => !t.deadline || execDateOnly(t.deadline) >= execDateOnly(new Date())).length} dentro do prazo`;
+            document.getElementById('execVariacaoSub').innerText = `${old.completed.length} entregas no período anterior`;
+
+            // Status visual do SLA
+            const slaEl = document.getElementById('execSLA');
+            slaEl.className = 'value ' + (sla >= 90 ? 'exec-positive' : sla >= 75 ? 'exec-warning' : 'exec-danger');
+
+            // Equipe
+            const teamKeys = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+            const team = teamKeys.map(key => {
+                const mine = cur.completed.filter(t => t.userWhoFinished === key);
+                const mineOn = mine.filter(t => t.onTime === true);
+                return {key, name: nomesExibicao[key] || key, total:mine.length, on:mineOn.length, pct:execPercent(mineOn.length,mine.length)};
+            }).sort((a,b)=>b.total-a.total || b.pct-a.pct);
+
+            const body = document.getElementById('execTeamBody');
+            body.innerHTML = team.map(x => `
+                <tr>
+                    <td><strong>${x.name}</strong></td>
+                    <td class="num">${x.total}</td>
+                    <td class="num">${x.on}</td>
+                    <td class="num">${x.total ? x.pct+'%' : '—'}</td>
+                </tr>`).join('');
+
+            const interpret = document.getElementById('execInterpretacao');
+            if (cur.completed.length === 0) {
+                interpret.innerText = 'Ainda não há entregas concluídas registradas no período selecionado. Evite interpretar ausência de dados como baixa produtividade.';
+            } else if (sla >= 90) {
+                interpret.innerText = `O setor entregou ${cur.completed.length} demanda(s) no período, com ${sla}% de cumprimento de prazo, acima da referência interna de 90%.`;
+            } else {
+                interpret.innerText = `O setor entregou ${cur.completed.length} demanda(s) no período. O cumprimento de prazo foi de ${sla}%, abaixo da referência interna de 90%, indicando oportunidade de melhoria no planejamento e acompanhamento dos prazos.`;
+            }
+
+            // Comparativo
+            const compare = [
+                ['Demandas recebidas', cur.received.length, old.received.length],
+                ['Entregas concluídas', cur.completed.length, old.completed.length],
+                ['Cumprimento de prazo', sla, oldSla],
+                ['Atrasos ativos', cur.overdue.length, old.overdue.length]
+            ];
+            document.getElementById('execCompareBody').innerHTML = compare.map(row => {
+                const v = execVariation(row[1],row[2]);
+                const suffix = row[0] === 'Cumprimento de prazo' ? ' p.p.' : '%';
+                return `<tr><td><strong>${row[0]}</strong></td><td class="num">${row[1]}${row[0]==='Cumprimento de prazo'?'%':''}</td><td class="num">${row[2]}${row[0]==='Cumprimento de prazo'?'%':''}</td><td class="num">${v>0?'+':''}${v}${suffix}</td></tr>`;
+            }).join('');
+
+            // Tempo produtivo, capacidade e ocupação
+            const totalCapacidade = execCapacityMinutes(start,end);
+            let totalTempoRastreado = 0, totalTarefasExatas = 0;
+            const capacityRows = team.map(x => {
+                const tm = execEmployeeTimeMetrics(cur.completed,x.key,start,end);
+                totalTempoRastreado += tm.tracked;
+                totalTarefasExatas += tm.exactTasks;
+                return {...x,...tm};
+            });
+
+            const ocupacaoGeral = totalCapacidade ? Math.round((totalTempoRastreado/totalCapacidade)*100) : 0;
+            const tempoMedioGeral = totalTarefasExatas ? Math.round(totalTempoRastreado/totalTarefasExatas) : 0;
+
+            const fmtMin = (min) => {
+                if (!min || min < 1) return '0m';
+                const h = Math.floor(min/60), m = min%60;
+                return h ? `${h}h ${m}m` : `${m}m`;
+            };
+
+            document.getElementById('execHorasTarefas').innerText = fmtMin(totalTempoRastreado);
+            document.getElementById('execHorasTarefasSub').innerText = `${totalTarefasExatas} tarefa(s) com encerramento rastreável`;
+            document.getElementById('execOcupacao').innerText = `${ocupacaoGeral}%`;
+            document.getElementById('execOcupacaoSub').innerText = `${fmtMin(totalCapacidade)} de capacidade útil`;
+            document.getElementById('execTempoMedio').innerText = fmtMin(tempoMedioGeral);
+            document.getElementById('execTempoMedioSub').innerText = `${totalTarefasExatas} tarefa(s) com tempo exato`;
+            const tarefasHoraGeral = totalTempoRastreado > 0 ? (totalTarefasExatas / (totalTempoRastreado / 60)).toFixed(2) : '0';
+            document.getElementById('execTarefasHora').innerText = tarefasHoraGeral;
+
+            const capBody = document.getElementById('execCapacityBody');
+            capBody.innerHTML = capacityRows.map(x => `
+                <tr>
+                    <td><strong>${x.name}</strong></td>
+                    <td class="num">${execBusinessDaysInclusive(start,end)}</td>
+                    <td class="num">${fmtMin(x.capacity)}</td>
+                    <td class="num">${fmtMin(x.tracked)}</td>
+                    <td class="num">${x.exactTasks ? x.occupancy+'%' : '—'}</td>
+                    <td class="num">${x.tasks}</td>
+                    <td class="num">${x.tracked > 0 ? (x.exactTasks/(x.tracked/60)).toFixed(2) : '—'}</td>
+                    <td class="num">${x.exactTasks ? fmtMin(x.avg) : '—'}</td>
+                </tr>`).join('');
+
+            // Tendência
+            const trend = execBuildTrend(cur,start,end);
+            const canvas = document.getElementById('execTrendChart');
+            if (canvas && window.Chart) {
+                if (execTrendChart) execTrendChart.destroy();
+                execTrendChart = new Chart(canvas.getContext('2d'), {
+                    type:'bar',
+                    data:{labels:trend.labels,datasets:[{label:'Entregas concluídas',data:trend.values,backgroundColor:'#2980b9'}]},
+                    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+                });
+            }
+
+            // Guarda os dados para exportação.
+            window._execReportData = {periodo,start,end,prev,cur,old,sla,oldSla,variation,team,trend,totalCapacidade,totalTempoRastreado,totalTarefasExatas,ocupacaoGeral,tempoMedioGeral,tarefasHoraGeral,capacityRows};
+        }
+
+        function gerarRelatorioExecutivoPDF() {
+            if (!window.jspdf) { alert('Biblioteca PDF não carregada.'); return; }
+            updateExecutiveReport();
+            const d = window._execReportData;
+            if (!d) return;
+
+            const {jsPDF} = window.jspdf;
+            const doc = new jsPDF('p','mm','a4');
+            let y = 16;
+            const titulo = 'ENGENHARIA E MODELAGEM';
+            const subtitulo = 'RELATÓRIO EXECUTIVO DE PRODUTIVIDADE';
+
+            doc.setFontSize(16); doc.setTextColor(44,62,80); doc.text(titulo,14,y); y += 7;
+            doc.setFontSize(11); doc.setTextColor(41,128,185); doc.text(subtitulo,14,y); y += 6;
+            doc.setFontSize(8); doc.setTextColor(100);
+            doc.text(`Período: ${execFmtPeriod(d.periodo,d.start,d.end)} | Gerado em: ${new Date().toLocaleString('pt-BR')}`,14,y); y += 9;
+
+            const sla = d.sla;
+            const total = d.cur.completed.length;
+            const textoExecutivo = total === 0
+                ? 'Não há entregas concluídas registradas no período. O resultado deve ser tratado como ausência de base, e não como indicador de baixa produtividade.'
+                : `No período, o setor registrou ${d.cur.received.length} demanda(s) recebida(s) e ${total} entrega(s) concluída(s), com ${sla}% de cumprimento de prazo. O comparativo anterior registrou ${d.old.completed.length} entrega(s).`;
+
+            doc.setFontSize(9); doc.setTextColor(55);
+            const linhasTexto = doc.splitTextToSize(textoExecutivo,180);
+            doc.text(linhasTexto,14,y); y += linhasTexto.length*4.5 + 5;
+
+            doc.setFontSize(11); doc.setTextColor(44,62,80); doc.text('1. Indicadores-chave',14,y); y += 4;
+            doc.autoTable({
+                startY:y,
+                head:[['Indicador','Período atual','Período anterior','Variação']],
+                body:[
+                    ['Demandas recebidas',d.cur.received.length,d.old.received.length,`${d.variation>0?'+':''}${execVariation(d.cur.received.length,d.old.received.length)}%`],
+                    ['Entregas concluídas',d.cur.completed.length,d.old.completed.length,`${d.variation>0?'+':''}${d.variation}%`],
+                    ['Cumprimento de prazo',`${sla}%`,`${d.oldSla}%`,`${sla-d.oldSla>0?'+':''}${sla-d.oldSla} p.p.`],
+                    ['Backlog atual',d.cur.open.length,d.old.open.length,`${execVariation(d.cur.open.length,d.old.open.length)>0?'+':''}${execVariation(d.cur.open.length,d.old.open.length)}%`],
+                    ['Atrasos ativos',d.cur.overdue.length,d.old.overdue.length,`${execVariation(d.cur.overdue.length,d.old.overdue.length)>0?'+':''}${execVariation(d.cur.overdue.length,d.old.overdue.length)}%`]
+                ],
+                theme:'grid', headStyles:{fillColor:[41,128,185]}, styles:{fontSize:8}
+            });
+            y = doc.lastAutoTable.finalY + 9;
+
+            if (y > 245) { doc.addPage(); y=16; }
+            doc.setFontSize(11); doc.setTextColor(44,62,80); doc.text('2. Produção por colaborador',14,y); y += 4;
+            doc.autoTable({
+                startY:y,
+                head:[['Colaborador','Entregas','No prazo','Cumprimento']],
+                body:d.team.map(x=>[x.name,x.total,x.on,x.total?`${x.pct}%`:'—']),
+                theme:'striped', headStyles:{fillColor:[44,62,80]}, styles:{fontSize:8}
+            });
+            y = doc.lastAutoTable.finalY + 9;
+
+            if (y > 245) { doc.addPage(); y=16; }
+            doc.setFontSize(11); doc.setTextColor(44,62,80); doc.text('3. Tempo produtivo e capacidade',14,y); y += 4;
+            const fmtPdfMin = (min) => {
+                if (!min || min < 1) return '0m';
+                const h=Math.floor(min/60), m=min%60;
+                return h ? `${h}h ${m}m` : `${m}m`;
+            };
+            doc.autoTable({
+                startY:y,
+                head:[['Indicador','Resultado']],
+                body:[
+                    ['Capacidade útil do período',fmtPdfMin(d.totalCapacidade)],
+                    ['Tempo rastreado em tarefas',fmtPdfMin(d.totalTempoRastreado)],
+                    ['Ocupação produtiva',`${d.ocupacaoGeral}%`],
+                    ['Tempo médio por tarefa rastreável',fmtPdfMin(d.tempoMedioGeral)],
+                    ['Tarefas por hora rastreada',d.tarefasHoraGeral],
+                    ['Tarefas com encerramento rastreável',d.totalTarefasExatas]
+                ],
+                theme:'grid', headStyles:{fillColor:[41,128,185]}, styles:{fontSize:8}
+            });
+            y = doc.lastAutoTable.finalY + 9;
+
+            if (y > 245) { doc.addPage(); y=16; }
+            doc.setFontSize(11); doc.setTextColor(44,62,80); doc.text('4. Conclusão gerencial',14,y); y += 5;
+            const conclusao = total === 0
+                ? 'Base insuficiente para avaliar produtividade no período.'
+                : (sla >= 90
+                    ? `O setor apresentou desempenho consistente em prazo, com ${sla}% das entregas concluídas dentro do prazo. A evolução do volume deve ser acompanhada em conjunto com o cumprimento de prazo e o backlog.`
+                    : `O setor apresentou ${total} entrega(s), porém com cumprimento de prazo de ${sla}%. Recomenda-se acompanhamento das demandas em atraso e revisão das prioridades e capacidade para o próximo ciclo.`);
+            doc.setFontSize(9); doc.setTextColor(55);
+            doc.text(doc.splitTextToSize(conclusao,180),14,y);
+
+            doc.save(`Relatorio_Executivo_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        function exportarRelatorioExecutivoExcel() {
+            updateExecutiveReport();
+            const d = window._execReportData;
+            if (!d || !window.XLSX) { alert('Biblioteca Excel não carregada.'); return; }
+
+            const wb = XLSX.utils.book_new();
+            const resumo = [
+                ['RELATÓRIO EXECUTIVO DE PRODUTIVIDADE'],
+                ['Período',execFmtPeriod(d.periodo,d.start,d.end)],
+                [],
+                ['Indicador','Período Atual','Período Anterior','Variação'],
+                ['Demandas recebidas',d.cur.received.length,d.old.received.length,execVariation(d.cur.received.length,d.old.received.length)+'%'],
+                ['Entregas concluídas',d.cur.completed.length,d.old.completed.length,d.variation+'%'],
+                ['Cumprimento de prazo',d.sla+'%',d.oldSla+'%',(d.sla-d.oldSla)+' p.p.'],
+                ['Backlog atual',d.cur.open.length,d.old.open.length,execVariation(d.cur.open.length,d.old.open.length)+'%'],
+                ['Atrasos ativos',d.cur.overdue.length,d.old.overdue.length,execVariation(d.cur.overdue.length,d.old.overdue.length)+'%']
+            ];
+            XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(resumo),'Resumo Executivo');
+
+            const equipe = [['Colaborador','Entregas','No prazo','Cumprimento']];
+            d.team.forEach(x=>equipe.push([x.name,x.total,x.on,x.total?x.pct/100:null]));
+            XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(equipe),'Equipe');
+
+            const detalhe = [['ID','Modelo/Tarefa','Responsáveis','Solicitante','Prazo','Conclusão','No prazo']];
+            d.cur.completed.forEach(t=>detalhe.push([
+                t.id||'',t.title||'',t.responsibles ? t.responsibles.map(r=>nomesExibicao[r]||r).join(', '):'',
+                t.requester||'',t.deadline||'',t.dateFinished||'',t.onTime?'Sim':'Não'
+            ]));
+            XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(detalhe),'Entregas do Período');
+
+            const capacidade = [['Colaborador','Dias úteis','Capacidade (min)','Tempo em tarefas (min)','Ocupação','Tarefas','Tarefas/h','Tarefas com tempo exato','Tempo médio (min)']];
+            d.capacityRows.forEach(x => capacidade.push([x.name,execBusinessDaysInclusive(d.start,d.end),x.capacity,x.tracked,x.exactTasks?x.occupancy/100:null,x.tasks,x.tracked>0?(x.exactTasks/(x.tracked/60)):null,x.exactTasks,x.exactTasks?x.avg:null]));
+            XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(capacidade),'Capacidade e Tempo');
+
+            XLSX.writeFile(wb,`Relatorio_Executivo_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
         function updateReportDashboard() {
             if (document.getElementById('tabRelatorios').style.display === 'none') return;
+            updateExecutiveReport();
             const metrics = getFilteredMetrics();
             
             document.getElementById('mNoPrazo').innerText = metrics.noPrazo;
@@ -2152,22 +2820,27 @@
                 doc.text("4. Dados e Resumo de Matéria-Prima (Calculadora de Consumo)", 14, currentY);
                 currentY += 4;
 
-                const cat = document.getElementById('prod_categoria').value;
-                const codigo = document.getElementById('prod_codigo').value || "Não informado";
-                const nomeProd = document.getElementById('prod_nome').value || "Não informado";
+                const codigo = document.getElementById('cc_codigo')?.value || "Não informado";
+                const nomeProd = document.getElementById('cc_descricao')?.value || "Não informado";
+                const cat = document.getElementById('cc_tipoCategoria')?.value || "Não informado";
+                const padrao = document.getElementById('cc_padraoCor')?.value || "";
+                const personalizacao = document.getElementById('cc_tipoKit')?.value || "";
 
                 const rowsConsumo = [];
-                rowsConsumo.push(["Identificação do Produto", `Código: ${codigo} | Modelo: ${nomeProd} | Categoria: ${cat}`]);
+                rowsConsumo.push(["Identificação do Produto", `Código: ${codigo} | Modelo: ${nomeProd} | Tipo: ${cat}`]);
+                rowsConsumo.push(["Configuração", `${padrao} | ${personalizacao}`]);
 
-                const cardsConsumo = document.querySelectorAll('#dashboard-resultados .card');
-                cardsConsumo.forEach(card => {
-                    const title = card.querySelector('.card-title')?.innerText || '';
-                    const val = card.querySelector('.card-value')?.innerText || '';
-                    const sub = card.querySelector('.card-sub')?.innerText || '';
-                    if (title && val) {
-                        rowsConsumo.push([title, `${val} ${sub ? '(' + sub + ')' : ''}`]);
+                if (typeof cc_obterBancoLocal === 'function') {
+                    const bancoAtual = cc_obterBancoLocal();
+                    const registro = bancoAtual.find(item => item.codigo === codigo && (item.descricao || '') === nomeProd);
+                    if (registro) {
+                        rowsConsumo.push(["Consumo Líquido Total", `${Number(registro.totalLiquido || 0).toFixed(2)} m²`]);
+                        rowsConsumo.push(["Consumo Bruto Total", `${Number(registro.totalBruto || 0).toFixed(2)} m²`]);
+                        rowsConsumo.push(["Atualizado Em", registro.dataAtualizacao || "Não informado"]);
+                    } else {
+                        rowsConsumo.push(["Status", "Produto atual ainda não foi salvo no Banco de Dados."]);
                     }
-                });
+                }
 
                 doc.autoTable({
                     startY: currentY,
@@ -2250,284 +2923,552 @@
             document.getElementById('taskForm').reset(); alert("Tarefa enviada!");
         });
 
-        /* --- LÓGICA DA CALCULADORA DE CONSUMO --- */
-        const partesBancos = [
-            { id: "ED", letra: "B" }, { id: "AD", letra: "C" }, { id: "ET", letra: "D" },
-            { id: "AT", letra: "E" }, { id: "ETPM", letra: "G" }, { id: "ATPM", letra: "H" }
-        ];
+        /* --- NOVA LÓGICA DA FERRAMENTA DE COMPOSIÇÃO E CONSUMO --- */
 
-        const partesAPC = [
-            { id: "PORTAS", letra: "F" }, { id: "PAINEL", letra: "F" },
-            { id: "APC", letra: "A" }, { id: "APB", letra: "A" }, { id: "CONSOLE", letra: "A" }
-        ];
+    const composicoesPadrao = ["100% COURO", "70/30", "50/50", "40/60", "30/70", "100% VINIL"];
+    const materiaisPrincipais = ["couro", "espuma", "carpete", "v1", "v2", "v3", "v4"];
 
-        function toggleAdminTool() {
-            const p = document.getElementById('painel-admin-tool');
-            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+    const pecasBidim = [
+        { id: "ED", label: "ED (B)" }, { id: "AD", label: "AD (C)" },
+        { id: "ET", label: "ET (D)" }, { id: "AT", label: "AT (E)" },
+        { id: "ETPM", label: "ETPM (G)" }, { id: "ATPM", label: "ATPM (H)" }
+    ];
+
+    const pecasGerais = [
+        ...pecasBidim,
+        { id: "APB_DIAN", label: "A - APB Dianteiro" }, { id: "APB_TRAS", label: "A - APB Traseiro" },
+        { id: "APOIO_CAB", label: "A - Apoio de Cabeça" }, { id: "CONSOLE", label: "A - Console" }
+    ];
+
+    const listaInsumos = [
+        { id: "bidim", nome: "Bidim", pecas: pecasBidim, unidade: "m" },
+        { id: "zipper", nome: "Zíper", pecas: pecasGerais, unidade: "m" },
+        { id: "velcro_macho", nome: "Velcro Macho", pecas: pecasGerais, unidade: "m" },
+        { id: "velcro_femea", nome: "Velcro Fêmea", pecas: pecasGerais, unidade: "m" },
+        { id: "velcro_original", nome: "Velcro Original", pecas: pecasGerais, unidade: "m" },
+        { id: "guarnicao_seta", nome: "Guarnição (Seta)", pecas: pecasGerais, unidade: "m" },
+        { id: "guarnicao_j", nome: "Guarnição (J)", pecas: pecasGerais, unidade: "m" },
+        { id: "linha", nome: "Linha de Costura", pecas: pecasGerais, unidade: "m" }
+    ];
+
+    // --- TOGGLE DA BARRA DE PARÂMETROS ---
+    function cc_toggleParametros() {
+        const bar = document.getElementById('cc_barParametros');
+        bar.classList.toggle('cc-visible');
+    }
+
+    // --- FORMATAÇÃO INTELIGENTE ---
+    function cc_formatarEntradaInteligente(inputElement) {
+        let val = inputElement.value.trim();
+        if (val === "" || val === ",") { inputElement.value = "0,00"; return; }
+        if (val.startsWith(",") || val.startsWith(".")) val = "0" + val;
+        val = val.replace(".", ",");
+        if (!val.includes(",")) val = val + ",00";
+        else {
+            let partes = val.split(",");
+            let inteira = partes[0] || "0";
+            let decimal = partes[1] || "00";
+            if (decimal.length === 1) decimal = decimal + "0";
+            if (decimal.length > 2) decimal = decimal.substring(0, 2);
+            val = `${inteira},${decimal}`;
         }
+        inputElement.value = val;
+    }
 
-        function alternarThermoflex() {
-            const usa = document.getElementById('usa_thermoflex').value;
-            const el = document.getElementById('f-alt-thermo');
-            if(el) {
-                el.style.display = (usa === 'Sim') ? 'flex' : 'none';
-                if(usa === 'Nao') document.getElementById('alt_thermo').value = 0;
+    function cc_parseVal(str) { 
+        if(!str) return 0;
+        return parseFloat(str.toString().replace(/\./g, '').replace(',', '.')) || 0; 
+    }
+
+    function cc_formatVal(num) { 
+        return num.toFixed(2).replace('.', ','); 
+    }
+
+    function cc_criarCellHTML(matClass, callbackCalculo, valor = "0,00", ePrimeiro = true) {
+        return `
+            <div class="cc-input-row">
+                <span class="cc-color-label">Cor 1</span>
+                <input type="text" class="cc-table-input ${matClass}" value="${valor}" 
+                    onfocus="this.select()" 
+                    onblur="cc_formatarEntradaInteligente(this); ${callbackCalculo}();" 
+                    oninput="${callbackCalculo}()">
+                ${ePrimeiro 
+                    ? `<button type="button" class="cc-btn-add-item" onclick="cc_adicionarCampoMedida(this, '${matClass}', '${callbackCalculo}')"><i class="fa-solid fa-plus"></i></button>`
+                    : `<button type="button" class="cc-btn-remove-item" onclick="cc_removerCampoMedida(this, '${callbackCalculo}')"><i class="fa-solid fa-xmark"></i></button>`
+                }
+            </div>
+        `;
+    }
+
+    function cc_adicionarCampoMedida(btn, matClass, callbackCalculo, valInit = "0,00") {
+        const container = btn.closest('.cc-multi-input-container');
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cc_criarCellHTML(matClass, callbackCalculo, valInit, false);
+        container.appendChild(tempDiv.firstElementChild);
+        cc_atualizarRotulosCores(container);
+        window[callbackCalculo]();
+    }
+
+    function cc_removerCampoMedida(btn, callbackCalculo) {
+        const container = btn.closest('.cc-multi-input-container');
+        btn.closest('.cc-input-row').remove();
+        cc_atualizarRotulosCores(container);
+        window[callbackCalculo]();
+    }
+
+    function cc_atualizarRotulosCores(container) {
+        const rows = container.querySelectorAll('.cc-input-row');
+        rows.forEach((row, index) => {
+            const label = row.querySelector('.cc-color-label');
+            if (label) {
+                label.style.display = rows.length > 1 ? 'inline-block' : 'none';
+                label.innerText = `Cor ${index + 1}`;
             }
-            calcularTudo();
-        }
+        });
+    }
 
-        function alternarFluxoCategoria() {
-            const cat = document.getElementById('prod_categoria').value;
-            const isKit = cat === 'KIT';
+    function cc_inicializarTabelaPrincipal() {
+        const mainTbody = document.getElementById('cc_mainTableBody');
+        mainTbody.innerHTML = "";
+        composicoesPadrao.forEach(comp => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-comp', comp);
+            let colsHTML = `<td style="font-weight: 600;">${comp}</td>`;
+            materiaisPrincipais.forEach(mat => {
+                const bgExtra = (mat === 'espuma' || mat === 'carpete') ? 'cc-highlight-espuma-carpete' : '';
+                colsHTML += `<td class="${bgExtra}"><div class="cc-multi-input-container">${cc_criarCellHTML('val-' + mat, 'cc_recalcularTabelaPrincipal', '0,00', true)}</div></td>`;
+            });
+            colsHTML += `<td class="cc-text-right cc-col-total col-calc-liquido">0,00</td>`;
+            colsHTML += `<td class="cc-text-right cc-col-total col-calc-bruto" style="color: #0d6efd;">0,00</td>`;
+            tr.innerHTML = colsHTML;
+            mainTbody.appendChild(tr);
+        });
+        cc_recalcularTabelaPrincipal();
+    }
 
-            document.getElementById('f-tipo-kit').style.display = isKit ? 'flex' : 'none';
-            document.getElementById('f-qtd-cores').style.display = isKit ? 'flex' : 'none';
-            document.getElementById('opcoes-corte-kit').style.display = isKit ? 'flex' : 'none';
+    function cc_recalcularTabelaPrincipal() {
+        const qCouro = (parseFloat(document.getElementById('cc_paramQuebraCouro').value) || 0) / 100;
+        const qVinil = (parseFloat(document.getElementById('cc_paramQuebraVinil').value) || 0) / 100;
 
-            document.getElementById('campos-consumo-kit').style.display = isKit ? 'grid' : 'none';
-            document.getElementById('campos-consumo-piso').style.display = isKit ? 'none' : 'grid';
-
-            document.getElementById('bloco-tabelas-kit').style.display = isKit ? 'block' : 'none';
-            document.getElementById('bloco-tabelas-piso').style.display = isKit ? 'none' : 'block';
-
-            if(isKit) renderizarCamposConsumoKit();
-            calcularTudo();
-        }
-
-        function renderizarCamposConsumoKit() {
-            const qtdCores = parseInt(document.getElementById('prod_qtd_cores').value) || 1;
-            const container = document.getElementById('campos-consumo-kit');
+        document.querySelectorAll('#cc_mainTable tbody tr').forEach(row => {
+            let somaCouro = 0, somaVinil = 0;
+            row.querySelectorAll('.val-couro').forEach(inp => somaCouro += cc_parseVal(inp.value));
             
-            const valoresAntigos = {};
-            container.querySelectorAll('input').forEach(i => valoresAntigos[i.id] = i.value);
-
-            let html = '';
-
-            for(let i = 1; i <= qtdCores; i++) {
-                let sufixo = qtdCores > 1 ? ` Cor ${i}` : '';
-                let idSufixo = `_c${i}`;
-
-                html += `
-                    <div class="form-group"><label style="color:#dd6b20;">COURO${sufixo} - Comprimento (cm):</label><input type="number" id="alt_couro${idSufixo}" value="${valoresAntigos[`alt_couro${idSufixo}`] || 0}" oninput="calcularTudo()"></div>
-                    <div class="form-group"><label>Vinil Espuma Média${sufixo} - Comprimento (cm):</label><input type="number" id="alt_v_media${idSufixo}" value="${valoresAntigos[`alt_v_media${idSufixo}`] || 0}" oninput="calcularTudo()"></div>
-                    <div class="form-group"><label>Vinil Espuma Fina${sufixo} - Comprimento (cm):</label><input type="number" id="alt_v_fina${idSufixo}" value="${valoresAntigos[`alt_v_fina${idSufixo}`] || 0}" oninput="calcularTudo()"></div>
-                    <div class="form-group"><label>Vinil Sem Espuma${sufixo} - Comprimento (cm):</label><input type="number" id="alt_v_sem${idSufixo}" value="${valoresAntigos[`alt_v_sem${idSufixo}`] || 0}" oninput="calcularTudo()"></div>
-                `;
-            }
-
-            html += `
-                <div class="form-group"><label style="color:#38a169;">Espuma Média - Comprimento (cm):</label><input type="number" id="alt_e_media" value="${valoresAntigos['alt_e_media'] || 0}" oninput="calcularTudo()"></div>
-                <div class="form-group"><label style="color:#38a169;">Espuma Fina - Comprimento (cm):</label><input type="number" id="alt_e_fina" value="${valoresAntigos['alt_e_fina'] || 0}" oninput="calcularTudo()"></div>
-            `;
-
-            const usaThermo = document.getElementById('usa_thermoflex').value;
-            let displayThermo = usaThermo === "Sim" ? "flex" : "none";
-            html += `
-                <div class="form-group" id="f-alt-thermo" style="display:${displayThermo};"><label style="color:#805ad5;">Thermoflex - Comprimento (cm):</label><input type="number" id="alt_thermo" value="${valoresAntigos['alt_thermo'] || 0}" oninput="calcularTudo()"></div>
-            `;
-
-            container.innerHTML = html;
-            calcularTudo();
-        }
-
-        function inicializarConsumoTool() {
-            const cb = document.getElementById('corpo-bancos');
-            if (!cb) return;
-            cb.innerHTML = '';
-            partesBancos.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="part-header">${p.id} (${p.letra})</td>
-                    <td><input type="number" class="input-table" data-mat="GUARNIÇÃO J" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="GUARNIÇÃO SETA" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO ORIGINAL" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO MACHO" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO FEMEA" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="ZIPPER" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="PALETA DE BOLSA" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="ELÁSTICO" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                `;
-                cb.appendChild(tr);
+            ["v1", "v2", "v3", "v4"].forEach(mat => {
+                row.querySelectorAll(`.val-${mat}`).forEach(inp => somaVinil += cc_parseVal(inp.value));
             });
 
-            const ca = document.getElementById('corpo-apc');
-            if (!ca) return;
-            ca.innerHTML = '';
-            partesAPC.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="part-header">${p.id} (${p.letra})</td>
-                    <td><input type="number" class="input-table" data-mat="GUARNIÇÃO J" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="GUARNIÇÃO SETA" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO ORIGINAL" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO MACHO" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="VELCRO FEMEA" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="ZIPPER" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                    <td><input type="number" class="input-table" data-mat="ELÁSTICO" value="0" oninput="calcularTudo()"><span class="unit-label">m</span></td>
-                `;
-                ca.appendChild(tr);
-            });
-            
-            renderizarCamposConsumoKit();
-        }
+            let totalLiquido = somaCouro + somaVinil;
+            let totalBruto = (somaCouro * (1 + qCouro)) + (somaVinil * (1 + qVinil));
 
-        function cmParaM2(comprimentoCm) {
-            const larguraConfig = parseFloat(document.getElementById('cfg_largura').value) || 138;
-            return (larguraConfig / 100) * ((parseFloat(comprimentoCm) || 0) / 100);
-        }
+            row.querySelector('.col-calc-liquido').innerText = cc_formatVal(totalLiquido);
+            row.querySelector('.col-calc-bruto').innerText = cc_formatVal(totalBruto);
+        });
+    }
 
-        function calcularTudo() {
-            const categoria = document.getElementById('prod_categoria').value;
-            const prodCodigo = document.getElementById('prod_codigo').value || "Não informado";
-            const prodNome = document.getElementById('prod_nome').value || "Não informado";
-            
-            const pCouro = (parseFloat(document.getElementById('cfg_perda_couro').value) || 0) / 100;
-            const pOutros = (parseFloat(document.getElementById('cfg_perda_outros').value) || 0) / 100;
+    function cc_inicializarInsumos() {
+        const tbody = document.getElementById('cc_insumosTableBody');
+        tbody.innerHTML = "";
 
-            const dash = document.getElementById('dashboard-resultados');
-            if (!dash) return;
-            dash.innerHTML = '';
-
-            dash.innerHTML += `
-                <div class="card prod-info">
-                    <div class="card-title">📦 Produto Em Medição (${categoria})</div>
-                    <div style="font-size:14px; margin-top:5px;">
-                        <strong>Código:</strong> ${prodCodigo} | <strong>Modelo/Nome:</strong> ${prodNome}
+        listaInsumos.forEach(insumo => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${insumo.nome}</strong></td>
+                <td>
+                    <div class="cc-insumo-row-container" id="container-${insumo.id}">
+                        ${cc_criarLinhaInsumoHTML(insumo.id, insumo.pecas, true)}
                     </div>
-                </div>
+                </td>
+                <td class="cc-text-right">
+                    <span id="total-${insumo.id}" class="cc-subtotal-insumo">0,00 ${insumo.unidade}</span>
+                </td>
             `;
+            tbody.appendChild(tr);
+        });
+    }
 
-            if (categoria === "KIT") {
-                const tipoCorte = document.getElementById('tipo_corte').value;
-                const qtdCores = parseInt(document.getElementById('prod_qtd_cores').value) || 1;
-                const usaThermo = document.getElementById('usa_thermoflex').value;
-
-                let percCouro = 0, percVinil = 0;
-                if (tipoCorte === "70/30") { percCouro = 0.7; percVinil = 0.3; }
-                else if (tipoCorte === "50/50") { percCouro = 0.5; percVinil = 0.5; }
-                else if (tipoCorte === "40/60") { percCouro = 0.4; percVinil = 0.6; }
-                else if (tipoCorte === "30/70") { percCouro = 0.3; percVinil = 0.7; }
-                else if (tipoCorte === "100V") { percCouro = 0; percVinil = 1; }
-                else if (tipoCorte === "100C") { percCouro = 1; percVinil = 0; }
-
-                for (let i = 1; i <= qtdCores; i++) {
-                    let labelSufixo = qtdCores > 1 ? ` Cor ${i}` : '';
-                    let idSufixo = `_c${i}`;
-
-                    const cmC = parseFloat(document.getElementById(`alt_couro${idSufixo}`)?.value) || 0;
-                    const m2CBase = cmParaM2(cmC) * percCouro;
-                    if(m2CBase > 0) {
-                        dash.innerHTML += `
-                            <div class="card destaque-c">
-                                <div class="card-title">COURO${labelSufixo} [Corte: ${tipoCorte}] <span class="badge-perda">${(pCouro*100).toFixed(0)}% Perda</span></div>
-                                <div class="card-value">${(m2CBase * (1 + pCouro)).toFixed(2)} m²</div>
-                                <div class="card-sub">Líquido: ${m2CBase.toFixed(2)} m²</div>
-                            </div>`;
-                    }
-
-                    const cmVM = parseFloat(document.getElementById(`alt_v_media${idSufixo}`)?.value) || 0;
-                    const m2VMBase = cmParaM2(cmVM) * percVinil;
-                    if(m2VMBase > 0) {
-                        dash.innerHTML += `
-                            <div class="card destaque-v">
-                                <div class="card-title">VINIL ESPUMA MÉDIA${labelSufixo} [Corte: ${tipoCorte}] <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                                <div class="card-value">${(m2VMBase * (1 + pOutros)).toFixed(2)} m²</div>
-                                <div class="card-sub">Líquido: ${m2VMBase.toFixed(2)} m²</div>
-                            </div>`;
-                    }
-
-                    const cmVF = parseFloat(document.getElementById(`alt_v_fina${idSufixo}`)?.value) || 0;
-                    const m2VFBase = cmParaM2(cmVF) * percVinil;
-                    if(m2VFBase > 0) {
-                        dash.innerHTML += `
-                            <div class="card destaque-v">
-                                <div class="card-title">VINIL ESPUMA FINA${labelSufixo} [Corte: ${tipoCorte}] <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                                <div class="card-value">${(m2VFBase * (1 + pOutros)).toFixed(2)} m²</div>
-                                <div class="card-sub">Líquido: ${m2VFBase.toFixed(2)} m²</div>
-                            </div>`;
-                    }
-
-                    const cmVS = parseFloat(document.getElementById(`alt_v_sem${idSufixo}`)?.value) || 0;
-                    const m2VSBase = cmParaM2(cmVS) * percVinil;
-                    if(m2VSBase > 0) {
-                        dash.innerHTML += `
-                            <div class="card destaque-v">
-                                <div class="card-title">VINIL SEM ESPUMA${labelSufixo} [Corte: ${tipoCorte}] <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                                <div class="card-value">${(m2VSBase * (1 + pOutros)).toFixed(2)} m²</div>
-                                <div class="card-sub">Líquido: ${m2VSBase.toFixed(2)} m²</div>
-                            </div>`;
-                    }
+    function cc_criarLinhaInsumoHTML(insumoId, pecas, ePrimeira = false, valPeca = "", valMetro = "0,00", valQtd = "1") {
+        let optionsHTML = pecas.map(p => `<option value="${p.id}" ${p.id === valPeca ? 'selected' : ''}>${p.label}</option>`).join('');
+        return `
+            <div class="cc-insumo-item-row">
+                <select class="cc-table-select select-peca" style="width: 180px;">${optionsHTML}</select>
+                <input type="text" class="cc-table-input input-metro" style="width: 90px;" placeholder="Metro (m)" value="${valMetro}" 
+                    onfocus="this.select()" 
+                    onblur="cc_formatarEntradaInteligente(this); cc_calcularTotalInsumo('${insumoId}');" 
+                    oninput="cc_calcularTotalInsumo('${insumoId}')">
+                <span style="font-size: 11px;">x</span>
+                <input type="number" class="cc-table-input input-qtd" style="width: 60px;" placeholder="Qtd" value="${valQtd}" min="1" oninput="cc_calcularTotalInsumo('${insumoId}')">
+                <span style="font-size: 11px; margin-right: 5px;">rep.</span>
+                ${ePrimeira 
+                    ? `<button type="button" class="cc-btn-add-item" onclick="cc_adicionarLinhaInsumo('${insumoId}')"><i class="fa-solid fa-plus"></i></button>`
+                    : `<button type="button" class="cc-btn-remove-item" onclick="cc_removerLinhaInsumo(this, '${insumoId}')"><i class="fa-solid fa-xmark"></i></button>`
                 }
+            </div>
+        `;
+    }
 
-                const espMedM2 = cmParaM2(document.getElementById('alt_e_media')?.value || 0);
-                const espFinM2 = cmParaM2(document.getElementById('alt_e_fina')?.value || 0);
-                const thermoM2 = (usaThermo === "Sim") ? cmParaM2(document.getElementById('alt_thermo')?.value || 0) : 0;
+    function cc_adicionarLinhaInsumo(insumoId) {
+        const insumoObj = listaInsumos.find(i => i.id === insumoId);
+        const container = document.getElementById(`container-${insumoId}`);
+        const div = document.createElement('div');
+        div.innerHTML = cc_criarLinhaInsumoHTML(insumoId, insumoObj.pecas, false);
+        container.appendChild(div.firstElementChild);
+        cc_calcularTotalInsumo(insumoId);
+    }
 
-                if (espMedM2 > 0) {
-                    dash.innerHTML += `
-                        <div class="card destaque-e">
-                            <div class="card-title">ESPUMA MÉDIA <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                            <div class="card-value">${(espMedM2 * (1 + pOutros)).toFixed(2)} m²</div>
-                            <div class="card-sub">Líquido: ${espMedM2.toFixed(2)} m²</div>
-                        </div>`;
-                }
-                if (espFinM2 > 0) {
-                    dash.innerHTML += `
-                        <div class="card destaque-e">
-                            <div class="card-title">ESPUMA FINA <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                            <div class="card-value">${(espFinM2 * (1 + pOutros)).toFixed(2)} m²</div>
-                            <div class="card-sub">Líquido: ${espFinM2.toFixed(2)} m²</div>
-                        </div>`;
-                }
-                if (thermoM2 > 0) {
-                    dash.innerHTML += `
-                        <div class="card destaque-t">
-                            <div class="card-title">THERMOFLEX <span class="badge-perda t-p">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                            <div class="card-value">${(thermoM2 * (1 + pOutros)).toFixed(2)} m²</div>
-                            <div class="card-sub">Líquido: ${thermoM2.toFixed(2)} m²</div>
-                        </div>`;
-                }
+    function cc_removerLinhaInsumo(btn, insumoId) {
+        btn.closest('.cc-insumo-item-row').remove();
+        cc_calcularTotalInsumo(insumoId);
+    }
 
-                const lineares = { "GUARNIÇÃO J":0, "GUARNIÇÃO SETA":0, "VELCRO ORIGINAL":0, "VELCRO MACHO":0, "VELCRO FEMEA":0, "ZIPPER":0, "PALETA DE BOLSA":0, "ELÁSTICO":0 };
-                document.querySelectorAll('#tabConsumo .input-table').forEach(input => {
-                    lineares[input.getAttribute('data-mat')] += parseFloat(input.value) || 0;
+    function cc_calcularTotalInsumo(insumoId) {
+        const container = document.getElementById(`container-${insumoId}`);
+        let total = 0;
+        container.querySelectorAll('.cc-insumo-item-row').forEach(row => {
+            const m = cc_parseVal(row.querySelector('.input-metro').value);
+            const qtd = parseInt(row.querySelector('.input-qtd').value) || 0;
+            total += (m * qtd);
+        });
+        const insumoObj = listaInsumos.find(i => i.id === insumoId);
+        document.getElementById(`total-${insumoId}`).innerText = `${cc_formatVal(total)} ${insumoObj.unidade}`;
+    }
+
+    // --- BANCO DE DADOS E PERSISTÊNCIA ---
+
+    function cc_obterBancoLocal() {
+        return JSON.parse(localStorage.getItem('banco_produtos') || '[]');
+    }
+
+    function cc_salvarBancoLocal(dados) {
+        localStorage.setItem('banco_produtos', JSON.stringify(dados));
+        cc_atualizarSelectVariacoes();
+        cc_renderizarBancoNaAba2();
+        cc_renderizarRelatorioAba3();
+    }
+
+    function cc_salvarConfiguracaoAtual() {
+        const codigo = document.getElementById('cc_codigo').value.trim();
+        const descricao = document.getElementById('cc_descricao').value.trim();
+        const tipoCategoria = document.getElementById('cc_tipoCategoria').value;
+        const padraoCor = document.getElementById('cc_padraoCor').value;
+        const tipoKit = document.getElementById('cc_tipoKit').value;
+
+        if (!codigo || !descricao) {
+            alert('Por favor, informe o Código e a Descrição/Nome do Produto antes de salvar.');
+            if(!codigo) document.getElementById('cc_codigo').focus();
+            else document.getElementById('cc_descricao').focus();
+            return;
+        }
+
+        // Tabela Principal
+        const tabelaPrincipal = [];
+        let somaTotalLiquido = 0;
+        let somaTotalBruto = 0;
+
+        document.querySelectorAll('#cc_mainTable tbody tr').forEach(row => {
+            const comp = row.getAttribute('data-comp');
+            const rowData = { composicao: comp, materiais: {} };
+
+            materiaisPrincipais.forEach(mat => {
+                const vals = [];
+                row.querySelectorAll(`.val-${mat}`).forEach(inp => vals.push(inp.value));
+                rowData.materiais[mat] = vals;
+            });
+
+            somaTotalLiquido += cc_parseVal(row.querySelector('.col-calc-liquido').innerText);
+            somaTotalBruto += cc_parseVal(row.querySelector('.col-calc-bruto').innerText);
+
+            tabelaPrincipal.push(rowData);
+        });
+
+        // Insumos
+        const insumosData = {};
+        listaInsumos.forEach(insumo => {
+            const container = document.getElementById(`cc_container-${insumo.id}`);
+            const itens = [];
+            container.querySelectorAll('.cc-insumo-item-row').forEach(row => {
+                itens.push({
+                    peca: row.querySelector('.select-peca').value,
+                    metro: row.querySelector('.input-metro').value,
+                    qtd: row.querySelector('.input-qtd').value
                 });
-                for (const [mat, m] of Object.entries(lineares)) {
-                    if (m > 0) {
-                        dash.innerHTML += `<div class="card"><div class="card-title">${mat} (SOMA TOTAL)</div><div class="card-value">${m.toFixed(2)} m</div></div>`;
-                    }
-                }
+            });
+            insumosData[insumo.id] = itens;
+        });
 
-            } else {
-                const evaM2 = cmParaM2(document.getElementById('alt_piso_eva').value);
-                const vinilSemEspM2 = cmParaM2(document.getElementById('alt_piso_sem_esp').value);
+        // ID único para verificação estrita: Código + Nome + Padrão + Tipo
+        const idUnico = `${codigo}_${descricao.toLowerCase().replace(/\s+/g, '')}_${padraoCor}_${tipoKit}`;
 
-                if (evaM2 > 0) {
-                    dash.innerHTML += `
-                        <div class="card destaque-v">
-                            <div class="card-title">VINIL DUBLADO COM EVA <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                            <div class="card-value">${(evaM2 * (1 + pOutros)).toFixed(2)} m²</div>
-                            <div class="card-sub">Líquido: ${evaM2.toFixed(2)} m²</div>
-                        </div>`;
-                }
-                if (vinilSemEspM2 > 0) {
-                    dash.innerHTML += `
-                        <div class="card destaque-v">
-                            <div class="card-title">VINIL SEM ESPUMA (PISO) <span class="badge-perda v-e">${(pOutros*100).toFixed(0)}% Perda</span></div>
-                            <div class="card-value">${(vinilSemEspM2 * (1 + pOutros)).toFixed(2)} m²</div>
-                            <div class="card-sub">Líquido: ${vinilSemEspM2.toFixed(2)} m²</div>
-                        </div>`;
-                }
+        const produto = {
+            id: idUnico,
+            codigo: codigo,
+            descricao: descricao,
+            tipoCategoria: tipoCategoria,
+            padraoCor: padraoCor,
+            tipoKit: tipoKit,
+            totalLiquido: somaTotalLiquido,
+            totalBruto: somaTotalBruto,
+            params: {
+                largura: document.getElementById('cc_paramLargura').value,
+                quebraCouro: document.getElementById('cc_paramQuebraCouro').value,
+                quebraVinil: document.getElementById('cc_paramQuebraVinil').value
+            },
+            tabelaPrincipal: tabelaPrincipal,
+            insumos: insumosData,
+            dataAtualizacao: new Date().toLocaleString('pt-BR')
+        };
 
-                document.querySelectorAll('#tabConsumo .input-table-piso').forEach(input => {
-                    const mat = input.getAttribute('data-piso');
-                    const m = parseFloat(input.value) || 0;
-                    if (m > 0) {
-                        dash.innerHTML += `<div class="card"><div class="card-title">${mat} (SOMA TOTAL)</div><div class="card-value">${m.toFixed(2)} m</div></div>`;
-                    }
+        let banco = cc_obterBancoLocal();
+        const indexExistente = banco.findIndex(item => item.id === idUnico);
+
+        if (indexExistente >= 0) {
+            banco[indexExistente] = produto;
+            alert(`Produto estritamente idêntico localizado! O cadastro "${codigo} - ${descricao}" foi ATUALIZADO.`);
+        } else {
+            banco.push(produto);
+            alert(`Novo produto "${codigo} - ${descricao}" CADASTRADO no banco com sucesso!`);
+        }
+
+        cc_salvarBancoLocal(banco);
+    }
+
+    function cc_atualizarSelectVariacoes(filtro = "") {
+        const select = document.getElementById('cc_selectVariacao');
+        select.innerHTML = '<option value="">-- Selecione o Produto --</option>';
+
+        let banco = cc_obterBancoLocal();
+        if (filtro) {
+            banco = banco.filter(item => 
+                item.codigo.toLowerCase().includes(filtro.toLowerCase()) || 
+                item.descricao.toLowerCase().includes(filtro.toLowerCase())
+            );
+        }
+
+        banco.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.innerText = `[${item.codigo}] ${item.descricao} - ${item.padraoCor} (${item.tipoKit})`;
+            select.appendChild(option);
+        });
+    }
+
+    function cc_carregarConfiguracaoSelecionada() {
+        const idSelect = document.getElementById('cc_selectVariacao').value;
+        if (!idSelect) return;
+
+        const banco = cc_obterBancoLocal();
+        const config = banco.find(item => item.id === idSelect);
+        if (!config) return;
+
+        // Cabeçalho
+        document.getElementById('cc_codigo').value = config.codigo;
+        document.getElementById('cc_descricao').value = config.descricao || '';
+        document.getElementById('cc_tipoCategoria').value = config.tipoCategoria || 'Kit';
+        document.getElementById('cc_padraoCor').value = config.padraoCor;
+        document.getElementById('cc_tipoKit').value = config.tipoKit;
+
+        // Parâmetros
+        if (config.params) {
+            document.getElementById('cc_paramLargura').value = config.params.largura;
+            document.getElementById('cc_paramQuebraCouro').value = config.params.quebraCouro;
+            document.getElementById('cc_paramQuebraVinil').value = config.params.quebraVinil;
+        }
+
+        // Tabela 1
+        cc_inicializarTabelaPrincipal();
+        config.tabelaPrincipal.forEach(rowData => {
+            const tr = document.querySelector(`#cc_mainTable tbody tr[data-comp="${rowData.composicao}"]`);
+            if (tr) {
+                materiaisPrincipais.forEach(mat => {
+                    const vals = rowData.materiais[mat] || ["0,00"];
+                    const container = tr.querySelector(`.val-${mat}`).closest('.cc-multi-input-container');
+                    container.innerHTML = "";
+                    vals.forEach((v, idx) => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = cc_criarCellHTML(`val-${mat}`, 'cc_recalcularTabelaPrincipal', v, idx === 0);
+                        container.appendChild(tempDiv.firstElementChild);
+                    });
+                    cc_atualizarRotulosCores(container);
                 });
             }
+        });
+        cc_recalcularTabelaPrincipal();
+
+        // Insumos
+        listaInsumos.forEach(insumo => {
+            const itens = config.insumos[insumo.id] || [];
+            const container = document.getElementById(`cc_container-${insumo.id}`);
+            container.innerHTML = "";
+
+            if (itens.length === 0) {
+                container.innerHTML = cc_criarLinhaInsumoHTML(insumo.id, insumo.pecas, true);
+            } else {
+                itens.forEach((item, idx) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = cc_criarLinhaInsumoHTML(insumo.id, insumo.pecas, idx === 0, item.peca, item.metro, item.qtd);
+                    container.appendChild(div.firstElementChild);
+                });
+            }
+            cc_calcularTotalInsumo(insumo.id);
+        });
+    }
+
+    function cc_buscarKitsPeloCodigo() {
+        const termo = document.getElementById('cc_codigo').value.trim() || document.getElementById('cc_descricao').value.trim();
+        if (!termo) {
+            alert('Digite um código ou descrição para buscar.');
+            cc_atualizarSelectVariacoes();
+            return;
         }
+        cc_atualizarSelectVariacoes(termo);
+        const select = document.getElementById('cc_selectVariacao');
+        if (select.options.length > 1) {
+            select.selectedIndex = 1;
+            cc_carregarConfiguracaoSelecionada();
+        } else {
+            alert(`Nenhum produto cadastrado foi encontrado para "${termo}".`);
+        }
+    }
+
+    function cc_renderizarBancoNaAba2() {
+        const container = document.getElementById('cc_listaBancoView');
+        const banco = cc_obterBancoLocal();
+        if (banco.length === 0) {
+            container.innerHTML = "<p>Nenhum produto salvo no banco até o momento.</p>";
+            return;
+        }
+
+        let html = `<table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descrição / Nome</th>
+                    <th>Tipo</th>
+                    <th>Padrão Cor</th>
+                    <th>Personalização</th>
+                    <th>Atualizado Em</th>
+                    <th class="cc-text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        banco.forEach(item => {
+            html += `<tr>
+                <td style="font-weight:bold">${item.codigo}</td>
+                <td>${item.descricao || '-'}</td>
+                <td>${item.tipoCategoria || 'Kit'}</td>
+                <td>${item.padraoCor}</td>
+                <td>${item.tipoKit}</td>
+                <td>${item.dataAtualizacao || '-'}</td>
+                <td class="cc-text-center">
+                    <button class="cc-btn-action cc-btn-load" style="height:24px; font-size:10px; display:inline-flex;" onclick="cc_carregarItemDoBanco('${item.id}')">Carregar</button>
+                </td>
+            </tr>`;
+        });
+
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+    function cc_renderizarRelatorioAba3() {
+        const banco = cc_obterBancoLocal();
+        const tbodyGeral = document.getElementById('cc_tabelaRelatorioGeralBody');
+        const tbodyMedias = document.getElementById('cc_tabelaMediasBody');
+
+        tbodyGeral.innerHTML = "";
+        tbodyMedias.innerHTML = "";
+
+        if (banco.length === 0) {
+            tbodyGeral.innerHTML = `<tr><td colspan="7" class="cc-text-center">Nenhum registro no banco.</td></tr>`;
+            tbodyMedias.innerHTML = `<tr><td colspan="5" class="cc-text-center">Nenhum registro para calcular médias.</td></tr>`;
+            return;
+        }
+
+        // 1. Preenche Listagem Detalhada Geral
+        banco.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold">${item.codigo}</td>
+                <td>${item.descricao}</td>
+                <td>${item.tipoCategoria || 'Kit'}</td>
+                <td>${item.padraoCor} / ${item.tipoKit}</td>
+                <td class="cc-text-right">${cc_formatVal(item.totalLiquido || 0)}</td>
+                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(item.totalBruto || 0)}</td>
+                <td class="cc-text-center">${item.dataAtualizacao || '-'}</td>
+            `;
+            tbodyGeral.appendChild(tr);
+        });
+
+        // 2. Agrupa por Nome/Descrição do Produto e calcula as MÉDIAS
+        const gruposPorNome = {};
+
+        banco.forEach(item => {
+            const nomeNormalizado = item.descricao.trim().toUpperCase();
+            if (!gruposPorNome[nomeNormalizado]) {
+                gruposPorNome[nomeNormalizado] = {
+                    nomeOriginal: item.descricao,
+                    itens: []
+                };
+            }
+            gruposPorNome[nomeNormalizado].itens.push(item);
+        });
+
+        Object.keys(gruposPorNome).forEach(chave => {
+            const grupo = gruposPorNome[chave];
+            const qtd = grupo.itens.length;
+            
+            let somaLiquido = 0;
+            let somaBruto = 0;
+            let codigosUnicos = new Set();
+
+            grupo.itens.forEach(item => {
+                somaLiquido += (item.totalLiquido || 0);
+                somaBruto += (item.totalBruto || 0);
+                codigosUnicos.add(item.codigo);
+            });
+
+            const mediaLiquida = somaLiquido / qtd;
+            const mediaBruta = somaBruto / qtd;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold">${grupo.nomeOriginal}</td>
+                <td class="cc-text-center"><span style="background:#e7f1ff; padding:2px 8px; border-radius:10px; font-weight:bold; color:#0d6efd;">${qtd}</span></td>
+                <td class="cc-text-right" style="font-weight:bold;">${cc_formatVal(mediaLiquida)} m²</td>
+                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(mediaBruta)} m²</td>
+                <td>${Array.from(codigosUnicos).join(', ')}</td>
+            `;
+            tbodyMedias.appendChild(tr);
+        });
+    }
+
+    function cc_carregarItemDoBanco(id) {
+        cc_trocarAba('cc_abaEdicao', document.querySelectorAll('.cc-nav-tab')[0]);
+        cc_atualizarSelectVariacoes();
+        document.getElementById('cc_selectVariacao').value = id;
+        cc_carregarConfiguracaoSelecionada();
+    }
+
+    function cc_trocarAba(abaId, element) {
+        document.querySelectorAll('.cc-view-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.cc-nav-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(abaId).classList.add('active');
+        element.classList.add('active');
+
+        if(abaId === 'cc_abaRelatorio') {
+            cc_renderizarRelatorioAba3();
+        }
+    }
+
+    function cc_init() {
+        cc_inicializarTabelaPrincipal();
+        cc_inicializarInsumos();
+        cc_atualizarSelectVariacoes();
+        cc_renderizarBancoNaAba2();
+        cc_renderizarRelatorioAba3();
+    }
+
+    if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", cc_init); } else { cc_init(); }
     </script>
 </body>
 </html>
