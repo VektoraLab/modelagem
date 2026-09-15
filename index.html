@@ -36,6 +36,8 @@
 
         .dashboard-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .dashboard-layout.full-width { grid-template-columns: 1fr; }
+        #tabPainel { width: 100%; min-width: 0; }
+        #tabPainel > div { width: 100%; min-width: 0; }
 
         .panel-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .panel-box h2 { font-size: 1.2rem; margin-bottom: 15px; color: var(--secondary-color); border-bottom: 2px solid var(--neutral-light); padding-bottom: 8px; }
@@ -341,13 +343,77 @@
 
     <div class="nav-tabs" id="adminTabs">
         <button id="btnTabPainel" class="tab-btn active" onclick="switchTab('painel')">Painel de Monitoramento Geral</button>
+        <button id="btnTabLancamento" class="tab-btn" onclick="switchTab('lancamento')" style="display: none;">➕ Lançar Nova Tarefa</button>
         <button id="btnTabRelatorios" class="tab-btn" onclick="switchTab('relatorios')">Relatórios &amp; Gráficos Estatísticos</button>
         <button id="btnTabConsumo" class="tab-btn" onclick="switchTab('consumo')" style="display: none;">Composição e Consumo 📊</button>
         <button id="btnTabGerenciamento" class="tab-btn" onclick="switchTab('gerenciamento')" style="display: none;">Gerenciar Equipe &amp; Backup</button>
     </div>
 
     <div id="tabPainel" class="dashboard-layout full-width">
-        <div id="adminFormBox" class="panel-box" style="display: none;">
+        <div>
+            <div id="realTimeStatusContainer" class="panel-box" style="border-top: 4px solid var(--danger-color); display: none;">
+                <h2>🔴 Atividades da Equipe em Tempo Real</h2>
+            </div>
+
+            <div id="criticalAlertPanel" class="panel-box" style="border: 2px solid var(--danger-color); background: #fdf2f2; display: none;">
+                <h3 style="color: var(--danger-color); font-size: 1.05rem; margin-bottom: 5px;">⚠️ ATENÇÃO COM AS PRIORIDADES!</h3>
+                <p style="font-size: 0.9rem; color: #555;">Você possui tarefas de <strong>Prioridade 1</strong> atrasadas ou vencendo hoje alocadas na sua fila.</p>
+            </div>
+
+            <div id="userControlPanels" class="aux-panels" style="display: none;">
+                <div class="aux-card" style="border-left: 4px solid #e67e22;">
+                    <div><p id="mealStatusLabel" style="font-weight: bold;">Status do Almoço: Pronto</p></div>
+                    <div>
+                        <button id="btnStartMeal" class="btn-aux btn-meal" onclick="registrarAlmoço('start')">Ir para o Almoço 🍽️</button>
+                        <button id="btnEndMeal" class="btn-aux btn-meal" style="background: #27ae60; display: none;" onclick="registrarAlmoço('end')">Voltar do Almoço ↩</button>
+                    </div>
+                </div>
+                <div class="aux-card" style="border-left: 4px solid #9b59b6;">
+                    <div><p id="descansoStatusLabel" style="font-weight: bold;">Status do Descanso: Disponível</p></div>
+                    <div>
+                        <button id="btnStartDescanso" class="btn-aux btn-descanso" onclick="registrarDescanso('start')">Iniciar Descanso ☕</button>
+                        <button id="btnEndDescanso" class="btn-aux btn-descanso" style="background: #27ae60; display: none;" onclick="registrarDescanso('end')">Finalizar Descanso ↩</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                    <h2>Fila Geral de Monitoramento em Tempo Real</h2>
+                    <div class="filter-container">
+                        <input type="text" id="taskSearchBar" class="form-control" style="width: 250px;" placeholder="🔍 Buscar modelo, cliente, data, instrução..." oninput="renderTasks()">
+                        <select id="filterActionSelect" class="form-control" style="width: 210px;" onchange="renderTasks()">
+                            <option value="todos">Todas as Especificações</option>
+                            <option value="Fazer modelo novo">Fazer modelo novo</option>
+                            <option value="Alterar modelo existente">Alterar modelo existente</option>
+                            <option value="Cadastrar modelo novo">Cadastrar modelo novo</option>
+                            <option value="Alterar cadastro de um modelo existente">Alterar cadastro de um modelo existente</option>
+                            <option value="Digitalizar modelo novo">Digitalizar modelo novo</option>
+                            <option value="Alterar modelo ja digitalizado">Alterar modelo ja digitalizado</option>
+                            <option value="Fazer personalizado">Fazer personalizado</option>
+                            <option value="Desenvolver nova arte personalizada">Desenvolver nova arte personalizada</option>
+                            <option value="alterar personalizado existente">alterar personalizado existente</option>
+                            <option value="Criar bordado a partir da imagem disponibilizada">Criar bordado a partir da imagem disponibilizada</option>
+                        </select>
+                        <select id="queueUserFilter" class="form-control" style="width: 220px;" onchange="renderTasks()">
+                            <option value="todos">👁️ Ver todas as tarefas do setor</option>
+                            <option value="minhas">👤 Ver apenas minhas tarefas</option>
+                            <option value="admin" id="filterAdminName">Filtrar: Wesley</option>
+                            <option value="usuario_1" id="filterUser1">Filtrar: Modelista</option>
+                            <option value="usuario_2" id="filterUser2">Filtrar: Auxiliar 1 (Cadastro)</option>
+                            <option value="usuario_3" id="filterUser3">Filtrar: Digitalizador</option>
+                            <option value="usuario_4" id="filterUser4">Filtrar: Desenhista</option>
+                            <option value="usuario_5" id="filterUser5">Filtrar: Auxiliar 2 (Personalizado)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="taskList"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabLancamento" class="dashboard-layout full-width" style="display: none;">
+        <div id="adminFormBox" class="panel-box" style="display: block;">
             <button id="btnToggleForm" class="btn-submit" style="margin-bottom: 10px; background: var(--primary-color);" onclick="toggleFormTarefa()">➕ Lançar Nova Tarefa (Abrir Formulário)</button>
             
             <div id="taskFormBody" style="display: none; border-top: 1px dashed #ddd; padding-top: 15px;">
@@ -418,66 +484,6 @@
             </div>
         </div>
 
-        <div>
-            <div id="realTimeStatusContainer" class="panel-box" style="border-top: 4px solid var(--danger-color); display: none;">
-                <h2>🔴 Atividades da Equipe em Tempo Real</h2>
-            </div>
-
-            <div id="criticalAlertPanel" class="panel-box" style="border: 2px solid var(--danger-color); background: #fdf2f2; display: none;">
-                <h3 style="color: var(--danger-color); font-size: 1.05rem; margin-bottom: 5px;">⚠️ ATENÇÃO COM AS PRIORIDADES!</h3>
-                <p style="font-size: 0.9rem; color: #555;">Você possui tarefas de <strong>Prioridade 1</strong> atrasadas ou vencendo hoje alocadas na sua fila.</p>
-            </div>
-
-            <div id="userControlPanels" class="aux-panels" style="display: none;">
-                <div class="aux-card" style="border-left: 4px solid #e67e22;">
-                    <div><p id="mealStatusLabel" style="font-weight: bold;">Status do Almoço: Pronto</p></div>
-                    <div>
-                        <button id="btnStartMeal" class="btn-aux btn-meal" onclick="registrarAlmoço('start')">Ir para o Almoço 🍽️</button>
-                        <button id="btnEndMeal" class="btn-aux btn-meal" style="background: #27ae60; display: none;" onclick="registrarAlmoço('end')">Voltar do Almoço ↩</button>
-                    </div>
-                </div>
-                <div class="aux-card" style="border-left: 4px solid #9b59b6;">
-                    <div><p id="descansoStatusLabel" style="font-weight: bold;">Status do Descanso: Disponível</p></div>
-                    <div>
-                        <button id="btnStartDescanso" class="btn-aux btn-descanso" onclick="registrarDescanso('start')">Iniciar Descanso ☕</button>
-                        <button id="btnEndDescanso" class="btn-aux btn-descanso" style="background: #27ae60; display: none;" onclick="registrarDescanso('end')">Finalizar Descanso ↩</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel-box">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
-                    <h2>Fila Geral de Monitoramento em Tempo Real</h2>
-                    <div class="filter-container">
-                        <input type="text" id="taskSearchBar" class="form-control" style="width: 250px;" placeholder="🔍 Buscar modelo, cliente, data, instrução..." oninput="renderTasks()">
-                        <select id="filterActionSelect" class="form-control" style="width: 210px;" onchange="renderTasks()">
-                            <option value="todos">Todas as Especificações</option>
-                            <option value="Fazer modelo novo">Fazer modelo novo</option>
-                            <option value="Alterar modelo existente">Alterar modelo existente</option>
-                            <option value="Cadastrar modelo novo">Cadastrar modelo novo</option>
-                            <option value="Alterar cadastro de um modelo existente">Alterar cadastro de um modelo existente</option>
-                            <option value="Digitalizar modelo novo">Digitalizar modelo novo</option>
-                            <option value="Alterar modelo ja digitalizado">Alterar modelo ja digitalizado</option>
-                            <option value="Fazer personalizado">Fazer personalizado</option>
-                            <option value="Desenvolver nova arte personalizada">Desenvolver nova arte personalizada</option>
-                            <option value="alterar personalizado existente">alterar personalizado existente</option>
-                            <option value="Criar bordado a partir da imagem disponibilizada">Criar bordado a partir da imagem disponibilizada</option>
-                        </select>
-                        <select id="queueUserFilter" class="form-control" style="width: 220px;" onchange="renderTasks()">
-                            <option value="todos">👁️ Ver todas as tarefas do setor</option>
-                            <option value="minhas">👤 Ver apenas minhas tarefas</option>
-                            <option value="admin" id="filterAdminName">Filtrar: Wesley</option>
-                            <option value="usuario_1" id="filterUser1">Filtrar: Modelista</option>
-                            <option value="usuario_2" id="filterUser2">Filtrar: Auxiliar 1 (Cadastro)</option>
-                            <option value="usuario_3" id="filterUser3">Filtrar: Digitalizador</option>
-                            <option value="usuario_4" id="filterUser4">Filtrar: Desenhista</option>
-                            <option value="usuario_5" id="filterUser5">Filtrar: Auxiliar 2 (Personalizado)</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="taskList"></div>
-            </div>
-        </div>
     </div>
 
     <div id="tabRelatorios" style="display: none;">
@@ -1521,6 +1527,7 @@
         function configurarInterfacePorUsuario() {
             const container = document.getElementById('tabPainel');
             const adminBox = document.getElementById('adminFormBox');
+            const btnLancamento = document.getElementById('btnTabLancamento');
             const btnGerenciamento = document.getElementById('btnTabGerenciamento');
             const btnConsumo = document.getElementById('btnTabConsumo');
             const btnLoginTrigger = document.getElementById('btnLoginTrigger');
@@ -1530,6 +1537,7 @@
             const restrictedSection = document.getElementById('restrictedTimeReportSection');
 
             document.getElementById('adminTabs').style.display = 'flex';
+            btnLancamento.style.display = 'none';
             userPanels.style.display = 'none';
             const temPermissaoLancar = permissoesLancar[currentUser] || false;
 
@@ -1545,21 +1553,25 @@
 
             if (currentUser === 'admin') {
                 document.getElementById('userDisplay').innerText = nomesExibicao[currentUser];
-                adminBox.style.display = 'block'; container.classList.remove('full-width');
+                adminBox.style.display = 'block'; container.classList.add('full-width');
+                btnLancamento.style.display = 'block';
                 btnGerenciamento.style.display = 'block'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
                 reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block'; userPanels.style.display = 'flex';
                 atualizarPainelAlmoçoInterface(); atualizarPainelDescansoInterface(); switchTab('painel');
             } else if (currentUser === 'visitante') {
                 document.getElementById('userDisplay').innerText = "Monitoramento Geral";
                 adminBox.style.display = 'none'; container.classList.add('full-width');
+                btnLancamento.style.display = 'none';
                 btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'block'; btnLogout.style.display = 'none';
                 reportButtons.style.display = 'none'; restrictedSection.style.none; switchTab('painel');
             } else {
                 document.getElementById('userDisplay').innerText = nomesExibicao[currentUser] + (temPermissaoLancar ? " (Substituto 👑)" : "");
                 adminBox.style.display = temPermissaoLancar ? 'block' : 'none';
-                container.className = temPermissaoLancar ? 'dashboard-layout' : 'dashboard-layout full-width';
+                btnLancamento.style.display = temPermissaoLancar ? 'block' : 'none';
+                container.className = 'dashboard-layout full-width';
                 document.getElementById('adminTabs').style.display = temPermissaoLancar ? 'flex' : 'none';
                 btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
+                if (!temPermissaoLancar && document.getElementById('tabLancamento').style.display === 'block') switchTab('painel');
                 reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block'; userPanels.style.display = 'flex';
                 atualizarPainelAlmoçoInterface(); atualizarPainelDescansoInterface(); verificarAlertasCriticos();
             }
@@ -1577,14 +1589,21 @@
 
             document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tabPainel').style.display = 'none'; 
+            document.getElementById('tabLancamento').style.display = 'none';
             document.getElementById('tabRelatorios').style.display = 'none'; 
             document.getElementById('tabGerenciamento').style.display = 'none';
             document.getElementById('tabConsumo').style.display = 'none';
 
             if (tab === 'painel') { document.getElementById('btnTabPainel').classList.add('active'); document.getElementById('tabPainel').style.display = 'grid'; }
+            else if (tab === 'lancamento') {
+                const podeLancar = currentUser === 'admin' || permissoesLancar[currentUser] || false;
+                if (!podeLancar) { switchTab('painel'); return; }
+                document.getElementById('btnTabLancamento').classList.add('active');
+                document.getElementById('tabLancamento').style.display = 'block';
+            }
             else if (tab === 'relatorios') { document.getElementById('btnTabRelatorios').classList.add('active'); document.getElementById('tabRelatorios').style.display = 'block'; updateReportDashboard(); }
             else if (tab === 'gerenciamento') { document.getElementById('btnTabGerenciamento').classList.add('active'); document.getElementById('tabGerenciamento').style.display = 'block'; }
-            else if (tab === 'consumo') { document.getElementById('btnTabConsumo').classList.add('active'); document.getElementById('tabConsumo').style.display = 'block'; calcularTudo(); }
+            else if (tab === 'consumo') { document.getElementById('btnTabConsumo').classList.add('active'); document.getElementById('tabConsumo').style.display = 'block'; }
         }
 
         function verificarAlertasCriticos() {
@@ -3184,7 +3203,7 @@
         // Insumos
         const insumosData = {};
         listaInsumos.forEach(insumo => {
-            const container = document.getElementById(`cc_container-${insumo.id}`);
+            const container = document.getElementById(`container-${insumo.id}`);
             const itens = [];
             container.querySelectorAll('.cc-insumo-item-row').forEach(row => {
                 itens.push({
@@ -3297,7 +3316,7 @@
         // Insumos
         listaInsumos.forEach(insumo => {
             const itens = config.insumos[insumo.id] || [];
-            const container = document.getElementById(`cc_container-${insumo.id}`);
+            const container = document.getElementById(`container-${insumo.id}`);
             container.innerHTML = "";
 
             if (itens.length === 0) {
