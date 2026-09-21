@@ -360,23 +360,6 @@
                 <p style="font-size: 0.9rem; color: #555;">Você possui tarefas de <strong>Prioridade 1</strong> atrasadas ou vencendo hoje alocadas na sua fila.</p>
             </div>
 
-            <div id="userControlPanels" class="aux-panels" style="display: none;">
-                <div class="aux-card" style="border-left: 4px solid #e67e22;">
-                    <div><p id="mealStatusLabel" style="font-weight: bold;">Status do Almoço: Pronto</p></div>
-                    <div>
-                        <button id="btnStartMeal" class="btn-aux btn-meal" onclick="registrarAlmoço('start')">Ir para o Almoço 🍽️</button>
-                        <button id="btnEndMeal" class="btn-aux btn-meal" style="background: #27ae60; display: none;" onclick="registrarAlmoço('end')">Voltar do Almoço ↩</button>
-                    </div>
-                </div>
-                <div class="aux-card" style="border-left: 4px solid #9b59b6;">
-                    <div><p id="descansoStatusLabel" style="font-weight: bold;">Status do Descanso: Disponível</p></div>
-                    <div>
-                        <button id="btnStartDescanso" class="btn-aux btn-descanso" onclick="registrarDescanso('start')">Iniciar Descanso ☕</button>
-                        <button id="btnEndDescanso" class="btn-aux btn-descanso" style="background: #27ae60; display: none;" onclick="registrarDescanso('end')">Finalizar Descanso ↩</button>
-                    </div>
-                </div>
-            </div>
-
             <div class="panel-box">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
                     <h2>Fila Geral de Monitoramento em Tempo Real</h2>
@@ -633,6 +616,42 @@
                 </div>
             </div>
         </div>
+
+        <!-- ===== DETALHAMENTO INDIVIDUAL POR FUNCIONÁRIO ===== -->
+        <div class="panel-box exec-report" style="margin-top:16px;">
+            <div class="exec-header">
+                <div class="exec-title">
+                    <h2>Relatório Individual por Funcionário</h2>
+                    <p id="execIndividualLabel">Selecione um funcionário para visualizar os indicadores individuais do período.</p>
+                </div>
+                <div style="min-width:240px;">
+                    <select id="execIndividualEmployee" class="form-control" onchange="updateExecutiveIndividualReport()"></select>
+                </div>
+            </div>
+            <div class="exec-kpis">
+                <div class="exec-kpi"><div class="label">Demandas recebidas</div><div class="value exec-neutral" id="indRecebidas">0</div><div class="sub" id="indRecebidasSub">demandas atribuídas no período</div></div>
+                <div class="exec-kpi"><div class="label">Entregas concluídas</div><div class="value exec-positive" id="indConcluidas">0</div><div class="sub" id="indConcluidasSub">no período</div></div>
+                <div class="exec-kpi"><div class="label">Cumprimento de prazo</div><div class="value exec-positive" id="indSLA">0%</div><div class="sub" id="indSLASub">entregas dentro do prazo</div></div>
+                <div class="exec-kpi"><div class="label">Backlog</div><div class="value exec-warning" id="indBacklog">0</div><div class="sub" id="indBacklogSub">tarefas atribuídas em aberto</div></div>
+                <div class="exec-kpi"><div class="label">Atrasos ativos</div><div class="value exec-danger" id="indAtrasadas">0</div><div class="sub">tarefas em aberto vencidas</div></div>
+                <div class="exec-kpi"><div class="label">Variação de entregas</div><div class="value exec-neutral" id="indVariacao">0%</div><div class="sub" id="indVariacaoSub">vs. período anterior</div></div>
+                <div class="exec-kpi"><div class="label">Horas em tarefas</div><div class="value exec-neutral" id="indHorasTarefas">0h</div><div class="sub" id="indHorasTarefasSub">tempo com encerramento rastreável</div></div>
+                <div class="exec-kpi"><div class="label">Ocupação produtiva</div><div class="value exec-neutral" id="indOcupacao">0%</div><div class="sub" id="indOcupacaoSub">tempo / capacidade útil</div></div>
+                <div class="exec-kpi"><div class="label">Tempo médio por tarefa</div><div class="value exec-neutral" id="indTempoMedio">0m</div><div class="sub" id="indTempoMedioSub">tarefas com tempo exato</div></div>
+                <div class="exec-kpi"><div class="label">Tarefas por hora</div><div class="value exec-neutral" id="indTarefasHora">0</div><div class="sub">produção por hora rastreada</div></div>
+            </div>
+            <div class="exec-panel" style="margin-top:16px;">
+                <h3>📋 Detalhamento das tarefas do funcionário</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead><tr><th>Tarefa</th><th>Prazo</th><th>Conclusão</th><th>Status</th><th class="num">Tempo</th></tr></thead>
+                        <tbody id="execIndividualTasksBody"></tbody>
+                    </table>
+                </div>
+                <div class="exec-note">“Demandas recebidas” considera tarefas atribuídas ao funcionário no período selecionado. O tempo produtivo considera somente registros rastreáveis de início até pausa/fim, dentro da jornada útil. Almoço e descanso continuam registrados para os cálculos automáticos, mas não aparecem como botões ou barra de status.</div>
+            </div>
+        </div>
+
 
 <div class="goals-section">
             <div class="goal-card">
@@ -1533,7 +1552,6 @@
             const btnLoginTrigger = document.getElementById('btnLoginTrigger');
             const btnLogout = document.getElementById('btnLogout');
             const reportButtons = document.getElementById('reportButtonsContainer');
-            const userPanels = document.getElementById('userControlPanels');
             const restrictedSection = document.getElementById('restrictedTimeReportSection');
 
             document.getElementById('adminTabs').style.display = 'flex';
@@ -1556,8 +1574,8 @@
                 adminBox.style.display = 'block'; container.classList.add('full-width');
                 btnLancamento.style.display = 'block';
                 btnGerenciamento.style.display = 'block'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
-                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block'; userPanels.style.display = 'flex';
-                atualizarPainelAlmoçoInterface(); atualizarPainelDescansoInterface(); switchTab('painel');
+                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block';
+                switchTab('painel');
             } else if (currentUser === 'visitante') {
                 document.getElementById('userDisplay').innerText = "Monitoramento Geral";
                 adminBox.style.display = 'none'; container.classList.add('full-width');
@@ -1572,8 +1590,8 @@
                 document.getElementById('adminTabs').style.display = temPermissaoLancar ? 'flex' : 'none';
                 btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
                 if (!temPermissaoLancar && document.getElementById('tabLancamento').style.display === 'block') switchTab('painel');
-                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block'; userPanels.style.display = 'flex';
-                atualizarPainelAlmoçoInterface(); atualizarPainelDescansoInterface(); verificarAlertasCriticos();
+                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block';
+                verificarAlertasCriticos();
             }
             renderTasks(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
         }
@@ -1691,28 +1709,10 @@
             else { if (database) database.ref(refPath).update({ end: new Date().getTime() }); }
         }
 
-        function atualizarPainelDescansoInterface() {
-            if (currentUser === 'visitante') return;
-            const logHoje = descansoLogs[new Date().toISOString().split('T')[0]]?.[currentUser];
-            const btnStart = document.getElementById('btnStartDescanso'); const btnEnd = document.getElementById('btnEndDescanso'); const label = document.getElementById('descansoStatusLabel');
-            if (!logHoje) { btnStart.style.display = 'inline-block'; btnEnd.style.display = 'none'; label.innerText = "Status do Descanso: Disponível"; } 
-            else if (logHoje.start && !logHoje.end) { btnStart.style.display = 'none'; btnEnd.style.display = 'inline-block'; label.innerText = "Status: ☕ Em Intervalo..."; } 
-            else { btnStart.style.display = 'none'; btnEnd.style.display = 'none'; label.innerText = "Status: ✓ Realizado."; }
-        }
-
         function registrarAlmoço(status) {
             const hojeStr = new Date().toISOString().split('T')[0]; const refPath = `almoço/historico/${hojeStr}/${currentUser}`;
             if (status === 'start') { if (database) database.ref(refPath).set({ start: new Date().getTime() }); } 
             else { if (database) database.ref(refPath).update({ end: new Date().getTime() }); }
-        }
-
-        function atualizarPainelAlmoçoInterface() {
-            if (currentUser === 'visitante') return;
-            const logHoje = mealLogs[new Date().toISOString().split('T')[0]]?.[currentUser];
-            const btnStart = document.getElementById('btnStartMeal'); const btnEnd = document.getElementById('btnEndMeal'); const label = document.getElementById('mealStatusLabel');
-            if (!logHoje) { btnStart.style.display = 'inline-block'; btnEnd.style.display = 'none'; label.innerText = "Status do Almoço: Pronto"; } 
-            else if (logHoje.start && !logHoje.end) { btnStart.style.display = 'none'; btnEnd.style.display = 'inline-block'; label.innerText = "Status: 🍽️ Almoçando..."; } 
-            else { btnStart.style.display = 'none'; btnEnd.style.display = 'none'; label.innerText = "Status: ✓ Finalizado."; }
         }
 
         function buildPausasHTML(timeLogs) {
@@ -2402,6 +2402,87 @@
 
             // Guarda os dados para exportação.
             window._execReportData = {periodo,start,end,prev,cur,old,sla,oldSla,variation,team,trend,totalCapacidade,totalTempoRastreado,totalTarefasExatas,ocupacaoGeral,tempoMedioGeral,tarefasHoraGeral,capacityRows};
+        }
+
+        function execIndividualAssignedTasks(data, userKey, start, end) {
+            return data.allTasks.filter(t => {
+                if (!t || !Array.isArray(t.responsibles) || !t.responsibles.includes(userKey)) return false;
+                const d = execTaskCreatedDate(t);
+                return d && d >= start && d <= end;
+            });
+        }
+
+        function updateExecutiveIndividualReport() {
+            const periodSelect = document.getElementById('reportPeriod');
+            const employeeSelect = document.getElementById('execIndividualEmployee');
+            if (!periodSelect || !employeeSelect) return;
+            const periodo = periodSelect.value;
+            const {start,end} = execStartEnd(periodo);
+            const prev = execPreviousPeriod(periodo,start,end);
+            const cur = execTasksForPeriod(start,end);
+            const old = execTasksForPeriod(prev.start,prev.end);
+            const userKey = employeeSelect.value;
+            const userName = nomesExibicao[userKey] || userKey;
+
+            const assigned = execIndividualAssignedTasks(cur,userKey,start,end);
+            const completed = cur.completed.filter(t => t.userWhoFinished === userKey);
+            const oldCompleted = old.completed.filter(t => t.userWhoFinished === userKey);
+            const onTime = completed.filter(t => t.onTime === true);
+            const late = completed.filter(t => t.onTime === false);
+            const open = cur.open.filter(t => Array.isArray(t.responsibles) && t.responsibles.includes(userKey));
+            const overdue = cur.overdue.filter(t => Array.isArray(t.responsibles) && t.responsibles.includes(userKey));
+            const metrics = execEmployeeTimeMetrics(cur.completed,userKey,start,end);
+            const sla = execPercent(onTime.length,completed.length);
+            const variation = execVariation(completed.length,oldCompleted.length);
+            const fmtMin = min => {
+                if (!min || min < 1) return '0m';
+                const h=Math.floor(min/60), m=min%60;
+                return h ? `${h}h ${m}m` : `${m}m`;
+            };
+            const set = (id,value) => { const el=document.getElementById(id); if(el) el.innerText=value; };
+            set('execIndividualLabel',`${userName} | ${execFmtPeriod(periodo,start,end)} | Comparação: ${execFmtPeriod(periodo,prev.start,prev.end)}`);
+            set('indRecebidas',assigned.length);
+            set('indRecebidasSub',`${assigned.length} demanda(s) atribuída(s) no período`);
+            set('indConcluidas',completed.length);
+            set('indConcluidasSub',`${onTime.length} no prazo | ${late.length} fora do prazo`);
+            set('indSLA',`${sla}%`);
+            set('indSLASub',`${onTime.length} de ${completed.length} entrega(s) no prazo`);
+            set('indBacklog',open.length);
+            set('indBacklogSub',`${open.length} tarefa(s) atribuída(s) em aberto`);
+            set('indAtrasadas',overdue.length);
+            set('indVariacao',`${variation > 0 ? '+' : ''}${variation}%`);
+            set('indVariacaoSub',`${oldCompleted.length} entrega(s) no período anterior`);
+            set('indHorasTarefas',fmtMin(metrics.tracked));
+            set('indHorasTarefasSub',`${metrics.exactTasks} tarefa(s) com encerramento rastreável`);
+            set('indOcupacao',`${metrics.occupancy}%`);
+            set('indOcupacaoSub',`${fmtMin(metrics.capacity)} de capacidade útil`);
+            set('indTempoMedio',fmtMin(metrics.avg));
+            set('indTempoMedioSub',`${metrics.exactTasks} tarefa(s) com tempo exato`);
+            set('indTarefasHora',metrics.tracked > 0 ? (metrics.exactTasks/(metrics.tracked/60)).toFixed(2) : '0');
+            const slaEl=document.getElementById('indSLA');
+            if(slaEl) slaEl.className='value '+(sla>=90?'exec-positive':sla>=75?'exec-warning':'exec-danger');
+            const body=document.getElementById('execIndividualTasksBody');
+            if(!body) return;
+            const rows=assigned.slice().sort((a,b)=>(execTaskCreatedDate(b)?.getTime()||0)-(execTaskCreatedDate(a)?.getTime()||0));
+            body.innerHTML=rows.length ? rows.map(t=>{
+                const done=t.userWhoFinished===userKey && t.dateFinished;
+                const overdueTask=!done && t.deadline && execDateOnly(t.deadline)<execDateOnly(new Date());
+                const status=done?(t.onTime===true?'Concluída no prazo':'Concluída fora do prazo'):(overdueTask?'Em atraso':'Em aberto');
+                const statusClass=done?(t.onTime===true?'exec-positive':'exec-danger'):(overdueTask?'exec-danger':'exec-warning');
+                const dur=done?execTaskDurationForUser(t,userKey):{exact:false,minutes:0};
+                const safeTitle=String(t.title||t.name||t.modelo||'Tarefa').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+                return `<tr><td><strong>${safeTitle}</strong></td><td>${t.deadline?execDateOnly(t.deadline).toLocaleDateString('pt-BR'):'—'}</td><td>${t.dateFinished?execDateOnly(t.dateFinished).toLocaleDateString('pt-BR'):'—'}</td><td class="${statusClass}"><strong>${status}</strong></td><td class="num">${dur.exact?fmtMin(dur.minutes):'—'}</td></tr>`;
+            }).join(''):`<tr><td colspan="5" style="text-align:center;color:#777;">Não há tarefas atribuídas a ${userName} no período selecionado.</td></tr>`;
+        }
+
+        function inicializarRelatorioIndividual() {
+            const select=document.getElementById('execIndividualEmployee');
+            if(!select) return;
+            const keys=['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+            const atual=select.value||'admin';
+            select.innerHTML=keys.map(k=>`<option value="${k}">${nomesExibicao[k]||k}</option>`).join('');
+            select.value=keys.includes(atual)?atual:'admin';
+            updateExecutiveIndividualReport();
         }
 
         function gerarRelatorioExecutivoPDF() {
