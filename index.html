@@ -314,9 +314,19 @@
 .exec-chart-wrap { height:270px; position:relative; }
 @media(max-width:900px){ .exec-grid{grid-template-columns:1fr;} }
 
+    
+        /* BLOQUEIO VISUAL COMPLETO ANTES DO LOGIN */
+        body.pre-login > header,
+        body.pre-login > .nav-tabs,
+        body.pre-login > [id^="tab"],
+        body.pre-login > #welcomeSplash,
+        body.pre-login > .modal-overlay:not(#loginModal) {
+            display: none !important;
+        }
+        body.pre-login { background: #f4f6f8; }
     </style>
 </head>
-<body>
+<body class="pre-login">
 
     <div id="welcomeSplash" class="welcome-overlay" onclick="pularSplashPreLogin()">
         <div class="welcome-content" onclick="event.stopPropagation()">
@@ -594,7 +604,7 @@
                     </table>
                 </div>
                 <div class="exec-note">
-                    Capacidade calculada em <strong>07:12–17:00, de segunda a sexta-feira</strong> = 9h48 por dia.
+                    A capacidade é calculada para cada funcionário com base na <strong>jornada cadastrada em Gerenciar Equipe</strong>, de segunda a sexta-feira, descontando almoço e os descansos automáticos quando estiverem dentro da jornada.
                     O tempo produtivo considera somente intervalos registrados como <strong>início → pausa/fim</strong>.
                     A partir desta versão, cada conclusão grava o horário exato. Registros antigos que não possuem horário de conclusão
                     não são tratados como duração exata, evitando distorções nas métricas.
@@ -637,9 +647,33 @@
                 <div class="exec-kpi"><div class="label">Variação de entregas</div><div class="value exec-neutral" id="indVariacao">0%</div><div class="sub" id="indVariacaoSub">vs. período anterior</div></div>
                 <div class="exec-kpi"><div class="label">Horas em tarefas</div><div class="value exec-neutral" id="indHorasTarefas">0h</div><div class="sub" id="indHorasTarefasSub">tempo com encerramento rastreável</div></div>
                 <div class="exec-kpi"><div class="label">Ocupação produtiva</div><div class="value exec-neutral" id="indOcupacao">0%</div><div class="sub" id="indOcupacaoSub">tempo / capacidade útil</div></div>
-                <div class="exec-kpi"><div class="label">Tempo médio por tarefa</div><div class="value exec-neutral" id="indTempoMedio">0m</div><div class="sub" id="indTempoMedioSub">tarefas com tempo exato</div></div>
+                <div class="exec-kpi"><div class="label">Tempo médio real por tarefa</div><div class="value exec-neutral" id="indTempoMedio">0m</div><div class="sub" id="indTempoMedioSub">tarefas com tempo exato</div></div>
+                <div class="exec-kpi"><div class="label">Meta diária de tarefas</div><div class="value exec-neutral" id="indMetaDiaria">Não definida</div><div class="sub" id="indMetaDiariaSub">cadastre em Gerenciar Equipe</div></div>
+                <div class="exec-kpi"><div class="label">Meta de tempo médio</div><div class="value exec-neutral" id="indTempoMedioMeta">Não definida</div><div class="sub" id="indTempoMedioMetaSub">minutos por tarefa</div></div>
+                <div class="exec-kpi"><div class="label">Atingimento da meta</div><div class="value exec-neutral" id="indAtingimentoMeta">—</div><div class="sub" id="indAtingimentoMetaSub">concluídas / meta do período</div></div>
                 <div class="exec-kpi"><div class="label">Tarefas por hora</div><div class="value exec-neutral" id="indTarefasHora">0</div><div class="sub">produção por hora rastreada</div></div>
             </div>
+            <div class="exec-panel" style="margin-top:16px;">
+                <h3>🎯 Metas e médias de tempo por funcionário</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead>
+                            <tr>
+                                <th>Funcionário</th>
+                                <th class="num">Jornada</th>
+                                <th class="num">Meta/dia</th>
+                                <th class="num">Meta no período</th>
+                                <th class="num">Tempo médio alvo</th>
+                                <th class="num">Tempo médio real</th>
+                                <th class="num">Atingimento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="execTargetsBody"></tbody>
+                    </table>
+                </div>
+                <div class="exec-note">As metas individuais são cadastradas em <strong>Gerenciar Equipe</strong>. O tempo médio real é calculado somente com tarefas cujo início, pausas automáticas/manuais e encerramento permitem rastreamento exato. A jornada e a capacidade são calculadas a partir dos horários cadastrados para cada funcionário.</div>
+            </div>
+
             <div class="exec-panel" style="margin-top:16px;">
                 <h3>📋 Detalhamento das tarefas do funcionário</h3>
                 <div style="overflow-x:auto;">
@@ -924,7 +958,7 @@
     <div id="tabGerenciamento" style="display: none;">
         <div class="dashboard-layout" style="grid-template-columns: 1fr 1fr;">
             <div class="panel-box">
-                <h2>Customizar Integrantes da Equipe e Jornadas</h2>
+                <h2>Customizar Integrantes, Jornadas e Metas da Equipe</h2>
                 <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;" id="userFieldsContainer">
                     <div style="border: 1px solid #d4e6f1; padding: 10px; border-radius: 6px; margin-bottom: 15px; background: #f4f9fd;">
                         <span style="font-weight: bold; font-size: 0.85rem; color: #2980b9; display: block; margin-bottom: 5px;">Gestor Master:</span>
@@ -938,6 +972,11 @@
                             <input type="time" id="cfg_admin_meal_in" class="form-control" title="Início do Almoço">
                             <input type="time" id="cfg_admin_meal_out" class="form-control" title="Fim do Almoço">
                         </div>
+                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                            <input type="number" min="0" step="1" id="cfg_admin_meta" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
+                            <input type="number" min="0" step="1" id="cfg_admin_tempo_meta" class="form-control" title="Tempo médio alvo em minutos" placeholder="Tempo médio alvo (min)">
+                        </div>
+                        <div style="font-size:0.72rem;color:#667085;margin-top:4px;">Meta individual: tarefas por dia | tempo médio alvo por tarefa (minutos).</div>
                     </div>
                 </div>
                 <button class="btn-submit" style="margin-top: 15px; background: var(--success-color);" onclick="salvarConfiguracaoEquipe()">Gravar Configurações</button>
@@ -1157,6 +1196,16 @@
             "usuario_4": { in: "12:00", out: "13:00" }, "usuario_5": { in: "12:00", out: "13:00" }
         };
 
+        // Metas individuais. 0 significa "não definida" e nunca é tratado como meta zero.
+        let metasEquipe = {
+            "admin": { tarefasDia: 0, tempoMedioMetaMin: 0 },
+            "usuario_1": { tarefasDia: 0, tempoMedioMetaMin: 0 },
+            "usuario_2": { tarefasDia: 0, tempoMedioMetaMin: 0 },
+            "usuario_3": { tarefasDia: 0, tempoMedioMetaMin: 0 },
+            "usuario_4": { tarefasDia: 0, tempoMedioMetaMin: 0 },
+            "usuario_5": { tarefasDia: 0, tempoMedioMetaMin: 0 }
+        };
+
         let senhasEquipe = {
             "usuario_1": "123", "usuario_2": "123", "usuario_3": "123", "usuario_4": "123", "usuario_5": "123"
         };
@@ -1246,6 +1295,7 @@
         function renderizarStatusEquipeTempoReal() {
             const container = document.getElementById('realTimeStatusContainer');
             if (!container) return;
+            if (currentUser === 'visitante') { container.style.display = 'none'; return; }
             
             const temPermissaoLancar = permissoesLancar[currentUser] || false;
             if (currentUser !== 'admin' && !temPermissaoLancar && currentUser !== 'visitante') {
@@ -1269,28 +1319,13 @@
                 let cardBg = '#fdfefe';
                 let bordaCor = '#bdc3c7';
 
-                const hojeStr = new Date().toISOString().split('T')[0];
-                const logAlmoco = mealLogs[hojeStr]?.[uKey];
-                const logDescanso = descansoLogs[hojeStr]?.[uKey];
-
-                if (uKey === 'admin') {
-                    if (logAlmoco && logAlmoco.start && !logAlmoco.end) {
-                        statusTexto = '<span style="color: #e67e22; font-weight: bold;">🍽️ Em Almoço</span>';
-                        cardBg = '#fffaf5'; bordaCor = '#e67e22';
-                    } else if (logDescanso && logDescanso.start && !logDescanso.end) {
-                        statusTexto = '<span style="color: #9b59b6; font-weight: bold;">☕ Em Descanso</span>';
-                        cardBg = '#faf5ff'; bordaCor = '#9b59b6';
-                    } else {
-                        statusTexto = '<span style="color: var(--success-color); font-weight: bold;">💼 Gestão e Supervisão Ativa</span>';
-                        cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
-                    }
-                } else if (logAlmoco && logAlmoco.start && !logAlmoco.end) {
-                    statusTexto = '<span style="color: #e67e22; font-weight: bold;">🍽️ Em Almoço</span>';
-                    cardBg = '#fffaf5'; bordaCor = '#e67e22';
-                } else if (logDescanso && logDescanso.start && !logDescanso.end) {
-                    statusTexto = '<span style="color: #9b59b6; font-weight: bold;">☕ Em Descanso</span>';
-                    cardBg = '#faf5ff'; bordaCor = '#9b59b6';
-                } else if (taskAtiva) {
+                if (taskAtiva) {
+                    statusTexto = `<span style="color: var(--success-color); font-weight: bold;">▶️ Focando em:<br><small style="color:#333;">${taskAtiva.title}</small></span>`;
+                    cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
+                } else if (uKey === 'admin') {
+                    statusTexto = '<span style="color: var(--success-color); font-weight: bold;">💼 Gestão e Supervisão Ativa</span>';
+                    cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
+                } else if (minhasTasks.length > 0) {
                     statusTexto = `<span style="color: var(--success-color); font-weight: bold;">▶️ Focando em:<br><small style="color:#333;">${taskAtiva.title}</small></span>`;
                     cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
                 } else if (minhasTasks.length > 0) {
@@ -1399,6 +1434,11 @@
                             <input type="time" id="cfg_meal_in${i}" class="form-control" title="Início do Almoço">
                             <input type="time" id="cfg_meal_out${i}" class="form-control" title="Fim do Almoço">
                         </div>
+                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
+                            <input type="number" min="0" step="1" id="cfg_meta${i}" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
+                            <input type="number" min="0" step="1" id="cfg_tempo_meta${i}" class="form-control" title="Tempo médio alvo em minutos" placeholder="Tempo médio alvo (min)">
+                        </div>
+                        <div style="font-size:0.72rem;color:#667085;margin-bottom:5px;">Meta diária | tempo médio alvo por tarefa (min).</div>
                         <div style="display:flex; gap:10px; align-items:center; margin-top:5px; border-top: 1px dashed #ddd; padding-top:5px;">
                             <input type="password" id="cfg_pass${i}" class="form-control" style="width:130px; padding:5px; font-size:0.8rem;" placeholder="Senha">
                             <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color); cursor:pointer;">
@@ -1418,6 +1458,10 @@
                         if(data[k]) nomesExibicao[k] = data[k].nome || nomesExibicao[k];
                         if(data[k] && data[k].jornada) jornadas[k] = data[k].jornada;
                         if(data[k] && data[k].almoco) almocosPadrao[k] = data[k].almoco;
+                        if(data[k] && data[k].metas) metasEquipe[k] = {
+                            tarefasDia: Number(data[k].metas.tarefasDia) || 0,
+                            tempoMedioMetaMin: Number(data[k].metas.tempoMedioMetaMin) || 0
+                        };
                         if(data[k] && k !== 'admin') {
                             senhasEquipe[k] = data[k].senha || "123";
                             permissoesLancar[k] = data[k].podeLancar || false;
@@ -1428,6 +1472,8 @@
                     if (document.getElementById('cfg_admin_out')) document.getElementById('cfg_admin_out').value = jornadas['admin'].out;
                     if (document.getElementById('cfg_admin_meal_in')) document.getElementById('cfg_admin_meal_in').value = almocosPadrao['admin'].in;
                     if (document.getElementById('cfg_admin_meal_out')) document.getElementById('cfg_admin_meal_out').value = almocosPadrao['admin'].out;
+                    if (document.getElementById('cfg_admin_meta')) document.getElementById('cfg_admin_meta').value = metasEquipe['admin'].tarefasDia || '';
+                    if (document.getElementById('cfg_admin_tempo_meta')) document.getElementById('cfg_admin_tempo_meta').value = metasEquipe['admin'].tempoMedioMetaMin || '';
 
                     for(let i=1; i<=5; i++) {
                         const uKey = `usuario_${i}`;
@@ -1436,6 +1482,8 @@
                         if (document.getElementById(`cfg_out${i}`)) document.getElementById(`cfg_out${i}`).value = jornadas[uKey].out;
                         if (document.getElementById(`cfg_meal_in${i}`)) document.getElementById(`cfg_meal_in${i}`).value = almocosPadrao[uKey].in;
                         if (document.getElementById(`cfg_meal_out${i}`)) document.getElementById(`cfg_meal_out${i}`).value = almocosPadrao[uKey].out;
+                        if (document.getElementById(`cfg_meta${i}`)) document.getElementById(`cfg_meta${i}`).value = metasEquipe[uKey].tarefasDia || '';
+                        if (document.getElementById(`cfg_tempo_meta${i}`)) document.getElementById(`cfg_tempo_meta${i}`).value = metasEquipe[uKey].tempoMedioMetaMin || '';
                         if (document.getElementById(`cfg_pass${i}`)) document.getElementById(`cfg_pass${i}`).value = senhasEquipe[uKey];
                         if (document.getElementById(`cfg_perm${i}`)) document.getElementById(`cfg_perm${i}`).checked = permissoesLancar[uKey];
                         if (document.getElementById(`lbl_user${i}`)) document.getElementById(`lbl_user${i}`).innerText = `Funcionário ${i} (${nomesExibicao[uKey]}):`;
@@ -1459,11 +1507,11 @@
             });
 
             database.ref('almoço/historico').on('value', (snapshot) => {
-                mealLogs = snapshot.val() || {}; atualizarPainelAlmoçoInterface(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
+                mealLogs = snapshot.val() || {}; updateReportDashboard(); renderizarStatusEquipeTempoReal();
             });
 
             database.ref('descanso/historico').on('value', (snapshot) => {
-                descansoLogs = snapshot.val() || {}; atualizarPainelDescansoInterface(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
+                descansoLogs = snapshot.val() || {}; updateReportDashboard(); renderizarStatusEquipeTempoReal();
             });
         }
 
@@ -1508,18 +1556,20 @@
         window.addEventListener('DOMContentLoaded', () => {
             currentUser = sessionStorage.getItem('modelagem_current_user') || 'visitante';
             configurarInterfacePorUsuario();
-            
+
             const versiculoHoje = obterVersiculoDoDia();
             document.getElementById('splashVerse').innerText = versiculoHoje.texto;
             document.getElementById('splashRef').innerText = versiculoHoje.ref;
 
             inicializarConsumoTool();
 
-            setTimeout(() => {
-                if (currentUser === 'visitante') {
-                    pularSplashPreLogin();
-                }
-            }, 800);
+            if (currentUser !== 'visitante') {
+                document.body.classList.remove('pre-login');
+            } else {
+                document.body.classList.add('pre-login');
+                document.getElementById('welcomeSplash').style.display = 'none';
+                abrirModalLogin();
+            }
 
             setInterval(() => { verificarEExecutarHorariosAutomaticos(); updateReportDashboard(); }, 1000);
         });
@@ -1539,6 +1589,7 @@
             
             currentUser = userSelected;
             sessionStorage.setItem('modelagem_current_user', currentUser);
+            document.body.classList.remove('pre-login');
             fecharModalLogin(); configurarInterfacePorUsuario();
             exibirSplashPostLogin();
         }
@@ -1554,10 +1605,30 @@
             const reportButtons = document.getElementById('reportButtonsContainer');
             const restrictedSection = document.getElementById('restrictedTimeReportSection');
 
+            const temPermissaoLancar = permissoesLancar[currentUser] || false;
+
+            if (currentUser === 'visitante') {
+                document.body.classList.add('pre-login');
+                document.getElementById('adminTabs').style.display = 'none';
+                btnLancamento.style.display = 'none';
+                btnGerenciamento.style.display = 'none';
+                btnConsumo.style.display = 'none';
+                btnLoginTrigger.style.display = 'none';
+                btnLogout.style.display = 'none';
+                const rt = document.getElementById('realTimeStatusContainer'); if (rt) rt.style.display = 'none';
+                const ca = document.getElementById('criticalAlertPanel'); if (ca) ca.style.display = 'none';
+                if (reportButtons) reportButtons.style.display = 'none';
+                if (restrictedSection) restrictedSection.style.display = 'none';
+                document.querySelectorAll('[id^="tab"]').forEach(el => { if (el.id !== 'tabPainel') el.style.display = 'none'; });
+                document.getElementById('tabPainel').style.display = 'none';
+                document.getElementById('welcomeSplash').style.display = 'none';
+                abrirModalLogin();
+                return;
+            }
+
+            document.body.classList.remove('pre-login');
             document.getElementById('adminTabs').style.display = 'flex';
             btnLancamento.style.display = 'none';
-            userPanels.style.display = 'none';
-            const temPermissaoLancar = permissoesLancar[currentUser] || false;
 
             // REGRA DE SEGURANÇA: CALCULADORA VISÍVEL SOMENTE PARA ADMIN E DIGITALIZADOR (USUARIO_3)
             if (currentUser === 'admin' || currentUser === 'usuario_3') {
@@ -1581,7 +1652,7 @@
                 adminBox.style.display = 'none'; container.classList.add('full-width');
                 btnLancamento.style.display = 'none';
                 btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'block'; btnLogout.style.display = 'none';
-                reportButtons.style.display = 'none'; restrictedSection.style.none; switchTab('painel');
+                reportButtons.style.display = 'none'; restrictedSection.style.display = 'none'; document.getElementById('tabRelatorios').style.display = 'none'; switchTab('painel');
             } else {
                 document.getElementById('userDisplay').innerText = nomesExibicao[currentUser] + (temPermissaoLancar ? " (Substituto 👑)" : "");
                 adminBox.style.display = temPermissaoLancar ? 'block' : 'none';
@@ -1596,9 +1667,15 @@
             renderTasks(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
         }
 
-        function logout() { sessionStorage.setItem('modelagem_current_user', 'visitante'); currentUser = 'visitante'; configurarInterfacePorUsuario(); }
+        function logout() {
+            sessionStorage.setItem('modelagem_current_user', 'visitante');
+            currentUser = 'visitante';
+            document.body.classList.add('pre-login');
+            configurarInterfacePorUsuario();
+        }
 
         function switchTab(tab) {
+            if (currentUser === 'visitante') { abrirModalLogin(); return; }
             // VERIFICAÇÃO DE PERMISSÃO PARA CONSUMO
             if (tab === 'consumo' && currentUser !== 'admin' && currentUser !== 'usuario_3') {
                 alert("Acesso restrito! Apenas o Administrador e o Digitalizador possuem permissão para esta ferramenta.");
@@ -1631,86 +1708,206 @@
             document.getElementById('criticalAlertPanel').style.display = temUrgencia ? 'block' : 'none';
         }
 
-        function verificarEExecutarHorariosAutomaticos() {
-            if (currentUser === 'visitante' || currentUser === 'admin') return;
-            const agora = new Date(); const horaAtual = agora.getHours(); const minutoAtual = agora.getMinutes();
-            const totalMinutos = (horaAtual * 60) + minutoAtual;
-            const horaMinutoAtualStr = `${String(horaAtual).padStart(2, '0')}:${String(minutoAtual).padStart(2, '0')}`;
+        function obterIntervaloAutomatico(userKey, agora = new Date()) {
+            if (agora.getDay() < 1 || agora.getDay() > 5) return null;
 
-            const pausarTarefasEmExecucaoAutomatico = (motivoPreDefinido) => {
-                tasks.forEach(task => {
-                    const ultimoLog = task.timeLogs && task.timeLogs.length > 0 ? task.timeLogs[task.timeLogs.length - 1] : null;
-                    if (ultimoLog && ultimoLog.type === 'start' && ultimoLog.by === currentUser) {
-                        if (!task.timeLogs) task.timeLogs = [];
-                        task.timeLogs.push({
-                            type: 'pause',
-                            time: new Date().getTime(),
-                            by: 'sistema',
-                            byName: 'Sistema (Automático)',
-                            reason: motivoPreDefinido,
-                            requestedBy: 'Sistema'
-                        });
-                        if (database) database.ref('tasks/ativas/' + task.id).set(task);
-                    }
-                });
-            };
+            const jornada = jornadas[userKey];
+            if (!jornada || !jornada.in || !jornada.out) return null;
 
-            const configAlmoco = almocosPadrao[currentUser];
-            if (configAlmoco && configAlmoco.in && configAlmoco.out) {
-                if (horaMinutoAtualStr >= configAlmoco.in && horaMinutoAtualStr < configAlmoco.out) {
-                    if (!estadoAutomacao.almocoAtivo) {
-                        pausarTarefasEmExecucaoAutomatico("Pausa automática: Horário de Almoço iniciado");
-                        const hojeStr = new Date().toISOString().split('T')[0];
-                        const logHoje = mealLogs[hojeStr]?.[currentUser];
-                        if (!logHoje || !logHoje.start) { registrarAlmoço('start'); }
-                        estadoAutomacao.almocoAtivo = true;
-                    }
-                } else if (horaMinutoAtualStr >= configAlmoco.out) {
-                    if (estadoAutomacao.almocoAtivo) {
-                        const hojeStr = new Date().toISOString().split('T')[0];
-                        const logHoje = mealLogs[hojeStr]?.[currentUser];
-                        if (logHoje && logHoje.start && !logHoje.end) { registrarAlmoço('end'); }
-                        estadoAutomacao.almocoAtivo = false;
-                    }
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
+            const [hIn, mIn] = jornada.in.split(':').map(Number);
+            const [hOut, mOut] = jornada.out.split(':').map(Number);
+            const inicioJornada = hIn * 60 + mIn;
+            const fimJornada = hOut * 60 + mOut;
+
+            if (minutosAgora < inicioJornada || minutosAgora >= fimJornada) return null;
+
+            const almoco = almocosPadrao[userKey];
+            if (almoco && almoco.in && almoco.out) {
+                const [hi, mi] = almoco.in.split(':').map(Number);
+                const [ho, mo] = almoco.out.split(':').map(Number);
+                const inicio = hi * 60 + mi;
+                const fim = ho * 60 + mo;
+                if (minutosAgora >= inicio && minutosAgora < fim && inicio >= inicioJornada && fim <= fimJornada) {
+                    return {
+                        key: `almoco_${userKey}_${almoco.in}_${almoco.out}`,
+                        tipo: 'almoco',
+                        inicio,
+                        fim,
+                        motivo: 'Pausa automática: Horário de Almoço iniciado'
+                    };
                 }
             }
 
-            const naJanelaDescansoManha = (totalMinutos >= 590 && totalMinutos < 600);
-            const naJanelaDescansoTarde = (totalMinutos >= 930 && totalMinutos < 940);
+            const descansos = [
+                {key:'descanso_manha', inicio:590, fim:600, motivo:'Pausa automática: Horário de Descanso da manhã'},
+                {key:'descanso_tarde', inicio:930, fim:940, motivo:'Pausa automática: Horário de Descanso da tarde'}
+            ];
 
-            if (naJanelaDescansoManha || naJanelaDescansoTarde) {
-                if (!estadoAutomacao.descansoAtivo) {
-                    pausarTarefasEmExecucaoAutomatico("Pausa automática: Horário de Descanso setorial");
-                    const hojeStr = new Date().toISOString().split('T')[0];
-                    const logHoje = descansoLogs[hojeStr]?.[currentUser];
-                    if (!logHoje || !logHoje.start) { registrarDescanso('start'); }
-                    estadoAutomacao.descansoAtivo = true;
+            for (const d of descansos) {
+                if (minutosAgora >= d.inicio && minutosAgora < d.fim) {
+                    return {
+                        key: `${d.key}_${userKey}`,
+                        tipo: 'descanso',
+                        inicio: d.inicio,
+                        fim: d.fim,
+                        motivo: d.motivo
+                    };
+                }
+            }
+            return null;
+        }
+
+        function intervaloAnteriorAutomatico(userKey, agora = new Date()) {
+            if (agora.getDay() < 1 || agora.getDay() > 5) return null;
+            const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
+            const candidatos = [];
+
+            const almoco = almocosPadrao[userKey];
+            if (almoco && almoco.in && almoco.out) {
+                const [hi, mi] = almoco.in.split(':').map(Number);
+                const [ho, mo] = almoco.out.split(':').map(Number);
+                const inicio = hi * 60 + mi;
+                const fim = ho * 60 + mo;
+                if (fim <= minutosAgora) {
+                    candidatos.push({ key:`almoco_${userKey}_${almoco.in}_${almoco.out}`, tipo:'almoco', fim });
+                }
+            }
+
+            if (600 <= minutosAgora) candidatos.push({key:`descanso_manha_${userKey}`, tipo:'descanso', fim:600});
+            if (940 <= minutosAgora) candidatos.push({key:`descanso_tarde_${userKey}`, tipo:'descanso', fim:940});
+
+            if (!candidatos.length) return null;
+            candidatos.sort((a,b)=>b.fim-a.fim);
+            return candidatos[0];
+        }
+
+        function pausarTarefasAutomaticamente(userKey, intervalo, agoraMs) {
+            let alterou = false;
+            tasks.forEach(task => {
+                const logs = Array.isArray(task.timeLogs) ? task.timeLogs : [];
+                const ultimoLog = logs.length ? logs[logs.length - 1] : null;
+                if (!ultimoLog || ultimoLog.type !== 'start' || ultimoLog.by !== userKey) return;
+
+                logs.push({
+                    type: 'pause',
+                    time: agoraMs,
+                    by: 'sistema',
+                    byName: 'Sistema (Automático)',
+                    reason: intervalo.motivo,
+                    requestedBy: 'Sistema',
+                    autoPause: true,
+                    autoIntervalKey: intervalo.key,
+                    autoIntervalType: intervalo.tipo,
+                    autoPausedUser: userKey
+                });
+                task.timeLogs = logs;
+                alterou = true;
+                if (database) database.ref('tasks/ativas/' + task.id).set(task);
+            });
+            return alterou;
+        }
+
+        function retomarTarefasAutomaticamente(userKey, intervalo, agoraMs) {
+            let alterou = false;
+            tasks.forEach(task => {
+                const logs = Array.isArray(task.timeLogs) ? task.timeLogs : [];
+                const ultimoLog = logs.length ? logs[logs.length - 1] : null;
+                if (!ultimoLog || ultimoLog.type !== 'pause' || !ultimoLog.autoPause) return;
+                if (ultimoLog.autoIntervalKey !== intervalo.key || ultimoLog.autoPausedUser !== userKey) return;
+
+                logs.push({
+                    type: 'start',
+                    time: agoraMs,
+                    by: userKey,
+                    byName: nomesExibicao[userKey],
+                    autoResume: true,
+                    autoIntervalKey: intervalo.key,
+                    autoIntervalType: intervalo.tipo
+                });
+                task.timeLogs = logs;
+                alterou = true;
+                if (database) database.ref('tasks/ativas/' + task.id).set(task);
+            });
+            return alterou;
+        }
+
+        function atualizarRegistroIntervaloAutomatico(userKey, tipo, status, agoraMs) {
+            const hojeStr = new Date(agoraMs).toISOString().split('T')[0];
+            if (tipo === 'almoco') {
+                const refPath = `almoço/historico/${hojeStr}/${userKey}`;
+                if (database) {
+                    if (status === 'start') database.ref(refPath).set({start: agoraMs, automatico:true});
+                    else database.ref(refPath).update({end: agoraMs, automatico:true});
                 }
             } else {
-                if (estadoAutomacao.descansoAtivo) {
-                    const hojeStr = new Date().toISOString().split('T')[0];
-                    const logHoje = descansoLogs[hojeStr]?.[currentUser];
-                    if (logHoje && logHoje.start && !logHoje.end) { registrarDescanso('end'); }
-                    estadoAutomacao.descansoAtivo = false;
-                }
-            }
-
-            const configJornada = jornadas[currentUser];
-            if (configJornada && configJornada.out) {
-                if (horaMinutoAtualStr >= configJornada.out) {
-                    pausarTarefasEmExecucaoAutomatico("Pausa automática: Fim do Expediente atingido");
+                const refPath = `descanso/historico/${hojeStr}/${userKey}`;
+                if (database) {
+                    if (status === 'start') database.ref(refPath).set({start: agoraMs, automatico:true});
+                    else database.ref(refPath).update({end: agoraMs, automatico:true});
                 }
             }
         }
 
-        function registrarDescanso(status) {
-            const hojeStr = new Date().toISOString().split('T')[0]; const refPath = `descanso/historico/${hojeStr}/${currentUser}`;
+        function verificarEExecutarHorariosAutomaticos() {
+            if (currentUser === 'visitante') return;
+
+            const agora = new Date();
+            if (agora.getDay() < 1 || agora.getDay() > 5) return;
+            const agoraMs = agora.getTime();
+            const chavesEquipe = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+
+            chavesEquipe.forEach(userKey => {
+                const intervaloAtual = obterIntervaloAutomatico(userKey, agora);
+
+                if (intervaloAtual) {
+                    const hojeStr = new Date(agoraMs).toISOString().split('T')[0];
+                    const registro = intervaloAtual.tipo === 'almoco'
+                        ? mealLogs[hojeStr]?.[userKey]
+                        : descansoLogs[hojeStr]?.[userKey];
+
+                    if (!registro || !registro.start) {
+                        atualizarRegistroIntervaloAutomatico(userKey, intervaloAtual.tipo, 'start', agoraMs);
+                    }
+                    pausarTarefasAutomaticamente(userKey, intervaloAtual, agoraMs);
+                } else {
+                    const anterior = intervaloAnteriorAutomatico(userKey, agora);
+                    if (anterior) {
+                        const hojeStr = new Date(agoraMs).toISOString().split('T')[0];
+                        const registro = anterior.tipo === 'almoco'
+                            ? mealLogs[hojeStr]?.[userKey]
+                            : descansoLogs[hojeStr]?.[userKey];
+
+                        if (registro && registro.start && !registro.end) {
+                            atualizarRegistroIntervaloAutomatico(userKey, anterior.tipo, 'end', agoraMs);
+                        }
+
+                        // Retoma somente o que foi pausado automaticamente por aquele intervalo.
+                        retomarTarefasAutomaticamente(userKey, anterior, agoraMs);
+                    }
+                }
+
+                const jornada = jornadas[userKey];
+                if (jornada && jornada.out) {
+                    const [hOut, mOut] = jornada.out.split(':').map(Number);
+                    const fimJornada = hOut * 60 + mOut;
+                    const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
+                    if (minutosAgora >= fimJornada) {
+                        const logsFim = {key:`jornada_fim_${userKey}`, tipo:'jornada_fim', motivo:'Pausa automática: Fim do Expediente atingido'};
+                        pausarTarefasAutomaticamente(userKey, logsFim, agoraMs);
+                    }
+                }
+            });
+        }
+
+        function registrarDescanso(status, userKey = currentUser) {
+            const hojeStr = new Date().toISOString().split('T')[0]; const refPath = `descanso/historico/${hojeStr}/${userKey}`;
             if (status === 'start') { if (database) database.ref(refPath).set({ start: new Date().getTime() }); } 
             else { if (database) database.ref(refPath).update({ end: new Date().getTime() }); }
         }
 
-        function registrarAlmoço(status) {
-            const hojeStr = new Date().toISOString().split('T')[0]; const refPath = `almoço/historico/${hojeStr}/${currentUser}`;
+        function registrarAlmoço(status, userKey = currentUser) {
+            const hojeStr = new Date().toISOString().split('T')[0]; const refPath = `almoço/historico/${hojeStr}/${userKey}`;
             if (status === 'start') { if (database) database.ref(refPath).set({ start: new Date().getTime() }); } 
             else { if (database) database.ref(refPath).update({ end: new Date().getTime() }); }
         }
@@ -1729,6 +1926,7 @@
 
         /* --- FILTRO INTELIGENTE E RENDERIZAÇÃO DE TAREFAS --- */
         function renderTasks() {
+            if (currentUser === 'visitante') return;
             const taskList = document.getElementById('taskList'); if(!taskList) return;
             taskList.innerHTML = '';
             
@@ -1826,7 +2024,7 @@
                         ${currentUser !== 'visitante' ? `<button class="btn-action btn-edit" onclick="abrirModalEdicao('${task.id}')">Editar ✏️</button>` : ''}
                         ${!isRunning ? 
                             `<button class="${classeBotao} btn-start" ${atributoDesabilitado} onclick="alterarCronometro('${task.id}', 'start')">Iniciar Task ▶️</button>` : 
-                            `<button class="${classeBotao} btn-pause" ${atributoDesabilitado} onclick="alterarCronometro('${task.id}', 'pause')">Pausar Task ⏸️</button>`
+                            `<span style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:4px;background:#fff4e5;color:#9a6700;font-weight:700;font-size:.8rem;">⏸️ Pausas automáticas</span>`
                         }
                         <button class="${classeBotao} btn-done" ${atributoDesabilitado} onclick="finishTask('${task.id}')">Concluir ✓</button>
                     </div>
@@ -2174,35 +2372,14 @@
 
 
         /* ===== MÉTRICAS PRECISAS DE TEMPO POR TAREFA ===== */
-        const EXEC_JORNADA_IN = {h:7, m:12};
-        const EXEC_JORNADA_OUT = {h:17, m:0};
-
         function execIsWeekday(d) {
             const day = d.getDay();
             return day >= 1 && day <= 5;
         }
 
-        function execWorkingMinutesBetween(startMs, endMs) {
+        function execWorkingMinutesBetween(startMs, endMs, userKey) {
             if (!startMs || !endMs || endMs <= startMs) return 0;
-            let total = 0;
-            let cursor = new Date(startMs);
-            const end = new Date(endMs);
-
-            while (cursor <= end) {
-                const day = cursor.getDay();
-                if (day >= 1 && day <= 5) {
-                    const ini = new Date(cursor);
-                    ini.setHours(EXEC_JORNADA_IN.h, EXEC_JORNADA_IN.m, 0, 0);
-                    const fim = new Date(cursor);
-                    fim.setHours(EXEC_JORNADA_OUT.h, EXEC_JORNADA_OUT.m, 0, 0);
-                    const a = Math.max(startMs, ini.getTime());
-                    const b = Math.min(endMs, fim.getTime());
-                    if (a < b) total += b - a;
-                }
-                cursor.setDate(cursor.getDate()+1);
-                cursor.setHours(0,0,0,0);
-            }
-            return Math.round(total / 60000);
+            return Math.round(calcularMilissegundosUteisNoPeriodo(startMs, endMs, userKey) / 60000);
         }
 
         function execTaskTrackedSegments(t, userKey) {
@@ -2223,7 +2400,7 @@
                     started = true;
                 } else if (log.type === 'pause' || log.type === 'finish') {
                     if (activeStart !== null && log.time > activeStart) {
-                        minutes += execWorkingMinutesBetween(activeStart, log.time);
+                        minutes += execWorkingMinutesBetween(activeStart, log.time, userKey);
                         if (log.type === 'finish') exact = true;
                     }
                     activeStart = null;
@@ -2252,8 +2429,36 @@
             return count;
         }
 
-        function execCapacityMinutes(start, end) {
-            return execBusinessDaysInclusive(start,end) * 588; // 9h48 por dia
+        function minutosEntreHorarios(inicio, fim) {
+            if (!inicio || !fim) return 0;
+            const [hi, mi] = inicio.split(':').map(Number);
+            const [hf, mf] = fim.split(':').map(Number);
+            const a = hi * 60 + mi, b = hf * 60 + mf;
+            return Math.max(0, b - a);
+        }
+
+        function execCapacidadeDiariaUtilMin(userKey) {
+            const jornada = jornadas[userKey] || {in:'07:12',out:'17:00'};
+            let total = minutosEntreHorarios(jornada.in, jornada.out);
+
+            const almoco = almocosPadrao[userKey];
+            if (almoco) total -= minutosEntreHorarios(almoco.in, almoco.out);
+
+            // Descansos automáticos setoriais: 09:50–10:00 e 15:30–15:40,
+            // somente quando o intervalo estiver dentro da jornada cadastrada.
+            const [hIn,mIn] = jornada.in.split(':').map(Number);
+            const [hOut,mOut] = jornada.out.split(':').map(Number);
+            const inicioJ = hIn*60+mIn, fimJ = hOut*60+mOut;
+            [[590,600],[930,940]].forEach(([a,b]) => {
+                const inicio = Math.max(a, inicioJ);
+                const fim = Math.min(b, fimJ);
+                if (inicio < fim) total -= (fim-inicio);
+            });
+            return Math.max(0,total);
+        }
+
+        function execCapacityMinutes(start, end, userKey) {
+            return execBusinessDaysInclusive(start,end) * execCapacidadeDiariaUtilMin(userKey);
         }
 
         function execEmployeeTimeMetrics(completed, userKey, start, end) {
@@ -2266,7 +2471,7 @@
                     exactTasks++;
                 }
             });
-            const capacity = execCapacityMinutes(start,end);
+            const capacity = execCapacityMinutes(start,end,userKey);
             return {
                 tasks: mine.length,
                 tracked,
@@ -2347,8 +2552,7 @@
                 return `<tr><td><strong>${row[0]}</strong></td><td class="num">${row[1]}${row[0]==='Cumprimento de prazo'?'%':''}</td><td class="num">${row[2]}${row[0]==='Cumprimento de prazo'?'%':''}</td><td class="num">${v>0?'+':''}${v}${suffix}</td></tr>`;
             }).join('');
 
-            // Tempo produtivo, capacidade e ocupação
-            const totalCapacidade = execCapacityMinutes(start,end);
+            // Tempo produtivo, capacidade e ocupação por jornada cadastrada.
             let totalTempoRastreado = 0, totalTarefasExatas = 0;
             const capacityRows = team.map(x => {
                 const tm = execEmployeeTimeMetrics(cur.completed,x.key,start,end);
@@ -2357,6 +2561,7 @@
                 return {...x,...tm};
             });
 
+            const totalCapacidade = capacityRows.reduce((sum,x)=>sum + x.capacity,0);
             const ocupacaoGeral = totalCapacidade ? Math.round((totalTempoRastreado/totalCapacidade)*100) : 0;
             const tempoMedioGeral = totalTarefasExatas ? Math.round(totalTempoRastreado/totalTarefasExatas) : 0;
 
@@ -2434,6 +2639,10 @@
             const metrics = execEmployeeTimeMetrics(cur.completed,userKey,start,end);
             const sla = execPercent(onTime.length,completed.length);
             const variation = execVariation(completed.length,oldCompleted.length);
+            const meta = metasEquipe[userKey] || {tarefasDia:0, tempoMedioMetaMin:0};
+            const diasUteis = execBusinessDaysInclusive(start,end);
+            const metaPeriodo = Number(meta.tarefasDia) > 0 ? Number(meta.tarefasDia) * diasUteis : 0;
+            const atingimentoMeta = metaPeriodo > 0 ? Math.round((completed.length/metaPeriodo)*100) : null;
             const fmtMin = min => {
                 if (!min || min < 1) return '0m';
                 const h=Math.floor(min/60), m=min%60;
@@ -2458,9 +2667,35 @@
             set('indOcupacaoSub',`${fmtMin(metrics.capacity)} de capacidade útil`);
             set('indTempoMedio',fmtMin(metrics.avg));
             set('indTempoMedioSub',`${metrics.exactTasks} tarefa(s) com tempo exato`);
+            set('indMetaDiaria',meta.tarefasDia > 0 ? `${meta.tarefasDia}` : 'Não definida');
+            set('indMetaDiariaSub',meta.tarefasDia > 0 ? `${metaPeriodo} tarefa(s) na meta deste período` : 'Cadastre em Gerenciar Equipe');
+            set('indTempoMedioMeta',meta.tempoMedioMetaMin > 0 ? fmtMin(meta.tempoMedioMetaMin) : 'Não definida');
+            set('indTempoMedioMetaSub',meta.tempoMedioMetaMin > 0 ? 'tempo alvo por tarefa' : 'Cadastre em Gerenciar Equipe');
+            set('indAtingimentoMeta',atingimentoMeta !== null ? `${atingimentoMeta}%` : '—');
+            set('indAtingimentoMetaSub',metaPeriodo > 0 ? `${completed.length} / ${metaPeriodo} concluídas` : 'Meta de produção não definida');
             set('indTarefasHora',metrics.tracked > 0 ? (metrics.exactTasks/(metrics.tracked/60)).toFixed(2) : '0');
             const slaEl=document.getElementById('indSLA');
             if(slaEl) slaEl.className='value '+(sla>=90?'exec-positive':sla>=75?'exec-warning':'exec-danger');
+            const targetsBody = document.getElementById('execTargetsBody');
+            if (targetsBody) {
+                const teamKeys = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+                targetsBody.innerHTML = teamKeys.map(k => {
+                    const m = metasEquipe[k] || {tarefasDia:0, tempoMedioMetaMin:0};
+                    const tm = execEmployeeTimeMetrics(cur.completed,k,start,end);
+                    const metaP = m.tarefasDia > 0 ? m.tarefasDia * diasUteis : 0;
+                    const ating = metaP > 0 ? Math.round((tm.tasks/metaP)*100) : null;
+                    return `<tr>
+                        <td><strong>${nomesExibicao[k] || k}</strong></td>
+                        <td class="num">${(jornadas[k]?.in || '—')} às ${(jornadas[k]?.out || '—')}</td>
+                        <td class="num">${m.tarefasDia > 0 ? m.tarefasDia : 'Não definida'}</td>
+                        <td class="num">${metaP > 0 ? metaP : '—'}</td>
+                        <td class="num">${m.tempoMedioMetaMin > 0 ? fmtMin(m.tempoMedioMetaMin) : 'Não definida'}</td>
+                        <td class="num">${tm.exactTasks > 0 ? fmtMin(tm.avg) : '—'}</td>
+                        <td class="num">${ating !== null ? ating+'%' : '—'}</td>
+                    </tr>`;
+                }).join('');
+            }
+
             const body=document.getElementById('execIndividualTasksBody');
             if(!body) return;
             const rows=assigned.slice().sort((a,b)=>(execTaskCreatedDate(b)?.getTime()||0)-(execTaskCreatedDate(a)?.getTime()||0));
@@ -2610,6 +2845,7 @@
         }
 
         function updateReportDashboard() {
+            if (currentUser === 'visitante') return;
             if (document.getElementById('tabRelatorios').style.display === 'none') return;
             updateExecutiveReport();
             const metrics = getFilteredMetrics();
@@ -2664,19 +2900,9 @@
                     janelaTotalMinutosHoje = Math.round((Math.min(new Date().setHours(hOut, mOut), agoraMs) - new Date().setHours(hIn, mIn)) / 1000 / 60);
                 }
 
-                if (userKey === 'admin') {
-                    if (metrics.apenasHoje) {
-                        totalTrabalhoMin = Math.max(0, janelaTotalMinutosHoje - totalAlmoçoMin - descansoLegalMin);
-                    } else {
-                        const totalJornadaPadraoMin = (hOut * 60 + mOut) - (hIn * 60 + mIn) - totalAlmoçoMin;
-                        totalTrabalhoMin = totalJornadaPadraoMin;
-                    }
-                    totalInterrupcoesMin = 0; 
-                } else {
-                    const tempos = calcularTempoTrabalhoEInterrupcoes(userKey, metrics.dataCorte, metrics.apenasHoje);
-                    totalTrabalhoMin = tempos.trabalho;
-                    totalInterrupcoesMin = tempos.interrupcao;
-                }
+                const tempos = calcularTempoTrabalhoEInterrupcoes(userKey, metrics.dataCorte, metrics.apenasHoje);
+                totalTrabalhoMin = tempos.trabalho;
+                totalInterrupcoesMin = tempos.interrupcao;
 
                 let totalOciosoMin = metrics.apenasHoje ? Math.max(0, janelaTotalMinutosHoje - totalTrabalhoMin - totalAlmoçoMin - descansoLegalMin - totalInterrupcoesMin) : 0;
                 labelsTime.push(nomesExibicao[userKey]); dataWork.push(totalTrabalhoMin);
@@ -2705,6 +2931,9 @@
                     options: { responsive: true, maintainAspectRatio: false }
                 });
             }
+
+            // Mantém a visão individual sincronizada com o mesmo período e os dados atuais.
+            inicializarRelatorioIndividual();
         }
 
         function abrirDetalhamentoStatus(tipoStatus) {
@@ -2977,13 +3206,21 @@
                     nome: document.getElementById(`cfg_user${i}`).value,
                     jornada: { in: document.getElementById(`cfg_in${i}`).value, out: document.getElementById(`cfg_out${i}`).value },
                     almoco: { in: document.getElementById(`cfg_meal_in${i}`).value, out: document.getElementById(`cfg_meal_out${i}`).value },
+                    metas: {
+                        tarefasDia: Number(document.getElementById(`cfg_meta${i}`).value) || 0,
+                        tempoMedioMetaMin: Number(document.getElementById(`cfg_tempo_meta${i}`).value) || 0
+                    },
                     senha: document.getElementById(`cfg_pass${i}`).value || "123", podeLancar: document.getElementById(`cfg_perm${i}`).checked
                 };
             }
             configEquipe['admin'] = {
                 nome: document.getElementById('cfg_admin_nome').value || nomesExibicao['admin'],
                 jornada: { in: document.getElementById('cfg_admin_in').value, out: document.getElementById('cfg_admin_out').value },
-                almoco: { in: document.getElementById('cfg_admin_meal_in').value, out: document.getElementById('cfg_admin_meal_out').value }
+                almoco: { in: document.getElementById('cfg_admin_meal_in').value, out: document.getElementById('cfg_admin_meal_out').value },
+                metas: {
+                    tarefasDia: Number(document.getElementById('cfg_admin_meta').value) || 0,
+                    tempoMedioMetaMin: Number(document.getElementById('cfg_admin_tempo_meta').value) || 0
+                }
             };
             if (database) database.ref('configuracoes/equipe').set(configEquipe).then(() => alert("Configuração gravada!"));
         }
