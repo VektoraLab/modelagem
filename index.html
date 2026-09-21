@@ -649,7 +649,7 @@
                 <div class="exec-kpi"><div class="label">Ocupação produtiva</div><div class="value exec-neutral" id="indOcupacao">0%</div><div class="sub" id="indOcupacaoSub">tempo / capacidade útil</div></div>
                 <div class="exec-kpi"><div class="label">Tempo médio real por tarefa</div><div class="value exec-neutral" id="indTempoMedio">0m</div><div class="sub" id="indTempoMedioSub">tarefas com tempo exato</div></div>
                 <div class="exec-kpi"><div class="label">Meta diária de tarefas</div><div class="value exec-neutral" id="indMetaDiaria">Não definida</div><div class="sub" id="indMetaDiariaSub">cadastre em Gerenciar Equipe</div></div>
-                <div class="exec-kpi"><div class="label">Meta de tempo médio</div><div class="value exec-neutral" id="indTempoMedioMeta">Não definida</div><div class="sub" id="indTempoMedioMetaSub">minutos por tarefa</div></div>
+                <div class="exec-kpi"><div class="label">Meta de tempo médio</div><div class="value exec-neutral" id="indTempoMedioMeta">Não definida</div><div class="sub" id="indTempoMedioMetaSub">horas decimais por tarefa</div></div>
                 <div class="exec-kpi"><div class="label">Atingimento da meta</div><div class="value exec-neutral" id="indAtingimentoMeta">—</div><div class="sub" id="indAtingimentoMetaSub">concluídas / meta do período</div></div>
                 <div class="exec-kpi"><div class="label">Tarefas por hora</div><div class="value exec-neutral" id="indTarefasHora">0</div><div class="sub">produção por hora rastreada</div></div>
             </div>
@@ -974,9 +974,9 @@
                         </div>
                         <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
                             <input type="number" min="0" step="1" id="cfg_admin_meta" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
-                            <input type="number" min="0" step="1" id="cfg_admin_tempo_meta" class="form-control" title="Tempo médio alvo em minutos" placeholder="Tempo médio alvo (min)">
+                            <input type="number" min="0" step="0.01" id="cfg_admin_tempo_meta" class="form-control" title="Tempo médio alvo em horas decimais" placeholder="Tempo médio alvo (h)" step="0.01">
                         </div>
-                        <div style="font-size:0.72rem;color:#667085;margin-top:4px;">Meta individual: tarefas por dia | tempo médio alvo por tarefa (minutos).</div>
+                        <div style="font-size:0.72rem;color:#667085;margin-top:4px;">Meta individual: tarefas por dia | tempo médio alvo por tarefa (horas decimais).</div>
                     </div>
                 </div>
                 <button class="btn-submit" style="margin-top: 15px; background: var(--success-color);" onclick="salvarConfiguracaoEquipe()">Gravar Configurações</button>
@@ -1436,9 +1436,9 @@
                         </div>
                         <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
                             <input type="number" min="0" step="1" id="cfg_meta${i}" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
-                            <input type="number" min="0" step="1" id="cfg_tempo_meta${i}" class="form-control" title="Tempo médio alvo em minutos" placeholder="Tempo médio alvo (min)">
+                            <input type="number" min="0" step="0.01" id="cfg_tempo_meta${i}" class="form-control" title="Tempo médio alvo em horas decimais" placeholder="Tempo médio alvo (h)" step="0.01">
                         </div>
-                        <div style="font-size:0.72rem;color:#667085;margin-bottom:5px;">Meta diária | tempo médio alvo por tarefa (min).</div>
+                        <div style="font-size:0.72rem;color:#667085;margin-bottom:5px;">Meta diária | tempo médio alvo por tarefa (horas decimais).</div>
                         <div style="display:flex; gap:10px; align-items:center; margin-top:5px; border-top: 1px dashed #ddd; padding-top:5px;">
                             <input type="password" id="cfg_pass${i}" class="form-control" style="width:130px; padding:5px; font-size:0.8rem;" placeholder="Senha">
                             <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color); cursor:pointer;">
@@ -1473,7 +1473,7 @@
                     if (document.getElementById('cfg_admin_meal_in')) document.getElementById('cfg_admin_meal_in').value = almocosPadrao['admin'].in;
                     if (document.getElementById('cfg_admin_meal_out')) document.getElementById('cfg_admin_meal_out').value = almocosPadrao['admin'].out;
                     if (document.getElementById('cfg_admin_meta')) document.getElementById('cfg_admin_meta').value = metasEquipe['admin'].tarefasDia || '';
-                    if (document.getElementById('cfg_admin_tempo_meta')) document.getElementById('cfg_admin_tempo_meta').value = metasEquipe['admin'].tempoMedioMetaMin || '';
+                    if (document.getElementById('cfg_admin_tempo_meta')) document.getElementById('cfg_admin_tempo_meta').value = metasEquipe['admin'].tempoMedioMetaMin > 0 ? (metasEquipe['admin'].tempoMedioMetaMin / 60).toFixed(2) : '';
 
                     for(let i=1; i<=5; i++) {
                         const uKey = `usuario_${i}`;
@@ -1483,7 +1483,7 @@
                         if (document.getElementById(`cfg_meal_in${i}`)) document.getElementById(`cfg_meal_in${i}`).value = almocosPadrao[uKey].in;
                         if (document.getElementById(`cfg_meal_out${i}`)) document.getElementById(`cfg_meal_out${i}`).value = almocosPadrao[uKey].out;
                         if (document.getElementById(`cfg_meta${i}`)) document.getElementById(`cfg_meta${i}`).value = metasEquipe[uKey].tarefasDia || '';
-                        if (document.getElementById(`cfg_tempo_meta${i}`)) document.getElementById(`cfg_tempo_meta${i}`).value = metasEquipe[uKey].tempoMedioMetaMin || '';
+                        if (document.getElementById(`cfg_tempo_meta${i}`)) document.getElementById(`cfg_tempo_meta${i}`).value = metasEquipe[uKey].tempoMedioMetaMin > 0 ? (metasEquipe[uKey].tempoMedioMetaMin / 60).toFixed(2) : '';
                         if (document.getElementById(`cfg_pass${i}`)) document.getElementById(`cfg_pass${i}`).value = senhasEquipe[uKey];
                         if (document.getElementById(`cfg_perm${i}`)) document.getElementById(`cfg_perm${i}`).checked = permissoesLancar[uKey];
                         if (document.getElementById(`lbl_user${i}`)) document.getElementById(`lbl_user${i}`).innerText = `Funcionário ${i} (${nomesExibicao[uKey]}):`;
@@ -1660,9 +1660,18 @@
                 container.className = 'dashboard-layout full-width';
                 document.getElementById('adminTabs').style.display = temPermissaoLancar ? 'flex' : 'none';
                 btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
-                if (!temPermissaoLancar && document.getElementById('tabLancamento').style.display === 'block') switchTab('painel');
+                // Colaborador logado sempre tem acesso ao painel e ao relatório, mesmo sem permissão de lançamento.
+                // A aba de gerenciamento permanece exclusiva do administrador e Composição e Consumo segue sua própria permissão.
+                document.getElementById('adminTabs').style.display = 'flex';
+                document.getElementById('btnTabPainel').style.display = 'block';
+                document.getElementById('btnTabRelatorios').style.display = 'block';
+                document.getElementById('btnTabGerenciamento').style.display = 'none';
+                if (!temPermissaoLancar) document.getElementById('btnTabLancamento').style.display = 'none';
                 reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block';
                 verificarAlertasCriticos();
+                // O visitante deixa o painel oculto; por isso, após o login do colaborador,
+                // a tela principal precisa ser explicitamente reaberta.
+                switchTab('painel');
             }
             renderTasks(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
         }
@@ -2129,9 +2138,14 @@
         function calcularTempoTrabalhoEInterrupcoes(userKey, deDataStr, apenasHoje = false) {
             const agoraMs = new Date().getTime(); let eventos = [];
             const processarLogs = (t) => {
-                if (!t.timeLogs) return;
+                if (!Array.isArray(t.timeLogs)) return;
                 t.timeLogs.forEach(log => {
-                    if (log.by === userKey && log.time >= new Date(deDataStr).getTime()) { eventos.push({ time: log.time, type: log.type }); }
+                    if (!log || !Number.isFinite(Number(log.time)) || log.time < new Date(deDataStr).getTime()) return;
+                    // Inícios/retomadas pertencem ao funcionário; pausas e conclusões também fecham o segmento
+                    // quando foram registradas automaticamente pelo sistema.
+                    if (log.by === userKey || log.type === 'pause' || log.type === 'finish') {
+                        eventos.push({ time: Number(log.time), type: log.type, by: log.by, autoPause: !!log.autoPause, autoResume: !!log.autoResume });
+                    }
                 });
             };
             historicTasks.forEach(t => { if(t.dateFinished >= deDataStr) processarLogs(t); });
@@ -2385,8 +2399,16 @@
         function execTaskTrackedSegments(t, userKey) {
             if (!t || !Array.isArray(t.timeLogs)) return {minutes:0, exact:false, started:false};
             const logs = t.timeLogs
-                .filter(l => l && l.by === userKey && Number.isFinite(Number(l.time)))
-                .map(l => ({type:l.type, time:Number(l.time)}))
+                .filter(l => l && Number.isFinite(Number(l.time)) && (
+                    l.by === userKey || l.type === 'pause' || l.type === 'finish'
+                ))
+                .map(l => ({
+                    type:l.type,
+                    time:Number(l.time),
+                    by:l.by,
+                    autoPause:!!l.autoPause,
+                    autoResume:!!l.autoResume
+                }))
                 .sort((a,b)=>a.time-b.time);
 
             let activeStart = null;
@@ -2617,6 +2639,11 @@
             });
         }
 
+        function fmtHorasDecimais(minutos) {
+            const horas = Number(minutos || 0) / 60;
+            return `${horas.toFixed(2).replace('.', ',')} h`;
+        }
+
         function updateExecutiveIndividualReport() {
             const periodSelect = document.getElementById('reportPeriod');
             const employeeSelect = document.getElementById('execIndividualEmployee');
@@ -2669,8 +2696,8 @@
             set('indTempoMedioSub',`${metrics.exactTasks} tarefa(s) com tempo exato`);
             set('indMetaDiaria',meta.tarefasDia > 0 ? `${meta.tarefasDia}` : 'Não definida');
             set('indMetaDiariaSub',meta.tarefasDia > 0 ? `${metaPeriodo} tarefa(s) na meta deste período` : 'Cadastre em Gerenciar Equipe');
-            set('indTempoMedioMeta',meta.tempoMedioMetaMin > 0 ? fmtMin(meta.tempoMedioMetaMin) : 'Não definida');
-            set('indTempoMedioMetaSub',meta.tempoMedioMetaMin > 0 ? 'tempo alvo por tarefa' : 'Cadastre em Gerenciar Equipe');
+            set('indTempoMedioMeta',meta.tempoMedioMetaMin > 0 ? fmtHorasDecimais(meta.tempoMedioMetaMin) : 'Não definida');
+            set('indTempoMedioMetaSub',meta.tempoMedioMetaMin > 0 ? 'horas decimais alvo por tarefa' : 'Cadastre em Gerenciar Equipe');
             set('indAtingimentoMeta',atingimentoMeta !== null ? `${atingimentoMeta}%` : '—');
             set('indAtingimentoMetaSub',metaPeriodo > 0 ? `${completed.length} / ${metaPeriodo} concluídas` : 'Meta de produção não definida');
             set('indTarefasHora',metrics.tracked > 0 ? (metrics.exactTasks/(metrics.tracked/60)).toFixed(2) : '0');
@@ -2689,7 +2716,7 @@
                         <td class="num">${(jornadas[k]?.in || '—')} às ${(jornadas[k]?.out || '—')}</td>
                         <td class="num">${m.tarefasDia > 0 ? m.tarefasDia : 'Não definida'}</td>
                         <td class="num">${metaP > 0 ? metaP : '—'}</td>
-                        <td class="num">${m.tempoMedioMetaMin > 0 ? fmtMin(m.tempoMedioMetaMin) : 'Não definida'}</td>
+                        <td class="num">${m.tempoMedioMetaMin > 0 ? fmtHorasDecimais(m.tempoMedioMetaMin) : 'Não definida'}</td>
                         <td class="num">${tm.exactTasks > 0 ? fmtMin(tm.avg) : '—'}</td>
                         <td class="num">${ating !== null ? ating+'%' : '—'}</td>
                     </tr>`;
@@ -2714,9 +2741,11 @@
             const select=document.getElementById('execIndividualEmployee');
             if(!select) return;
             const keys=['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
-            const atual=select.value||'admin';
+            const atual = (currentUser !== 'admin' && currentUser !== 'visitante') ? currentUser : (select.value || 'admin');
             select.innerHTML=keys.map(k=>`<option value="${k}">${nomesExibicao[k]||k}</option>`).join('');
             select.value=keys.includes(atual)?atual:'admin';
+            // Colaborador visualiza o próprio relatório; administrador pode selecionar qualquer funcionário.
+            select.disabled = currentUser !== 'admin';
             updateExecutiveIndividualReport();
         }
 
@@ -3208,7 +3237,7 @@
                     almoco: { in: document.getElementById(`cfg_meal_in${i}`).value, out: document.getElementById(`cfg_meal_out${i}`).value },
                     metas: {
                         tarefasDia: Number(document.getElementById(`cfg_meta${i}`).value) || 0,
-                        tempoMedioMetaMin: Number(document.getElementById(`cfg_tempo_meta${i}`).value) || 0
+                        tempoMedioMetaMin: Math.round((Number(document.getElementById(`cfg_tempo_meta${i}`).value) || 0) * 60)
                     },
                     senha: document.getElementById(`cfg_pass${i}`).value || "123", podeLancar: document.getElementById(`cfg_perm${i}`).checked
                 };
@@ -3219,7 +3248,7 @@
                 almoco: { in: document.getElementById('cfg_admin_meal_in').value, out: document.getElementById('cfg_admin_meal_out').value },
                 metas: {
                     tarefasDia: Number(document.getElementById('cfg_admin_meta').value) || 0,
-                    tempoMedioMetaMin: Number(document.getElementById('cfg_admin_tempo_meta').value) || 0
+                    tempoMedioMetaMin: Math.round((Number(document.getElementById('cfg_admin_tempo_meta').value) || 0) * 60)
                 }
             };
             if (database) database.ref('configuracoes/equipe').set(configEquipe).then(() => alert("Configuração gravada!"));
