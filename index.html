@@ -646,6 +646,7 @@
                 <div class="exec-kpi"><div class="label">Atrasos ativos</div><div class="value exec-danger" id="indAtrasadas">0</div><div class="sub">tarefas em aberto vencidas</div></div>
                 <div class="exec-kpi"><div class="label">Variação de entregas</div><div class="value exec-neutral" id="indVariacao">0%</div><div class="sub" id="indVariacaoSub">vs. período anterior</div></div>
                 <div class="exec-kpi"><div class="label">Horas em tarefas</div><div class="value exec-neutral" id="indHorasTarefas">0h</div><div class="sub" id="indHorasTarefasSub">tempo com encerramento rastreável</div></div>
+                <div class="exec-kpi"><div class="label">Horas extras</div><div class="value exec-neutral" id="indHorasExtras">0h</div><div class="sub" id="indHorasExtrasSub">retomadas após o fim do expediente</div></div>
                 <div class="exec-kpi"><div class="label">Ocupação produtiva</div><div class="value exec-neutral" id="indOcupacao">0%</div><div class="sub" id="indOcupacaoSub">tempo / capacidade útil</div></div>
                 <div class="exec-kpi"><div class="label">Tempo médio real por tarefa</div><div class="value exec-neutral" id="indTempoMedio">0m</div><div class="sub" id="indTempoMedioSub">tarefas com tempo exato</div></div>
                 <div class="exec-kpi"><div class="label">Meta diária de tarefas</div><div class="value exec-neutral" id="indMetaDiaria">Não definida</div><div class="sub" id="indMetaDiariaSub">cadastre em Gerenciar Equipe</div></div>
@@ -665,13 +666,14 @@
                                 <th class="num">Meta no período</th>
                                 <th class="num">Tempo médio alvo</th>
                                 <th class="num">Tempo médio real</th>
+                                <th class="num">Horas extras</th>
                                 <th class="num">Atingimento</th>
                             </tr>
                         </thead>
                         <tbody id="execTargetsBody"></tbody>
                     </table>
                 </div>
-                <div class="exec-note">As metas individuais são cadastradas em <strong>Gerenciar Equipe</strong>. O tempo médio real é calculado somente com tarefas cujo início, pausas automáticas/manuais e encerramento permitem rastreamento exato. A jornada e a capacidade são calculadas a partir dos horários cadastrados para cada funcionário.</div>
+                <div class="exec-note">As metas individuais são cadastradas em <strong>Gerenciar Equipe</strong>. O tempo médio real é calculado somente com tarefas cujo início, pausas automáticas/manuais e encerramento permitem rastreamento exato. A jornada e a capacidade são calculadas a partir dos horários cadastrados para cada funcionário. Horas extras são contadas somente quando uma tarefa pausada automaticamente pelo fim do expediente é retomada em modo de hora extra.</div>
             </div>
 
             <div class="exec-panel" style="margin-top:16px;">
@@ -1086,6 +1088,65 @@
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="btn-submit" style="background: #7f8c8d;" onclick="fecharModalLogin()">Cancel</button>
                 <button class="btn-submit" onclick="login()">Confirmar Entrada</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="pauseTaskModal">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 8px; font-size: 1.2rem; color: var(--secondary-color);">⏸️ Pausar Tarefa</h2>
+            <p id="pauseTaskTitle" style="font-weight:700;color:#34495e;margin-bottom:15px;"></p>
+            <input type="hidden" id="pauseTaskId">
+            <div class="form-group">
+                <label for="pauseRequestedBy">Quem pediu a pausa *</label>
+                <input type="text" id="pauseRequestedBy" class="form-control" placeholder="Nome de quem solicitou" required>
+            </div>
+            <div class="form-group">
+                <label for="pauseReason">Motivo da pausa *</label>
+                <textarea id="pauseReason" class="form-control" rows="3" placeholder="Informe o motivo da pausa" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="pauseStartedAt">Horário da pausa *</label>
+                <input type="datetime-local" id="pauseStartedAt" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="pauseResumeAt">Horário de reinício (opcional)</label>
+                <input type="datetime-local" id="pauseResumeAt" class="form-control">
+                <small style="color:#777;display:block;margin-top:4px;">Se deixar vazio, a tarefa continuará pausada até alguém clicar em “Retomar”.</small>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn-submit" style="background:#7f8c8d;" onclick="fecharModalPausa()">Cancelar</button>
+                <button class="btn-submit" style="background:#f39c12;" onclick="salvarPausaTarefa()">Registrar Pausa</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editPauseModal">
+        <div class="modal-box" style="width:520px;">
+            <h2 style="margin-bottom:8px;font-size:1.2rem;color:var(--secondary-color);">✏️ Editar Pausa / Reinício</h2>
+            <p id="editPauseTaskTitle" style="font-weight:700;color:#34495e;margin-bottom:15px;"></p>
+            <input type="hidden" id="editPauseTaskId">
+            <input type="hidden" id="editPauseIndex">
+            <div class="form-group">
+                <label for="editPauseRequestedBy">Quem pediu a pausa</label>
+                <input type="text" id="editPauseRequestedBy" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="editPauseReason">Motivo</label>
+                <textarea id="editPauseReason" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editPauseStartedAt">Horário da pausa</label>
+                <input type="datetime-local" id="editPauseStartedAt" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="editPauseResumeAt">Horário de reinício</label>
+                <input type="datetime-local" id="editPauseResumeAt" class="form-control">
+                <small style="color:#777;display:block;margin-top:4px;">Deixe vazio se a tarefa ainda estiver pausada.</small>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn-submit" style="background:#7f8c8d;" onclick="fecharModalEdicaoPausa()">Cancelar</button>
+                <button class="btn-submit" style="background:var(--success-color);" onclick="salvarEdicaoPausa()">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -1846,6 +1907,7 @@
                 const ultimoLog = logs.length ? logs[logs.length - 1] : null;
                 if (!ultimoLog || ultimoLog.type !== 'start' || ultimoLog.by !== userKey) return;
 
+                const pauseId = `autoPause_${task.id}_${intervalo.key}_${agoraMs}`;
                 logs.push({
                     type: 'pause',
                     time: agoraMs,
@@ -1856,7 +1918,9 @@
                     autoPause: true,
                     autoIntervalKey: intervalo.key,
                     autoIntervalType: intervalo.tipo,
-                    autoPausedUser: userKey
+                    autoPausedUser: userKey,
+                    endOfDayPause: !!intervalo.fimExpediente,
+                    pauseId
                 });
                 task.timeLogs = logs;
                 alterou = true;
@@ -1873,6 +1937,9 @@
                 if (!ultimoLog || ultimoLog.type !== 'pause' || !ultimoLog.autoPause) return;
                 if (ultimoLog.autoIntervalKey !== intervalo.key || ultimoLog.autoPausedUser !== userKey) return;
 
+                ultimoLog.resumeTime = agoraMs;
+                ultimoLog.resumeBy = userKey;
+                ultimoLog.resumeByName = nomesExibicao[userKey];
                 logs.push({
                     type: 'start',
                     time: agoraMs,
@@ -1950,7 +2017,7 @@
                     const fimJornada = hOut * 60 + mOut;
                     const minutosAgora = agora.getHours() * 60 + agora.getMinutes();
                     if (minutosAgora >= fimJornada) {
-                        const logsFim = {key:`jornada_fim_${userKey}`, tipo:'jornada_fim', motivo:'Pausa automática: Fim do Expediente atingido'};
+                        const logsFim = {key:`jornada_fim_${userKey}`, tipo:'jornada_fim', motivo:'Pausa automática: Fim do Expediente atingido', fimExpediente:true};
                         pausarTarefasAutomaticamente(userKey, logsFim, agoraMs);
                     }
                 }
@@ -2032,13 +2099,14 @@
                 const dataBr = task.deadline.split('-').reverse().join('/');
                 let prazoStatus = task.deadline < hoje ? `<span class="deadline-alert">⚠️ ATRASADA (${dataBr})</span>` : (task.deadline === hoje ? `<span class="deadline-alert">🚨 ENTREGA HOJE</span>` : `Prazo: ${dataBr}`);
 
-                const ultimoLog = task.timeLogs && task.timeLogs.length > 0 ? task.timeLogs[task.timeLogs.length - 1] : null;
+                const logsNormalizados = obterLogsTarefaNormalizados(task);
+                const ultimoLog = logsNormalizados.length > 0 ? logsNormalizados[logsNormalizados.length - 1] : null;
                 const isRunning = ultimoLog && ultimoLog.type === 'start';
                 let statusCronometro = ultimoLog ? (ultimoLog.type === 'start' ? `▶️ Em execução por ${ultimoLog.byName}` : `⏸️ Pausado por ${ultimoLog.byName}`) : "Aguardando Início";
 
                 let motivosPausaHTML = '';
-                if (task.timeLogs) {
-                    const pausas = task.timeLogs.filter(log => log.type === 'pause');
+                if (logsNormalizados.length) {
+                    const pausas = logsNormalizados.filter(log => log.type === 'pause');
                     if (pausas.length > 0) {
                         motivosPausaHTML = `<div style="margin-top: 10px;">`;
                         pausas.forEach(p => { 
@@ -2079,10 +2147,12 @@
                     <div class="task-actions">
                         ${currentUser === 'admin' || temPermissaoLancar ? `<button class="btn-action btn-delete" onclick="deleteTask('${task.id}')">Excluir</button>` : ''}
                         ${currentUser !== 'visitante' ? `<button class="btn-action btn-edit" onclick="abrirModalEdicao('${task.id}')">Editar ✏️</button>` : ''}
-                        ${!isRunning ? 
-                            `<button class="${classeBotao} btn-start" ${atributoDesabilitado} onclick="alterarCronometro('${task.id}', 'start')">Iniciar Task ▶️</button>` : 
-                            `<span style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:4px;background:#fff4e5;color:#9a6700;font-weight:700;font-size:.8rem;">⏸️ Pausas automáticas</span>`
-                        }
+                        ${!isRunning && ultimoLog?.type !== 'pause' ? 
+                            `<button class="${classeBotao} btn-start" ${atributoDesabilitado} onclick="alterarCronometro('${task.id}', 'start')">Iniciar Task ▶️</button>` : ''}
+                        ${isRunning ? `<button class="${classeBotao}" ${atributoDesabilitado} style="background:#f39c12;color:#fff;" onclick="abrirModalPausa('${task.id}')">Pausar Tarefa ⏸️</button>` : ''}
+                        ${!isRunning && ultimoLog?.type === 'pause' && ultimoLog?.endOfDayPause ? `<button class="${classeBotao}" ${atributoDesabilitado} style="background:#8e44ad;color:#fff;" onclick="retomarTarefaHoraExtra('${task.id}')">Retomar em Hora Extra ⏱️</button>` : ''}
+                        ${!isRunning && ultimoLog?.type === 'pause' && !ultimoLog?.endOfDayPause ? `<button class="${classeBotao}" ${atributoDesabilitado} style="background:#27ae60;color:#fff;" onclick="retomarTarefaManual('${task.id}')">Retomar Tarefa ▶️</button>` : ''}
+                        ${(obterPausasDaTarefa(task).length > 0) ? obterPausasDaTarefa(task).map((pItem,pIdx) => `<button class="${classeBotao}" ${atributoDesabilitado} style="background:#7f8c8d;color:#fff;" onclick="abrirEdicaoPausa('${task.id}', ${pIdx})">Editar Pausa ${pIdx+1} ✏️</button>`).join('') : ''}
                         <button class="${classeBotao} btn-done" ${atributoDesabilitado} onclick="finishTask('${task.id}')">Concluir ✓</button>
                     </div>
                 `;
@@ -2129,32 +2199,221 @@
             }
         }
 
-        function alterarCronometro(id, acao) {
-            const task = tasks.find(t => t.id === id); if (!task) return;
-            const now = new Date().getTime(); if (!task.timeLogs) task.timeLogs = [];
+        function formatarParaDateTimeLocal(ms) {
+            if (!ms) return '';
+            const d = new Date(Number(ms));
+            const pad = n => String(n).padStart(2,'0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
 
-            if (acao === 'pause') {
-                const quemSolicitou = prompt("Quem solicitou a pausa? (Obrigatório):");
-                if (!quemSolicitou || quemSolicitou.trim() === "") { alert("Você deve informar quem solicitou a pausa."); return; }
-                
-                const motivo = prompt("Informe o motivo para pausar a tarefa (Obrigatório):"); 
-                if (!motivo || motivo.trim() === "") { alert("Você deve informar um motivo válido."); return; }
-                
-                task.timeLogs.push({ 
-                    type: 'pause', 
-                    time: now, 
-                    by: currentUser, 
-                    byName: nomesExibicao[currentUser], 
-                    reason: motivo.trim(),
-                    requestedBy: quemSolicitou.trim()
+        function obterPausasDaTarefa(task) {
+            const logs = obterLogsTarefaNormalizados(task);
+            const pausas = [];
+            logs.forEach((log, index) => {
+                if (!log || log.type !== 'pause') return;
+                let resumeLog = null;
+                if (log.pauseId) {
+                    resumeLog = logs.find(l => l && l.type === 'start' && l.resumesPauseId === log.pauseId);
+                }
+                if (!resumeLog) {
+                    for (let i=index+1;i<logs.length;i++) {
+                        if (logs[i]?.type === 'pause' || logs[i]?.type === 'finish') break;
+                        if (logs[i]?.type === 'start') { resumeLog = logs[i]; break; }
+                    }
+                }
+                pausas.push({ log, index, resumeLog, duration: resumeLog ? Math.max(0, Number(resumeLog.time)-Number(log.time)) : null });
+            });
+            return pausas;
+        }
+
+        function abrirModalPausa(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const logs = obterLogsTarefaNormalizados(task);
+            const ultimo = logs[logs.length-1];
+            if (!ultimo || ultimo.type !== 'start') {
+                alert('Esta tarefa não está em execução no momento.');
+                return;
+            }
+            document.getElementById('pauseTaskId').value = id;
+            document.getElementById('pauseTaskTitle').innerText = `Tarefa: ${task.title || 'Sem título'}`;
+            document.getElementById('pauseRequestedBy').value = nomesExibicao[currentUser] || currentUser || '';
+            document.getElementById('pauseReason').value = '';
+            document.getElementById('pauseStartedAt').value = formatarParaDateTimeLocal(Date.now());
+            document.getElementById('pauseResumeAt').value = '';
+            document.getElementById('pauseTaskModal').style.display = 'flex';
+        }
+
+        function fecharModalPausa() { document.getElementById('pauseTaskModal').style.display = 'none'; }
+
+        function salvarPausaTarefa() {
+            const id = document.getElementById('pauseTaskId').value;
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const requestedBy = document.getElementById('pauseRequestedBy').value.trim();
+            const reason = document.getElementById('pauseReason').value.trim();
+            const pauseTime = new Date(document.getElementById('pauseStartedAt').value).getTime();
+            const resumeRaw = document.getElementById('pauseResumeAt').value;
+            const resumeTime = resumeRaw ? new Date(resumeRaw).getTime() : null;
+            if (!requestedBy || !reason || !Number.isFinite(pauseTime)) { alert('Informe quem pediu, o motivo e o horário da pausa.'); return; }
+            if (resumeTime !== null && (!Number.isFinite(resumeTime) || resumeTime <= pauseTime)) { alert('O horário de reinício deve ser posterior ao horário da pausa.'); return; }
+            const logs = obterLogsTarefaNormalizados(task).slice();
+            const ultimo = logs[logs.length-1];
+            if (!ultimo || ultimo.type !== 'start') { alert('A tarefa não está mais em execução. Atualize a tela e tente novamente.'); return; }
+            const pauseId = `pause_${id}_${Date.now()}`;
+            const pauseLog = { type:'pause', time:pauseTime, by:currentUser, byName:nomesExibicao[currentUser] || currentUser, reason, requestedBy, pauseId, manualPause:true };
+            logs.push(pauseLog);
+            if (resumeTime !== null) {
+                const startLog = { type:'start', time:resumeTime, by:ultimo.by || currentUser, byName:ultimo.byName || nomesExibicao[currentUser] || currentUser, resumesPauseId:pauseId, manualResume:true };
+                pauseLog.resumeTime = resumeTime;
+                pauseLog.resumeBy = startLog.by;
+                pauseLog.resumeByName = startLog.byName;
+                logs.push(startLog);
+            }
+            task.timeLogs = logs;
+            if (database) database.ref('tasks/ativas/' + id).set(task).then(() => { fecharModalPausa(); renderTasks(); renderizarStatusEquipeTempoReal(); });
+            else { fecharModalPausa(); renderTasks(); renderizarStatusEquipeTempoReal(); }
+        }
+
+        function retomarTarefaHoraExtra(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const logs = obterLogsTarefaNormalizados(task).slice();
+            const ultimo = logs[logs.length-1];
+            if (!ultimo || ultimo.type !== 'pause' || !ultimo.endOfDayPause) {
+                alert('Esta tarefa não está pausada pelo fim do expediente.');
+                return;
+            }
+            const responsavel = ultimo.autoPausedUser || (Array.isArray(task.responsibles) && task.responsibles.includes(currentUser) ? currentUser : (task.responsibles || [currentUser])[0]);
+            if (currentUser !== 'admin' && currentUser !== responsavel && !(task.responsibles || []).includes(currentUser)) {
+                alert('Apenas o responsável pela tarefa ou a gestão pode retomá-la em hora extra.');
+                return;
+            }
+            const agora = Date.now();
+            const startLog = {
+                type:'start',
+                time:agora,
+                by:responsavel || currentUser,
+                byName:nomesExibicao[responsavel || currentUser] || nomesExibicao[currentUser] || currentUser,
+                resumesPauseId:ultimo.pauseId || null,
+                manualResume:true,
+                resumedBy:currentUser,
+                resumedByName:nomesExibicao[currentUser] || currentUser,
+                overtime:true,
+                overtimeStart:true,
+                overtimeRequestedBy:currentUser,
+                overtimeRequestedByName:nomesExibicao[currentUser] || currentUser,
+                overtimeFromEndOfDay:true
+            };
+            if (ultimo.pauseId) {
+                ultimo.resumeTime = agora;
+                ultimo.resumeBy = currentUser;
+                ultimo.resumeByName = nomesExibicao[currentUser] || currentUser;
+                ultimo.overtimeResume = true;
+            }
+            logs.push(startLog);
+            task.timeLogs = logs;
+            if (database) {
+                database.ref('tasks/ativas/' + id).set(task).then(() => {
+                    renderTasks();
+                    renderizarStatusEquipeTempoReal();
+                    updateReportDashboard();
+                    updateExecutiveIndividualReport();
                 });
             } else {
-                task.timeLogs.push({ type: 'start', time: now, by: currentUser, byName: nomesExibicao[currentUser] });
-                if (task.responsibles && !task.responsibles.includes(currentUser)) {
-                    task.responsibles.push(currentUser);
+                renderTasks();
+                renderizarStatusEquipeTempoReal();
+                updateReportDashboard();
+                updateExecutiveIndividualReport();
+            }
+        }
+
+        function retomarTarefaManual(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const logs = obterLogsTarefaNormalizados(task).slice();
+            const ultimo = logs[logs.length-1];
+            if (!ultimo || ultimo.type !== 'pause') { alert('A tarefa não está pausada.'); return; }
+            const agora = Date.now();
+            const startLog = { type:'start', time:agora, by:ultimo.autoPausedUser || ultimo.byResponsavel || currentUser, byName:nomesExibicao[ultimo.autoPausedUser || ultimo.byResponsavel || currentUser] || nomesExibicao[currentUser] || currentUser, resumesPauseId:ultimo.pauseId || null, manualResume:true, resumedBy:currentUser, resumedByName:nomesExibicao[currentUser] || currentUser };
+            if (ultimo.pauseId) { ultimo.resumeTime = agora; ultimo.resumeBy = currentUser; ultimo.resumeByName = nomesExibicao[currentUser] || currentUser; }
+            logs.push(startLog);
+            task.timeLogs = logs;
+            if (database) database.ref('tasks/ativas/' + id).set(task).then(() => { renderTasks(); renderizarStatusEquipeTempoReal(); });
+            else { renderTasks(); renderizarStatusEquipeTempoReal(); }
+        }
+
+        function abrirEdicaoPausa(id, pauseIndex) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const pausas = obterPausasDaTarefa(task);
+            const item = pausas[pauseIndex];
+            if (!item) return;
+            const p = item.log;
+            document.getElementById('editPauseTaskId').value = id;
+            document.getElementById('editPauseIndex').value = String(pauseIndex);
+            document.getElementById('editPauseTaskTitle').innerText = `Tarefa: ${task.title || 'Sem título'}`;
+            document.getElementById('editPauseRequestedBy').value = p.requestedBy || '';
+            document.getElementById('editPauseReason').value = p.reason || '';
+            document.getElementById('editPauseStartedAt').value = formatarParaDateTimeLocal(p.time);
+            document.getElementById('editPauseResumeAt').value = formatarParaDateTimeLocal(p.resumeTime || item.resumeLog?.time);
+            document.getElementById('editPauseModal').style.display = 'flex';
+        }
+
+        function fecharModalEdicaoPausa() { document.getElementById('editPauseModal').style.display = 'none'; }
+
+        function salvarEdicaoPausa() {
+            const id = document.getElementById('editPauseTaskId').value;
+            const pauseIndex = Number(document.getElementById('editPauseIndex').value);
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const pausas = obterPausasDaTarefa(task);
+            const item = pausas[pauseIndex];
+            if (!item) return;
+            const p = item.log;
+            const newPause = new Date(document.getElementById('editPauseStartedAt').value).getTime();
+            const resumeRaw = document.getElementById('editPauseResumeAt').value;
+            const newResume = resumeRaw ? new Date(resumeRaw).getTime() : null;
+            if (!Number.isFinite(newPause)) { alert('Informe um horário de pausa válido.'); return; }
+            if (newResume !== null && (!Number.isFinite(newResume) || newResume <= newPause)) { alert('O reinício deve ser posterior à pausa.'); return; }
+            p.time = newPause;
+            p.requestedBy = document.getElementById('editPauseRequestedBy').value.trim();
+            p.reason = document.getElementById('editPauseReason').value.trim();
+            if (newResume !== null) {
+                p.resumeTime = newResume;
+                if (item.resumeLog) { item.resumeLog.time = newResume; item.resumeLog.resumesPauseId = p.pauseId || item.resumeLog.resumesPauseId; }
+                else {
+                    const idx = task.timeLogs.indexOf(p);
+                    task.timeLogs.splice(idx+1,0,{type:'start',time:newResume,by:p.autoPausedUser || currentUser,byName:nomesExibicao[p.autoPausedUser || currentUser] || nomesExibicao[currentUser] || currentUser,resumesPauseId:p.pauseId||null,manualResume:true});
+                }
+            } else {
+                p.resumeTime = null;
+                if (item.resumeLog) {
+                    const ri = task.timeLogs.indexOf(item.resumeLog);
+                    if (ri >= 0) task.timeLogs.splice(ri,1);
                 }
             }
-            if (database) database.ref('tasks/ativas/' + id).set(task);
+            if (database) database.ref('tasks/ativas/' + id).set(task).then(() => { fecharModalEdicaoPausa(); renderTasks(); renderizarStatusEquipeTempoReal(); });
+            else { fecharModalEdicaoPausa(); renderTasks(); renderizarStatusEquipeTempoReal(); }
+        }
+
+        function alterarCronometro(id, acao) {
+            const task = tasks.find(t => t.id === id); if (!task) return;
+            const logs = obterLogsTarefaNormalizados(task);
+            const ultimo = logs[logs.length-1];
+            if (acao === 'pause') {
+                abrirModalPausa(id);
+                return;
+            }
+            if (acao === 'start') {
+                if (ultimo && ultimo.type === 'start') { alert('Esta tarefa já está em execução.'); return; }
+                const now = Date.now();
+                if (!Array.isArray(task.timeLogs)) task.timeLogs = logs;
+                task.timeLogs.push({ type:'start', time:now, by:currentUser, byName:nomesExibicao[currentUser] || currentUser });
+                if (task.responsibles && !task.responsibles.includes(currentUser)) task.responsibles.push(currentUser);
+                if (database) database.ref('tasks/ativas/' + id).set(task).then(() => { renderTasks(); renderizarStatusEquipeTempoReal(); });
+                else { renderTasks(); renderizarStatusEquipeTempoReal(); }
+            }
         }
 
         function finishTask(id) {
@@ -2486,6 +2745,46 @@
             return execTaskTrackedSegments(t, userKey);
         }
 
+        function execTaskOvertimeMinutes(t, userKey, startPeriod, endPeriod) {
+            if (!t || !Array.isArray(t.timeLogs)) return 0;
+            const logs = t.timeLogs
+                .filter(l => l && Number.isFinite(Number(l.time)) && (l.by === userKey || l.type === 'pause' || l.type === 'finish'))
+                .map(l => ({ type:l.type, time:Number(l.time), by:l.by, overtime:!!l.overtime, overtimeStart:!!l.overtimeStart }))
+                .sort((a,b)=>a.time-b.time);
+            let activeOvertimeStart = null;
+            let total = 0;
+            const periodStart = startPeriod instanceof Date ? startPeriod.getTime() : Number(startPeriod);
+            const periodEnd = endPeriod instanceof Date ? endPeriod.getTime() : Number(endPeriod);
+            for (const log of logs) {
+                if (log.type === 'start' && log.by === userKey) {
+                    activeOvertimeStart = log.overtime || log.overtimeStart ? Math.max(log.time, periodStart) : null;
+                } else if ((log.type === 'pause' || log.type === 'finish') && activeOvertimeStart !== null) {
+                    const fim = Math.min(log.time, periodEnd);
+                    if (fim > activeOvertimeStart) total += Math.round((fim - activeOvertimeStart) / 60000);
+                    activeOvertimeStart = null;
+                }
+            }
+            if (activeOvertimeStart !== null) {
+                const fim = Math.min(Date.now(), periodEnd);
+                if (fim > activeOvertimeStart) total += Math.round((fim - activeOvertimeStart) / 60000);
+            }
+            return Math.max(0,total);
+        }
+
+        function execEmployeeOvertimeMetrics(userKey, start, end) {
+            const startMs = start instanceof Date ? start.getTime() : Number(start);
+            const endMs = end instanceof Date ? end.getTime() : Number(end);
+            const all = [...(Array.isArray(historicTasks) ? historicTasks : []), ...(Array.isArray(tasks) ? tasks : [])];
+            let minutes = 0;
+            const seen = new Set();
+            all.forEach(t => {
+                if (!t || seen.has(t.id)) return;
+                seen.add(t.id);
+                minutes += execTaskOvertimeMinutes(t,userKey,startMs,endMs);
+            });
+            return {minutes};
+        }
+
         function execBusinessDaysInclusive(start, end) {
             let count = 0;
             const d = new Date(start);
@@ -2712,6 +3011,7 @@
             const open = cur.open.filter(t => Array.isArray(t.responsibles) && t.responsibles.includes(userKey));
             const overdue = cur.overdue.filter(t => Array.isArray(t.responsibles) && t.responsibles.includes(userKey));
             const metrics = execEmployeeTimeMetrics(cur.completed,userKey,start,end);
+            const overtime = execEmployeeOvertimeMetrics(userKey,start,end);
             const sla = execPercent(onTime.length,completed.length);
             const variation = execVariation(completed.length,oldCompleted.length);
             const meta = metasEquipe[userKey] || {tarefasDia:0, tempoMedioMetaMin:0};
@@ -2738,6 +3038,8 @@
             set('indVariacaoSub',`${oldCompleted.length} entrega(s) no período anterior`);
             set('indHorasTarefas',fmtMin(metrics.tracked));
             set('indHorasTarefasSub',`${metrics.exactTasks} tarefa(s) com encerramento rastreável`);
+            set('indHorasExtras',fmtMin(overtime.minutes));
+            set('indHorasExtrasSub',overtime.minutes > 0 ? 'tempo trabalhado após o fim da jornada' : 'nenhuma hora extra registrada');
             set('indOcupacao',`${metrics.occupancy}%`);
             set('indOcupacaoSub',`${fmtMin(metrics.capacity)} de capacidade útil`);
             set('indTempoMedio',fmtMin(metrics.avg));
@@ -2757,6 +3059,7 @@
                 targetsBody.innerHTML = teamKeys.map(k => {
                     const m = metasEquipe[k] || {tarefasDia:0, tempoMedioMetaMin:0};
                     const tm = execEmployeeTimeMetrics(cur.completed,k,start,end);
+                    const extra = execEmployeeOvertimeMetrics(k,start,end);
                     const metaP = m.tarefasDia > 0 ? m.tarefasDia * diasUteis : 0;
                     const ating = metaP > 0 ? Math.round((tm.tasks/metaP)*100) : null;
                     return `<tr>
@@ -2766,6 +3069,7 @@
                         <td class="num">${metaP > 0 ? metaP : '—'}</td>
                         <td class="num">${m.tempoMedioMetaMin > 0 ? fmtHorasDecimais(m.tempoMedioMetaMin) : 'Não definida'}</td>
                         <td class="num">${tm.exactTasks > 0 ? fmtMin(tm.avg) : '—'}</td>
+                        <td class="num">${extra.minutes > 0 ? fmtMin(extra.minutes) : '0m'}</td>
                         <td class="num">${ating !== null ? ating+'%' : '—'}</td>
                     </tr>`;
                 }).join('');
