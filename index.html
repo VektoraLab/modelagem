@@ -1292,51 +1292,99 @@
             }
         }
 
+        function obterLogsTarefaNormalizados(task) {
+            if (!task || !task.timeLogs) return [];
+            if (Array.isArray(task.timeLogs)) return task.timeLogs.filter(Boolean);
+            if (typeof task.timeLogs === 'object') {
+                return Object.keys(task.timeLogs)
+                    .sort((a,b) => Number(a) - Number(b))
+                    .map(k => task.timeLogs[k])
+                    .filter(Boolean);
+            }
+            return [];
+        }
+
+        function obterTarefasEmExecucaoDoColaborador(userKey) {
+            const ativas = [];
+            (Array.isArray(tasks) ? tasks : []).forEach(task => {
+                const logs = obterLogsTarefaNormalizados(task);
+                if (!logs.length) return;
+
+                // O estado atual da tarefa é determinado pelo ÚLTIMO evento.
+                // Se o último evento for um START daquele colaborador, a tarefa
+                // está efetivamente em execução por ele.
+                const ultimoLog = logs[logs.length - 1];
+                if (!ultimoLog) return;
+
+                if (ultimoLog.type === 'start' && ultimoLog.by === userKey) {
+                    ativas.push({
+                        task,
+                        time: Number(ultimoLog.time) || 0,
+                        log: ultimoLog
+                    });
+                }
+            });
+
+            ativas.sort((a, b) => b.time - a.time);
+            return ativas;
+        }
+
+        // Compatibilidade com chamadas antigas do sistema.
+        function obterTarefaEmExecucaoDoColaborador(userKey) {
+            const lista = obterTarefasEmExecucaoDoColaborador(userKey);
+            return lista.length ? lista[0].task : null;
+        }
+
         function renderizarStatusEquipeTempoReal() {
             const container = document.getElementById('realTimeStatusContainer');
             if (!container) return;
-            if (currentUser === 'visitante') { container.style.display = 'none'; return; }
-            
-            const temPermissaoLancar = permissoesLancar[currentUser] || false;
-            if (currentUser !== 'admin' && !temPermissaoLancar && currentUser !== 'visitante') {
+            if (currentUser === 'visitante') {
                 container.style.display = 'none';
                 return;
             }
+
+            // O monitoramento em tempo real é informativo para toda a equipe.
+            // Qualquer colaborador autenticado pode acompanhar o que o setor está fazendo.
             container.style.display = 'block';
 
             const chavesEquipe = ['admin', 'usuario_1', 'usuario_2', 'usuario_3', 'usuario_4', 'usuario_5'];
-            let htmlGrid = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px;">';
+            let htmlGrid = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;margin-top:10px;">';
 
             chavesEquipe.forEach(uKey => {
-                const nome = nomesExibicao[uKey];
-                const minhasTasks = tasks.filter(t => t.responsibles && t.responsibles.includes(uKey));
-                const taskAtiva = tasks.find(t => {
-                    const ultimoLog = t.timeLogs && t.timeLogs.length > 0 ? t.timeLogs[t.timeLogs.length - 1] : null;
-                    return ultimoLog && ultimoLog.type === 'start' && ultimoLog.by === uKey;
-                });
+                const nome = nomesExibicao[uKey] || uKey;
+                const minhasTasks = (Array.isArray(tasks) ? tasks : []).filter(t => t.responsibles && t.responsibles.includes(uKey));
+                const tarefasAtivas = obterTarefasEmExecucaoDoColaborador(uKey);
 
-                let statusTexto = '<span style="color: #7f8c8d; font-weight: bold;">💤 Desconectado / Ocioso</span>';
+                let statusTexto = '<span style="color:#7f8c8d;font-weight:bold;">💤 Ocioso / Nenhuma tarefa em execução</span>';
                 let cardBg = '#fdfefe';
                 let bordaCor = '#bdc3c7';
 
-                if (taskAtiva) {
-                    statusTexto = `<span style="color: var(--success-color); font-weight: bold;">▶️ Focando em:<br><small style="color:#333;">${taskAtiva.title}</small></span>`;
-                    cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
+                if (tarefasAtivas.length > 0) {
+                    const linhas = tarefasAtivas.map((item, idx) => {
+                        const titulo = item.task.title || 'Tarefa sem título';
+                        const hora = item.time ? new Date(item.time).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
+                        return `<div style="margin-top:${idx ? '8px' : '0'};padding-top:${idx ? '8px' : '0'};${idx ? 'border-top:1px solid #d9eadf;' : ''}">` +
+                               `<span style="color:var(--success-color);font-weight:bold;">▶️ ${titulo}</span>` +
+                               `<small style="display:block;color:#55705f;margin-top:2px;">Iniciada às ${hora}</small>` +
+                               `</div>`;
+                    }).join('');
+                    statusTexto = `<div><span style="color:var(--success-color);font-weight:bold;">🟢 TRABALHANDO AGORA</span>${linhas}</div>`;
+                    cardBg = '#f5fdf7';
+                    bordaCor = 'var(--success-color)';
+                } else if (minhasTasks.length > 0) {
+                    statusTexto = `<span style="color:#f39c12;font-weight:bold;">📋 ${minhasTasks.length} tarefa(s) atribuída(s), nenhuma em execução</span>`;
+                    cardBg = '#fffdf5';
+                    bordaCor = '#f39c12';
                 } else if (uKey === 'admin') {
-                    statusTexto = '<span style="color: var(--success-color); font-weight: bold;">💼 Gestão e Supervisão Ativa</span>';
-                    cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
-                } else if (minhasTasks.length > 0) {
-                    statusTexto = `<span style="color: var(--success-color); font-weight: bold;">▶️ Focando em:<br><small style="color:#333;">${taskAtiva.title}</small></span>`;
-                    cardBg = '#f5fdf7'; bordaCor = 'var(--success-color)';
-                } else if (minhasTasks.length > 0) {
-                    statusTexto = `<span style="color: #f39c12; font-weight: bold;">⏸️ Fila Coletiva (${minhasTasks.length} un)</span>`;
-                    cardBg = '#fffdf5'; bordaCor = '#f39c12';
+                    statusTexto = '<span style="color:var(--success-color);font-weight:bold;">💼 Gestão e Supervisão Ativa</span>';
+                    cardBg = '#f5fdf7';
+                    bordaCor = 'var(--success-color)';
                 }
 
                 htmlGrid += `
-                    <div style="background: ${cardBg}; border: 1px solid ${bordaCor}; border-left: 5px solid ${bordaCor}; padding: 12px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                        <strong style="color: var(--secondary-color); font-size: 0.95rem; display: block; margin-bottom: 4px;">${nome}</strong>
-                        <div style="font-size: 0.85rem; line-height: 1.3;">${statusTexto}</div>
+                    <div style="background:${cardBg};border:1px solid ${bordaCor};border-left:5px solid ${bordaCor};padding:12px;border-radius:6px;box-shadow:0 2px 4px rgba(0,0,0,0.02);min-height:72px;">
+                        <strong style="color:var(--secondary-color);font-size:0.95rem;display:block;margin-bottom:6px;">${nome}</strong>
+                        <div style="font-size:0.85rem;line-height:1.35;">${statusTexto}</div>
                     </div>
                 `;
             });
