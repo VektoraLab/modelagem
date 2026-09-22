@@ -1903,11 +1903,24 @@
         function pausarTarefasAutomaticamente(userKey, intervalo, agoraMs) {
             let alterou = false;
             tasks.forEach(task => {
-                const logs = Array.isArray(task.timeLogs) ? task.timeLogs : [];
+                // Use o mesmo normalizador usado pelo restante do sistema.
+                // Isso permite que tarefas antigas vindas do Firebase com timeLogs
+                // em formato de objeto também sejam pausadas automaticamente.
+                const logs = obterLogsTarefaNormalizados(task).slice();
                 const ultimoLog = logs.length ? logs[logs.length - 1] : null;
-                if (!ultimoLog || ultimoLog.type !== 'start' || ultimoLog.by !== userKey) return;
+                if (!ultimoLog || ultimoLog.type !== 'start') return;
 
-                const pauseId = `autoPause_${task.id}_${intervalo.key}_${agoraMs}`;
+                // Normalmente o responsável pela execução está gravado em by.
+                // Para registros antigos sem by, só usamos o responsável da tarefa
+                // quando houver um único responsável, evitando pausar a tarefa errada.
+                const responsaveis = Array.isArray(task.responsibles) ? task.responsibles : [];
+                const usuarioEmExecucao = ultimoLog.by || (responsaveis.length === 1 ? responsaveis[0] : null);
+                if (usuarioEmExecucao !== userKey) return;
+
+                const pauseId = `autoPause_${task.id}_${intervalo.key}`;
+                // Evita duplicar a mesma pausa se o relógio de 1 segundo executar novamente.
+                if (logs.some(log => log.type === 'pause' && log.autoPause && log.autoIntervalKey === intervalo.key && log.autoPausedUser === userKey)) return;
+
                 logs.push({
                     type: 'pause',
                     time: agoraMs,
@@ -1932,7 +1945,7 @@
         function retomarTarefasAutomaticamente(userKey, intervalo, agoraMs) {
             let alterou = false;
             tasks.forEach(task => {
-                const logs = Array.isArray(task.timeLogs) ? task.timeLogs : [];
+                const logs = obterLogsTarefaNormalizados(task).slice();
                 const ultimoLog = logs.length ? logs[logs.length - 1] : null;
                 if (!ultimoLog || ultimoLog.type !== 'pause' || !ultimoLog.autoPause) return;
                 if (ultimoLog.autoIntervalKey !== intervalo.key || ultimoLog.autoPausedUser !== userKey) return;
