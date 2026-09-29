@@ -209,6 +209,43 @@
         .cc-btn-save-db { background-color: #198754; }
         .cc-btn-print { background-color: #0dcaf0; color: #000; font-weight: bold; }
 
+        .cc-btn-secondary { background-color: #6c757d; }
+        .cc-btn-load { background-color: #0d6efd; }
+        .cc-btn-primary { background-color: #198754; }
+        .cc-product-modal {
+            display: none; position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,.58); padding: 24px; overflow-y: auto;
+        }
+        .cc-product-modal.active { display: flex; align-items: flex-start; justify-content: center; }
+        .cc-product-modal-card {
+            width: min(1100px, 100%); max-height: calc(100vh - 48px); overflow: hidden;
+            background: #fff; border-radius: 10px; box-shadow: 0 15px 50px rgba(0,0,0,.3);
+            display: flex; flex-direction: column;
+        }
+        .cc-product-modal-header {
+            display:flex; justify-content:space-between; align-items:center; gap:15px;
+            padding:14px 18px; background:#084298; color:#fff;
+        }
+        .cc-product-modal-header h3 { margin:0; font-size:16px; }
+        .cc-product-modal-close { border:0; background:transparent; color:#fff; font-size:24px; cursor:pointer; line-height:1; }
+        .cc-product-modal-body { padding:18px; overflow-y:auto; }
+        .cc-product-info-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+        .cc-product-info-card { border:1px solid #dce3ea; border-radius:6px; padding:9px; background:#f8fafc; }
+        .cc-product-info-card small { display:block; color:#6c757d; font-size:10px; margin-bottom:3px; }
+        .cc-product-info-card strong { display:block; color:#212529; font-size:12px; word-break:break-word; }
+        .cc-product-modal-section { margin-top:18px; }
+        .cc-product-modal-section h4 { color:#084298; font-size:13px; margin:0 0 8px; border-bottom:1px solid #dce3ea; padding-bottom:6px; }
+        .cc-product-modal-table { width:100%; border-collapse:collapse; font-size:11px; }
+        .cc-product-modal-table th,.cc-product-modal-table td { border:1px solid #dee2e6; padding:6px; vertical-align:top; }
+        .cc-product-modal-table th { background:#f1f3f5; color:#343a40; text-align:left; }
+        .cc-product-modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:12px 18px; border-top:1px solid #dee2e6; background:#f8f9fa; }
+        .cc-report-average { background:#eef6ff; font-weight:600; }
+        @media (max-width: 800px) {
+            .cc-product-info-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .cc-product-modal { padding:10px; }
+            .cc-product-modal-card { max-height:calc(100vh - 20px); }
+        }
+
         .cc-section-title { font-size: 13px; font-weight: 700; color: #0d6efd; margin: 15px 0 10px 0; display: flex; align-items: center; gap: 8px; }
         
         .cc-table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dcdcdc; border-radius: 4px; margin-bottom: 15px; }
@@ -238,13 +275,31 @@
         .cc-view-section { display: none; }
         .cc-view-section.active { display: block; }
 
+        /* ===== GESTAO AVANCADA DE COLABORADORES ===== */
+        .team-manager-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:14px; }
+        .team-card { border:1px solid #d9e2ec; border-radius:8px; padding:14px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+        .team-card-header { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
+        .team-card-header strong { color:#1f4e79; font-size:14px; }
+        .team-permissions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-top:8px; padding-top:8px; border-top:1px dashed #d5dbe3; }
+        .team-permissions label, .team-assignments label { font-size:11px; color:#344054; display:flex; gap:5px; align-items:center; }
+        .team-assignments { max-height:150px; overflow:auto; border:1px solid #e4e7ec; border-radius:5px; padding:7px; margin-top:6px; background:#fafafa; }
+        .team-remove { background:#e74c3c !important; }
+        .team-add { background:#198754 !important; }
+        .team-help { background:#eef6ff; border:1px solid #cfe2ff; border-radius:7px; padding:10px; color:#174a7e; font-size:12px; margin-bottom:12px; }
+        .team-section-title { font-weight:700; color:#0d6efd; margin:12px 0 7px; font-size:13px; }
+
         /* ESTILOS EXCLUSIVOS PARA IMPRESSÃO */
         @media print {
             #ccRoot { background-color: #fff; padding: 0; font-size: 10pt; }
             .cc-nav-tabs, .cc-btn-action, .cc-params-bar, .no-print { display: none !important; }
             .cc-container { box-shadow: none; padding: 0; margin-bottom: 10px; }
             .cc-view-section { display: none !important; }
-            .cc-view-section#abaRelatorio { display: block !important; }
+            .cc-view-section#cc_abaRelatorio { display: block !important; }
+            #cc_abaRelatorio, #cc_abaRelatorio .cc-container { display: block !important; }
+            #cc_abaRelatorio { visibility: visible !important; opacity: 1 !important; }
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: #fff !important; }
+            .cc-product-modal { display:none !important; }
             table { border: 1px solid #000 !important; width: 100% !important; page-break-inside: auto; }
             tr { page-break-inside: avoid; page-break-after: auto; }
             th, td { border: 1px solid #ccc !important; padding: 4px !important; }
@@ -914,39 +969,40 @@
             <button class="cc-btn-action cc-btn-print no-print" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir Relatório</button>
         </div>
 
-        <!-- SEÇÃO 1: COMPARATIVO E MÉDIAS DE CONSUMO POR NOME DE PRODUTO -->
-        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-calculator"></i> 1. Média de Consumo entre Produtos com o Mesmo Nome</h3>
+        <!-- SEÇÃO 1: CADA PRODUTO/VERSÃO SEPARADAMENTE -->
+        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-list"></i> 1. Relatório de Cada Produto Cadastrado Separadamente</h3>
         <div class="cc-table-responsive" style="margin-bottom: 25px;">
-            <table id="cc_tabelaMedias">
-                <thead>
-                    <tr>
-                        <th>Nome / Descrição do Produto</th>
-                        <th class="cc-text-center">Qtd de Cadastros/Códigos</th>
-                        <th class="cc-text-right">Média Líquida (m²)</th>
-                        <th class="cc-text-right" style="color: #0d6efd;">Média Bruta (m²)</th>
-                        <th>Códigos Relacionados</th>
-                    </tr>
-                </thead>
-                <tbody id="cc_tabelaMediasBody"></tbody>
-            </table>
-        </div>
-
-        <!-- SEÇÃO 2: DETALHAMENTO DE TODOS OS PRODUTOS CADASTRADOS -->
-        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-list"></i> 2. Listagem Detalhada de Todos os Registros</h3>
-        <div class="cc-table-responsive">
             <table id="cc_tabelaRelatorioGeral">
                 <thead>
                     <tr>
                         <th>Código</th>
-                        <th>Descrição / Nome</th>
+                        <th>Produto / Nome</th>
                         <th>Tipo</th>
-                        <th>Cor / Personalização</th>
-                        <th class="cc-text-right">Líquido Total (m²)</th>
-                        <th class="cc-text-right" style="color: #0d6efd;">Bruto Total (m²)</th>
-                        <th class="cc-text-center">Atualizado Em</th>
+                        <th>Versão (Cor / Personalização)</th>
+                        <th class="cc-text-right">Consumo Líquido (m²)</th>
+                        <th class="cc-text-right" style="color:#0d6efd;">Consumo Bruto (m²)</th>
+                        <th class="cc-text-center">Cadastrado / Atualizado</th>
                     </tr>
                 </thead>
                 <tbody id="cc_tabelaRelatorioGeralBody"></tbody>
+            </table>
+        </div>
+
+        <!-- SEÇÃO 2: MÉDIA SOMENTE ENTRE VERSÕES DO MESMO PRODUTO -->
+        <h3 style="color:#084298; margin-bottom: 10px; font-size: 13px;"><i class="fa-solid fa-calculator"></i> 2. Média de Consumo entre Versões do Mesmo Produto</h3>
+        <div style="font-size:11px;color:#555;margin:-4px 0 10px 0;">A média é calculada somente quando existem duas ou mais versões/cadastros com o mesmo nome do produto.</div>
+        <div class="cc-table-responsive">
+            <table id="cc_tabelaMedias">
+                <thead>
+                    <tr>
+                        <th>Produto / Nome</th>
+                        <th class="cc-text-center">Qtd. de Versões</th>
+                        <th class="cc-text-right">Média Líquida (m²)</th>
+                        <th class="cc-text-right" style="color:#0d6efd;">Média Bruta (m²)</th>
+                        <th>Versões / Códigos Considerados</th>
+                    </tr>
+                </thead>
+                <tbody id="cc_tabelaMediasBody"></tbody>
             </table>
         </div>
     </div>
@@ -958,45 +1014,36 @@
     </div>
 
     <div id="tabGerenciamento" style="display: none;">
-        <div class="dashboard-layout" style="grid-template-columns: 1fr 1fr;">
+        <div class="dashboard-layout" style="grid-template-columns: 1fr;">
             <div class="panel-box">
-                <h2>Customizar Integrantes, Jornadas e Metas da Equipe</h2>
-                <div style="max-height: 500px; overflow-y: auto; padding-right: 10px;" id="userFieldsContainer">
-                    <div style="border: 1px solid #d4e6f1; padding: 10px; border-radius: 6px; margin-bottom: 15px; background: #f4f9fd;">
-                        <span style="font-weight: bold; font-size: 0.85rem; color: #2980b9; display: block; margin-bottom: 5px;">Gestor Master:</span>
-                        <input type="text" id="cfg_admin_nome" class="form-control" style="margin-bottom: 5px;" placeholder="Nome do Gestor">
-                        <div style="display: flex; gap: 10px; margin-bottom: 5px;">
-                            <input type="time" id="cfg_admin_in" class="form-control" title="Início da Jornada">
-                            <input type="time" id="cfg_admin_out" class="form-control" title="Fim da Jornada">
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <span style="font-size: 0.75rem; font-weight: bold; color: #e67e22;">Almoço:</span>
-                            <input type="time" id="cfg_admin_meal_in" class="form-control" title="Início do Almoço">
-                            <input type="time" id="cfg_admin_meal_out" class="form-control" title="Fim do Almoço">
-                        </div>
-                        <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-                            <input type="number" min="0" step="1" id="cfg_admin_meta" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
-                            <input type="number" min="0" step="0.01" id="cfg_admin_tempo_meta" class="form-control" title="Tempo médio alvo em horas decimais" placeholder="Tempo médio alvo (h)" step="0.01">
-                        </div>
-                        <div style="font-size:0.72rem;color:#667085;margin-top:4px;">Meta individual: tarefas por dia | tempo médio alvo por tarefa (horas decimais).</div>
-                    </div>
+                <h2>👥 Gestão de Colaboradores e Permissões</h2>
+                <div class="team-help">
+                    Cadastre novos colaboradores, altere nome e função, defina jornada e metas, escolha quais atribuições cada pessoa pode receber e determine exatamente quais módulos e ações do sistema ela poderá visualizar ou editar.
+                    <strong>O Administrador Master continua com acesso total.</strong>
                 </div>
-                <button class="btn-submit" style="margin-top: 15px; background: var(--success-color);" onclick="salvarConfiguracaoEquipe()">Gravar Configurações</button>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                    <button type="button" class="btn-submit team-add" onclick="adicionarNovoColaborador()">➕ Novo Colaborador</button>
+                    <button type="button" class="btn-submit" style="background:#0d6efd;" onclick="salvarConfiguracaoEquipe()">💾 Salvar Equipe e Permissões</button>
+                </div>
+                <div class="team-section-title">Administrador Master</div>
+                <div id="adminTeamCard" class="team-card" style="margin-bottom:14px;"></div>
+                <div class="team-section-title">Colaboradores</div>
+                <div id="advancedTeamContainer" class="team-manager-grid"></div>
             </div>
-            <div>
+            <div class="dashboard-layout" style="grid-template-columns:1fr 1fr;">
                 <div class="panel-box">
-                    <h2>Segurança do Painel</h2>
+                    <h2>🔐 Segurança do Painel</h2>
                     <div class="form-group">
                         <label for="cfg_adminPassword">Alterar Senha do Administrador</label>
                         <input type="password" id="cfg_adminPassword" class="form-control" placeholder="Digite a nova senha">
                     </div>
-                    <button class="btn-submit" style="background: var(--secondary-color);" onclick="salvarSenhaAdmin()">Atualizar Senha Master</button>
+                    <button class="btn-submit" style="background:var(--secondary-color);" onclick="salvarSenhaAdmin()">Atualizar Senha Master</button>
                 </div>
                 <div class="panel-box">
-                    <h2>Backup Preventivo e Restauração Secura</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-submit" style="background: #34495e;" onclick="criarBackupFirebase()">Gerar Ponto de Backup 💾</button>
-                        <button class="btn-submit" style="background: #95a5a6;" onclick="restaurarBackupFirebase()">Restaurar Backup 🔄</button>
+                    <h2>💾 Backup e Restauração</h2>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="btn-submit" style="background:#34495e;" onclick="criarBackupFirebase()">Gerar Ponto de Backup 💾</button>
+                        <button class="btn-submit" style="background:#95a5a6;" onclick="restaurarBackupFirebase()">Restaurar Backup 🔄</button>
                     </div>
                 </div>
             </div>
@@ -1196,6 +1243,21 @@
         </div>
     </div>
 
+<!-- POPUP: INFORMAÇÕES COMPLETAS DO PRODUTO -->
+<div id="cc_produtoModal" class="cc-product-modal" role="dialog" aria-modal="true" aria-labelledby="cc_produtoModalTitulo" onclick="if(event.target===this) cc_fecharModalProduto()">
+    <div class="cc-product-modal-card">
+        <div class="cc-product-modal-header">
+            <h3 id="cc_produtoModalTitulo"><i class="fa-solid fa-box-open"></i> Informações completas do produto</h3>
+            <button type="button" class="cc-product-modal-close" onclick="cc_fecharModalProduto()" aria-label="Fechar">&times;</button>
+        </div>
+        <div id="cc_produtoModalBody" class="cc-product-modal-body"></div>
+        <div class="cc-product-modal-footer">
+            <button type="button" class="cc-btn-action cc-btn-secondary" onclick="cc_fecharModalProduto()"><i class="fa-solid fa-xmark"></i> Fechar</button>
+            <button type="button" class="cc-btn-action cc-btn-primary" id="cc_btnConfirmarCarregamento"><i class="fa-solid fa-folder-open"></i> Carregar produto na edição</button>
+        </div>
+    </div>
+</div>
+
     <script>
         const firebaseConfig = {
             apiKey: "COLE_AQUI_SUA_API_KEY", 
@@ -1273,6 +1335,125 @@
         let permissoesLancar = {
             "usuario_1": false, "usuario_2": false, "usuario_3": false, "usuario_4": false, "usuario_5": false
         };
+
+        // Cadastro e controle granular de novos colaboradores.
+        let permissoesSistema = {};
+        let atribuicoesEquipe = {};
+        let funcoesEquipe = {};
+        let equipeAtiva = {};
+        const permissoesPadrao = { painel:true, lancamento:false, relatorios:true, consumo:false, gerenciamento:false, editarTarefas:false, pausarTarefas:true, concluirTarefas:true };
+        const acoesEquipe = Object.keys(roteamentoUsuarios);
+
+        function getChavesEquipe() {
+            const chaves = Object.keys(nomesExibicao || {}).filter(k => k !== 'visitante');
+            return chaves.filter(k => equipeAtiva[k] !== false);
+        }
+
+        function getPermissoesUsuario(userKey) {
+            if (userKey === 'admin') return { painel:true,lancamento:true,relatorios:true,consumo:true,gerenciamento:true,editarTarefas:true,pausarTarefas:true,concluirTarefas:true };
+            return Object.assign({}, permissoesPadrao, permissoesSistema[userKey] || {});
+        }
+
+        function podeUsuario(acao) { return currentUser === 'admin' || !!getPermissoesUsuario(currentUser)[acao]; }
+
+        function obterResponsaveisAcao(acao) {
+            const cadastrados = getChavesEquipe().filter(k => Array.isArray(atribuicoesEquipe[k]) && atribuicoesEquipe[k].includes(acao));
+            return cadastrados.length ? cadastrados : (roteamentoUsuarios[acao] || []);
+        }
+
+        function novoIdColaborador() { return 'usuario_' + Date.now(); }
+
+        function adicionarNovoColaborador() {
+            const id = novoIdColaborador();
+            nomesExibicao[id] = 'Novo Colaborador';
+            funcoesEquipe[id] = '';
+            jornadas[id] = {in:'07:12',out:'17:00'};
+            almocosPadrao[id] = {in:'12:00',out:'13:00'};
+            metasEquipe[id] = {tarefasDia:0,tempoMedioMetaMin:0};
+            senhasEquipe[id] = '123';
+            permissoesLancar[id] = false;
+            permissoesSistema[id] = Object.assign({}, permissoesPadrao);
+            atribuicoesEquipe[id] = [];
+            equipeAtiva[id] = true;
+            renderizarGestaoColaboradores();
+        }
+
+        function removerColaborador(id) {
+            if (!confirm('Desativar este colaborador? O histórico de tarefas será preservado.')) return;
+            equipeAtiva[id] = false;
+            if (document.querySelector('[data-team-card="'+id+'"]')) document.querySelector('[data-team-card="'+id+'"]').remove();
+            renderizarGestaoColaboradores();
+        }
+
+        function renderizarGestaoColaboradores() {
+            const box=document.getElementById('advancedTeamContainer');
+            const admin=document.getElementById('adminTeamCard');
+            if(!box || !admin) return;
+            const adminPerm=getPermissoesUsuario('admin');
+            admin.innerHTML=`<div class="team-card-header"><strong>👑 ${nomesExibicao.admin || 'Administrador'}</strong><span style="font-size:11px;color:#198754;font-weight:bold;">ACESSO TOTAL</span></div>
+                <div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;">
+                <input id="adv_admin_nome" class="form-control" value="${escHtml(nomesExibicao.admin||'Wesley')}" placeholder="Nome">
+                <input id="adv_admin_funcao" class="form-control" value="${escHtml(funcoesEquipe.admin||'Administrador / Gestor')}" placeholder="Função">
+                <input id="adv_admin_in" type="time" class="form-control" value="${jornadas.admin?.in||'07:12'}">
+                <input id="adv_admin_out" type="time" class="form-control" value="${jornadas.admin?.out||'17:00'}">
+                </div>`;
+            box.innerHTML='';
+            getChavesEquipe().filter(k=>k!=='admin').forEach((k,idx)=>{
+                const perms=getPermissoesUsuario(k);
+                const atribs=atribuicoesEquipe[k]||[];
+                const card=document.createElement('div'); card.className='team-card'; card.dataset.teamCard=k;
+                card.innerHTML=`<div class="team-card-header"><strong>${escHtml(nomesExibicao[k]||k)}</strong><button type="button" class="btn-submit team-remove" style="padding:5px 9px;font-size:11px;" onclick="removerColaborador('${k}')">Desativar</button></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+                    <input data-field="nome" class="form-control" value="${escHtml(nomesExibicao[k]||'')}" placeholder="Nome completo">
+                    <input data-field="funcao" class="form-control" value="${escHtml(funcoesEquipe[k]||'')}" placeholder="Função / cargo">
+                    <input data-field="senha" type="password" class="form-control" value="${escHtml(senhasEquipe[k]||'123')}" placeholder="Senha">
+                    <input data-field="in" type="time" class="form-control" value="${jornadas[k]?.in||'07:12'}">
+                    <input data-field="out" type="time" class="form-control" value="${jornadas[k]?.out||'17:00'}">
+                    <input data-field="mealIn" type="time" class="form-control" value="${almocosPadrao[k]?.in||'12:00'}">
+                    <input data-field="mealOut" type="time" class="form-control" value="${almocosPadrao[k]?.out||'13:00'}">
+                    <input data-field="meta" type="number" min="0" step="1" class="form-control" value="${metasEquipe[k]?.tarefasDia||0}" placeholder="Meta/dia">
+                    <input data-field="tempoMeta" type="number" min="0" step="0.01" class="form-control" value="${metasEquipe[k]?.tempoMedioMetaMin ? (metasEquipe[k].tempoMedioMetaMin/60).toFixed(2) : ''}" placeholder="Tempo médio alvo (h)">
+                    </div>
+                    <div class="team-section-title">👁️ O que pode acessar</div>
+                    <div class="team-permissions">${Object.entries({painel:'Painel',lancamento:'Lançar tarefas',relatorios:'Relatórios',consumo:'Composição e Consumo',gerenciamento:'Gerenciar equipe',editarTarefas:'Editar tarefas',pausarTarefas:'Pausar/retomar',concluirTarefas:'Concluir tarefas'}).map(([p,l])=>`<label><input type="checkbox" data-perm="${p}" ${perms[p]?'checked':''}>${l}</label>`).join('')}</div>
+                    <div class="team-section-title">🎯 Atribuições que pode receber</div>
+                    <div class="team-assignments">${acoesEquipe.map(a=>`<label><input type="checkbox" data-acao="${escHtml(a)}" ${atribs.includes(a)?'checked':''}>${escHtml(a)}</label>`).join('')}</div>`;
+                box.appendChild(card);
+            });
+        }
+
+        function escHtml(v){ return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c])); }
+
+        function coletarEGravarGestaoAvancada() {
+            const adminNome=document.getElementById('adv_admin_nome'); if(adminNome) nomesExibicao.admin=adminNome.value.trim()||'Wesley';
+            const adminFunc=document.getElementById('adv_admin_funcao'); if(adminFunc) funcoesEquipe.admin=adminFunc.value.trim()||'Administrador / Gestor';
+            if(document.getElementById('adv_admin_in')) jornadas.admin.in=document.getElementById('adv_admin_in').value;
+            if(document.getElementById('adv_admin_out')) jornadas.admin.out=document.getElementById('adv_admin_out').value;
+            const dados={};
+            Object.keys(nomesExibicao).filter(k=>k!=='visitante').forEach(k=>{
+                const card=document.querySelector('[data-team-card="'+k+'"]');
+                if(k!=='admin' && !card) {
+                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k]||'',jornada:jornadas[k]||{in:'07:12',out:'17:00'},almoco:almocosPadrao[k]||{in:'12:00',out:'13:00'},metas:metasEquipe[k]||{tarefasDia:0,tempoMedioMetaMin:0},senha:senhasEquipe[k]||'123',podeLancar:!!permissoesLancar[k],permissoes:getPermissoesUsuario(k),atribuicoes:atribuicoesEquipe[k]||[],ativo:false};
+                    return;
+                }
+                if(k!=='admin') {
+                    const q=s=>card.querySelector('[data-field="'+s+'"]');
+                    nomesExibicao[k]=(q('nome')?.value||nomesExibicao[k]).trim();
+                    funcoesEquipe[k]=(q('funcao')?.value||'').trim();
+                    senhasEquipe[k]=q('senha')?.value||'123';
+                    jornadas[k]={in:q('in')?.value||'07:12',out:q('out')?.value||'17:00'};
+                    almocosPadrao[k]={in:q('mealIn')?.value||'12:00',out:q('mealOut')?.value||'13:00'};
+                    metasEquipe[k]={tarefasDia:Number(q('meta')?.value)||0,tempoMedioMetaMin:Math.round((Number(q('tempoMeta')?.value)||0)*60)};
+                    permissoesSistema[k]={}; card.querySelectorAll('[data-perm]').forEach(el=>permissoesSistema[k][el.dataset.perm]=el.checked);
+                    permissoesLancar[k]=!!permissoesSistema[k].lancamento;
+                    atribuicoesEquipe[k]=Array.from(card.querySelectorAll('[data-acao]:checked')).map(el=>el.dataset.acao);
+                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k],jornada:jornadas[k],almoco:almocosPadrao[k],metas:metasEquipe[k],senha:senhasEquipe[k],podeLancar:permissoesLancar[k],permissoes:permissoesSistema[k],atribuicoes:atribuicoesEquipe[k],ativo:equipeAtiva[k]!==false};
+                }
+            });
+            dados.admin={nome:nomesExibicao.admin,funcao:funcoesEquipe.admin||'Administrador / Gestor',jornada:jornadas.admin,almoco:almocosPadrao.admin,metas:metasEquipe.admin,permissoes:getPermissoesUsuario('admin'),ativo:true};
+            return dados;
+        }
+
 
         let adminPasswordDB = "admin123"; 
         let tasks = []; let historicTasks = []; let mealLogs = {}; let descansoLogs = {};
@@ -1408,7 +1589,7 @@
             // Qualquer colaborador autenticado pode acompanhar o que o setor está fazendo.
             container.style.display = 'block';
 
-            const chavesEquipe = ['admin', 'usuario_1', 'usuario_2', 'usuario_3', 'usuario_4', 'usuario_5'];
+            const chavesEquipe = getChavesEquipe();
             let htmlGrid = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;margin-top:10px;">';
 
             chavesEquipe.forEach(uKey => {
@@ -1527,76 +1708,28 @@
             }
         }
 
-        const containerCampos = document.getElementById('userFieldsContainer');
-        if(containerCampos) {
-            for(let i=1; i<=5; i++) {
-                containerCampos.innerHTML += `
-                    <div style="border: 1px solid #eee; padding:10px; border-radius:6px; margin-bottom:10px; background:#fafafa;">
-                        <span id="lbl_user${i}" style="font-weight:bold; font-size:0.85rem; display:block; margin-bottom:5px;">Funcionário ${i}:</span>
-                        <input type="text" id="cfg_user${i}" class="form-control" style="margin-bottom:5px;" placeholder="Nome">
-                        <div style="display:flex; gap:10px; margin-bottom:5px;">
-                            <input type="time" id="cfg_in${i}" class="form-control" title="Início da Jornada">
-                            <input type="time" id="cfg_out${i}" class="form-control" title="Fim da Jornada">
-                        </div>
-                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
-                            <span style="font-size:0.75rem; font-weight:bold; color:#e67e22;">Almoço:</span>
-                            <input type="time" id="cfg_meal_in${i}" class="form-control" title="Início do Almoço">
-                            <input type="time" id="cfg_meal_out${i}" class="form-control" title="Fim do Almoço">
-                        </div>
-                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
-                            <input type="number" min="0" step="1" id="cfg_meta${i}" class="form-control" title="Meta diária de tarefas" placeholder="Meta tarefas/dia">
-                            <input type="number" min="0" step="0.01" id="cfg_tempo_meta${i}" class="form-control" title="Tempo médio alvo em horas decimais" placeholder="Tempo médio alvo (h)" step="0.01">
-                        </div>
-                        <div style="font-size:0.72rem;color:#667085;margin-bottom:5px;">Meta diária | tempo médio alvo por tarefa (horas decimais).</div>
-                        <div style="display:flex; gap:10px; align-items:center; margin-top:5px; border-top: 1px dashed #ddd; padding-top:5px;">
-                            <input type="password" id="cfg_pass${i}" class="form-control" style="width:130px; padding:5px; font-size:0.8rem;" placeholder="Senha">
-                            <label style="font-size:0.75rem; font-weight:bold; color:var(--primary-color); cursor:pointer;">
-                                <input type="checkbox" id="cfg_perm${i}"> Substituto 👑
-                            </label>
-                        </div>
-                    </div>
-                `;
-            }
-        }
+        renderizarGestaoColaboradores();
 
         if (database) {
             database.ref('configuracoes/equipe').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    Object.keys(jornadas).forEach(k => {
-                        if(data[k]) nomesExibicao[k] = data[k].nome || nomesExibicao[k];
-                        if(data[k] && data[k].jornada) jornadas[k] = data[k].jornada;
-                        if(data[k] && data[k].almoco) almocosPadrao[k] = data[k].almoco;
-                        if(data[k] && data[k].metas) metasEquipe[k] = {
-                            tarefasDia: Number(data[k].metas.tarefasDia) || 0,
-                            tempoMedioMetaMin: Number(data[k].metas.tempoMedioMetaMin) || 0
-                        };
-                        if(data[k] && k !== 'admin') {
-                            senhasEquipe[k] = data[k].senha || "123";
-                            permissoesLancar[k] = data[k].podeLancar || false;
-                        }
+                    Object.keys(data).forEach(k => {
+                        const d=data[k]||{};
+                        if(d.nome) nomesExibicao[k]=d.nome;
+                        if(d.jornada) jornadas[k]=d.jornada;
+                        if(d.almoco) almocosPadrao[k]=d.almoco;
+                        if(d.metas) metasEquipe[k]={tarefasDia:Number(d.metas.tarefasDia)||0,tempoMedioMetaMin:Number(d.metas.tempoMedioMetaMin)||0};
+                        if(k!=='admin') {
+                            senhasEquipe[k]=d.senha||'123';
+                            permissoesLancar[k]=!!d.podeLancar;
+                            permissoesSistema[k]=Object.assign({},permissoesPadrao,d.permissoes||{});
+                            atribuicoesEquipe[k]=Array.isArray(d.atribuicoes)?d.atribuicoes:[];
+                            funcoesEquipe[k]=d.funcao||'';
+                        } else { funcoesEquipe.admin=d.funcao||'Administrador / Gestor'; }
+                        equipeAtiva[k]=d.ativo!==false;
                     });
-                    if (document.getElementById('cfg_admin_nome')) document.getElementById('cfg_admin_nome').value = nomesExibicao['admin'];
-                    if (document.getElementById('cfg_admin_in')) document.getElementById('cfg_admin_in').value = jornadas['admin'].in;
-                    if (document.getElementById('cfg_admin_out')) document.getElementById('cfg_admin_out').value = jornadas['admin'].out;
-                    if (document.getElementById('cfg_admin_meal_in')) document.getElementById('cfg_admin_meal_in').value = almocosPadrao['admin'].in;
-                    if (document.getElementById('cfg_admin_meal_out')) document.getElementById('cfg_admin_meal_out').value = almocosPadrao['admin'].out;
-                    if (document.getElementById('cfg_admin_meta')) document.getElementById('cfg_admin_meta').value = metasEquipe['admin'].tarefasDia || '';
-                    if (document.getElementById('cfg_admin_tempo_meta')) document.getElementById('cfg_admin_tempo_meta').value = metasEquipe['admin'].tempoMedioMetaMin > 0 ? (metasEquipe['admin'].tempoMedioMetaMin / 60).toFixed(2) : '';
-
-                    for(let i=1; i<=5; i++) {
-                        const uKey = `usuario_${i}`;
-                        if (document.getElementById(`cfg_user${i}`)) document.getElementById(`cfg_user${i}`).value = nomesExibicao[uKey];
-                        if (document.getElementById(`cfg_in${i}`)) document.getElementById(`cfg_in${i}`).value = jornadas[uKey].in;
-                        if (document.getElementById(`cfg_out${i}`)) document.getElementById(`cfg_out${i}`).value = jornadas[uKey].out;
-                        if (document.getElementById(`cfg_meal_in${i}`)) document.getElementById(`cfg_meal_in${i}`).value = almocosPadrao[uKey].in;
-                        if (document.getElementById(`cfg_meal_out${i}`)) document.getElementById(`cfg_meal_out${i}`).value = almocosPadrao[uKey].out;
-                        if (document.getElementById(`cfg_meta${i}`)) document.getElementById(`cfg_meta${i}`).value = metasEquipe[uKey].tarefasDia || '';
-                        if (document.getElementById(`cfg_tempo_meta${i}`)) document.getElementById(`cfg_tempo_meta${i}`).value = metasEquipe[uKey].tempoMedioMetaMin > 0 ? (metasEquipe[uKey].tempoMedioMetaMin / 60).toFixed(2) : '';
-                        if (document.getElementById(`cfg_pass${i}`)) document.getElementById(`cfg_pass${i}`).value = senhasEquipe[uKey];
-                        if (document.getElementById(`cfg_perm${i}`)) document.getElementById(`cfg_perm${i}`).checked = permissoesLancar[uKey];
-                        if (document.getElementById(`lbl_user${i}`)) document.getElementById(`lbl_user${i}`).innerText = `Funcionário ${i} (${nomesExibicao[uKey]}):`;
-                    }
+                    renderizarGestaoColaboradores();
                     atualizarNomesNoSeletorLogin(); renderTasks(); renderizarStatusEquipeTempoReal();
                 }
             });
@@ -1626,9 +1759,10 @@
 
         function atualizarNomesNoSeletorLogin() {
             const select = document.getElementById('loginUser');
-            if (select && select.options.length > 0) {
-                select.options[0].text = nomesExibicao['admin'];
-                for(let i=1; i<=5; i++) { if(select.options[i]) select.options[i].text = nomesExibicao[`usuario_${i}`]; }
+            if (select) {
+                const atual=select.value; select.innerHTML='';
+                getChavesEquipe().forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent=nomesExibicao[k]||k; select.appendChild(opt); });
+                if(atual && getChavesEquipe().includes(atual)) select.value=atual;
             }
 
             const queueSelect = document.getElementById('queueUserFilter');
@@ -1639,7 +1773,7 @@
                     <option value="minhas">👤 Ver apenas minhas tarefas</option>
                 `;
                 
-                const chavesEquipe = ['admin', 'usuario_1', 'usuario_2', 'usuario_3', 'usuario_4', 'usuario_5'];
+                const chavesEquipe = getChavesEquipe();
                 const agrupadoPorNome = {};
                 
                 chavesEquipe.forEach(k => {
@@ -1704,84 +1838,25 @@
         }
 
         function configurarInterfacePorUsuario() {
-            const container = document.getElementById('tabPainel');
-            const adminBox = document.getElementById('adminFormBox');
-            const btnLancamento = document.getElementById('btnTabLancamento');
-            const btnGerenciamento = document.getElementById('btnTabGerenciamento');
-            const btnConsumo = document.getElementById('btnTabConsumo');
-            const btnLoginTrigger = document.getElementById('btnLoginTrigger');
-            const btnLogout = document.getElementById('btnLogout');
-            const reportButtons = document.getElementById('reportButtonsContainer');
-            const restrictedSection = document.getElementById('restrictedTimeReportSection');
-
-            const temPermissaoLancar = permissoesLancar[currentUser] || false;
-
-            if (currentUser === 'visitante') {
-                document.body.classList.add('pre-login');
-                document.getElementById('adminTabs').style.display = 'none';
-                btnLancamento.style.display = 'none';
-                btnGerenciamento.style.display = 'none';
-                btnConsumo.style.display = 'none';
-                btnLoginTrigger.style.display = 'none';
-                btnLogout.style.display = 'none';
-                const rt = document.getElementById('realTimeStatusContainer'); if (rt) rt.style.display = 'none';
-                const ca = document.getElementById('criticalAlertPanel'); if (ca) ca.style.display = 'none';
-                if (reportButtons) reportButtons.style.display = 'none';
-                if (restrictedSection) restrictedSection.style.display = 'none';
-                document.querySelectorAll('[id^="tab"]').forEach(el => { if (el.id !== 'tabPainel') el.style.display = 'none'; });
-                document.getElementById('tabPainel').style.display = 'none';
-                document.getElementById('welcomeSplash').style.display = 'none';
-                abrirModalLogin();
-                return;
-            }
-
+            const container=document.getElementById('tabPainel'), adminBox=document.getElementById('adminFormBox');
+            const btnLancamento=document.getElementById('btnTabLancamento'), btnGerenciamento=document.getElementById('btnTabGerenciamento'), btnConsumo=document.getElementById('btnTabConsumo');
+            const btnLoginTrigger=document.getElementById('btnLoginTrigger'), btnLogout=document.getElementById('btnLogout');
+            const reportButtons=document.getElementById('reportButtonsContainer'), restrictedSection=document.getElementById('restrictedTimeReportSection');
+            if(currentUser==='visitante'){ document.body.classList.add('pre-login'); document.getElementById('adminTabs').style.display='none'; document.querySelectorAll('[id^="tab"]').forEach(el=>{if(el.id!=='tabPainel')el.style.display='none';}); if(container)container.style.display='none'; if(btnLoginTrigger)btnLoginTrigger.style.display='none'; if(btnLogout)btnLogout.style.display='none'; abrirModalLogin(); return; }
             document.body.classList.remove('pre-login');
-            document.getElementById('adminTabs').style.display = 'flex';
-            btnLancamento.style.display = 'none';
-
-            // REGRA DE SEGURANÇA: CALCULADORA VISÍVEL SOMENTE PARA ADMIN E DIGITALIZADOR (USUARIO_3)
-            if (currentUser === 'admin' || currentUser === 'usuario_3') {
-                btnConsumo.style.display = 'block';
-            } else {
-                btnConsumo.style.display = 'none';
-                if (document.getElementById('tabConsumo').style.display === 'block') {
-                    switchTab('painel');
-                }
-            }
-
-            if (currentUser === 'admin') {
-                document.getElementById('userDisplay').innerText = nomesExibicao[currentUser];
-                adminBox.style.display = 'block'; container.classList.add('full-width');
-                btnLancamento.style.display = 'block';
-                btnGerenciamento.style.display = 'block'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
-                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block';
-                switchTab('painel');
-            } else if (currentUser === 'visitante') {
-                document.getElementById('userDisplay').innerText = "Monitoramento Geral";
-                adminBox.style.display = 'none'; container.classList.add('full-width');
-                btnLancamento.style.display = 'none';
-                btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'block'; btnLogout.style.display = 'none';
-                reportButtons.style.display = 'none'; restrictedSection.style.display = 'none'; document.getElementById('tabRelatorios').style.display = 'none'; switchTab('painel');
-            } else {
-                document.getElementById('userDisplay').innerText = nomesExibicao[currentUser] + (temPermissaoLancar ? " (Substituto 👑)" : "");
-                adminBox.style.display = temPermissaoLancar ? 'block' : 'none';
-                btnLancamento.style.display = temPermissaoLancar ? 'block' : 'none';
-                container.className = 'dashboard-layout full-width';
-                document.getElementById('adminTabs').style.display = temPermissaoLancar ? 'flex' : 'none';
-                btnGerenciamento.style.display = 'none'; btnLoginTrigger.style.display = 'none'; btnLogout.style.display = 'block';
-                // Colaborador logado sempre tem acesso ao painel e ao relatório, mesmo sem permissão de lançamento.
-                // A aba de gerenciamento permanece exclusiva do administrador e Composição e Consumo segue sua própria permissão.
-                document.getElementById('adminTabs').style.display = 'flex';
-                document.getElementById('btnTabPainel').style.display = 'block';
-                document.getElementById('btnTabRelatorios').style.display = 'block';
-                document.getElementById('btnTabGerenciamento').style.display = 'none';
-                if (!temPermissaoLancar) document.getElementById('btnTabLancamento').style.display = 'none';
-                reportButtons.style.display = 'flex'; restrictedSection.style.display = 'block';
-                verificarAlertasCriticos();
-                // O visitante deixa o painel oculto; por isso, após o login do colaborador,
-                // a tela principal precisa ser explicitamente reaberta.
-                switchTab('painel');
-            }
+            const p=getPermissoesUsuario(currentUser);
+            document.getElementById('adminTabs').style.display='flex';
+            document.getElementById('btnTabPainel').style.display=p.painel?'block':'none';
+            btnLancamento.style.display=p.lancamento?'block':'none';
+            document.getElementById('btnTabRelatorios').style.display=p.relatorios?'block':'none';
+            btnConsumo.style.display=p.consumo?'block':'none';
+            btnGerenciamento.style.display=(currentUser==='admin'||p.gerenciamento)?'block':'none';
+            if(adminBox)adminBox.style.display=p.lancamento?'block':'none';
+            if(btnLoginTrigger)btnLoginTrigger.style.display='none'; if(btnLogout)btnLogout.style.display='block';
+            if(reportButtons)reportButtons.style.display=p.relatorios?'flex':'none';
+            if(restrictedSection)restrictedSection.style.display=p.relatorios?'block':'none';
+            document.getElementById('userDisplay').innerText=nomesExibicao[currentUser]||currentUser;
+            if(!p.painel && p.relatorios) switchTab('relatorios'); else switchTab('painel');
             renderTasks(); updateReportDashboard(); renderizarStatusEquipeTempoReal();
         }
 
@@ -1793,30 +1868,17 @@
         }
 
         function switchTab(tab) {
-            if (currentUser === 'visitante') { abrirModalLogin(); return; }
-            // VERIFICAÇÃO DE PERMISSÃO PARA CONSUMO
-            if (tab === 'consumo' && currentUser !== 'admin' && currentUser !== 'usuario_3') {
-                alert("Acesso restrito! Apenas o Administrador e o Digitalizador possuem permissão para esta ferramenta.");
-                return;
-            }
-
-            document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tabPainel').style.display = 'none'; 
-            document.getElementById('tabLancamento').style.display = 'none';
-            document.getElementById('tabRelatorios').style.display = 'none'; 
-            document.getElementById('tabGerenciamento').style.display = 'none';
-            document.getElementById('tabConsumo').style.display = 'none';
-
-            if (tab === 'painel') { document.getElementById('btnTabPainel').classList.add('active'); document.getElementById('tabPainel').style.display = 'grid'; }
-            else if (tab === 'lancamento') {
-                const podeLancar = currentUser === 'admin' || permissoesLancar[currentUser] || false;
-                if (!podeLancar) { switchTab('painel'); return; }
-                document.getElementById('btnTabLancamento').classList.add('active');
-                document.getElementById('tabLancamento').style.display = 'block';
-            }
-            else if (tab === 'relatorios') { document.getElementById('btnTabRelatorios').classList.add('active'); document.getElementById('tabRelatorios').style.display = 'block'; updateReportDashboard(); }
-            else if (tab === 'gerenciamento') { document.getElementById('btnTabGerenciamento').classList.add('active'); document.getElementById('tabGerenciamento').style.display = 'block'; }
-            else if (tab === 'consumo') { document.getElementById('btnTabConsumo').classList.add('active'); document.getElementById('tabConsumo').style.display = 'block'; }
+            if(currentUser==='visitante'){abrirModalLogin();return;}
+            const p=getPermissoesUsuario(currentUser);
+            const mapa={painel:'painel',lancamento:'lancamento',relatorios:'relatorios',gerenciamento:'gerenciamento',consumo:'consumo'};
+            const permissao={painel:'painel',lancamento:'lancamento',relatorios:'relatorios',gerenciamento:'gerenciamento',consumo:'consumo'}[tab];
+            if(tab==='gerenciamento' && currentUser!=='admin' && !p.gerenciamento){alert('Acesso restrito à gestão de equipe.');return;}
+            if(permissao && !p[permissao]){alert('Seu perfil não possui permissão para acessar esta parte do sistema.');return;}
+            document.querySelectorAll('.nav-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
+            ['Painel','Lancamento','Relatorios','Gerenciamento','Consumo'].forEach(x=>{const el=document.getElementById('tab'+x);if(el)el.style.display='none';});
+            const btn=document.getElementById('btnTab'+tab.charAt(0).toUpperCase()+tab.slice(1)); if(btn)btn.classList.add('active');
+            const el=document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)); if(el)el.style.display=tab==='painel'?'grid':'block';
+            if(tab==='relatorios')updateReportDashboard();
         }
 
         function verificarAlertasCriticos() {
@@ -1992,7 +2054,7 @@
             const agora = new Date();
             if (agora.getDay() < 1 || agora.getDay() > 5) return;
             const agoraMs = agora.getTime();
-            const chavesEquipe = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+            const chavesEquipe = getChavesEquipe();
 
             chavesEquipe.forEach(userKey => {
                 const intervaloAtual = obterIntervaloAutomatico(userKey, agora);
@@ -2174,6 +2236,7 @@
         }
 
         function abrirModalEdicao(id) {
+            if(!podeUsuario('editarTarefas')){alert('Seu perfil não permite editar tarefas.');return;}
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             
@@ -2240,6 +2303,7 @@
         }
 
         function abrirModalPausa(id) {
+            if(!podeUsuario('pausarTarefas')){alert('Seu perfil não permite pausar tarefas.');return;}
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             const logs = obterLogsTarefaNormalizados(task);
@@ -2289,6 +2353,7 @@
         }
 
         function retomarTarefaHoraExtra(id) {
+            if(!podeUsuario('pausarTarefas')){alert('Seu perfil não permite retomar tarefas.');return;}
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             const logs = obterLogsTarefaNormalizados(task).slice();
@@ -2342,6 +2407,7 @@
         }
 
         function retomarTarefaManual(id) {
+            if(!podeUsuario('pausarTarefas')){alert('Seu perfil não permite retomar tarefas.');return;}
             const task = tasks.find(t => t.id === id);
             if (!task) return;
             const logs = obterLogsTarefaNormalizados(task).slice();
@@ -2430,6 +2496,7 @@
         }
 
         function finishTask(id) {
+            if(!podeUsuario('concluirTarefas')){alert('Seu perfil não permite concluir tarefas.');return;}
             const compTask = tasks.find(t => t.id === id); if (!compTask) return;
             const agora = new Date();
             compTask.dateFinished = agora.toISOString().split('T')[0];
@@ -2896,7 +2963,7 @@
             slaEl.className = 'value ' + (sla >= 90 ? 'exec-positive' : sla >= 75 ? 'exec-warning' : 'exec-danger');
 
             // Equipe
-            const teamKeys = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+            const teamKeys = getChavesEquipe();
             const team = teamKeys.map(key => {
                 const mine = cur.completed.filter(t => t.userWhoFinished === key);
                 const mineOn = mine.filter(t => t.onTime === true);
@@ -3068,7 +3135,7 @@
             if(slaEl) slaEl.className='value '+(sla>=90?'exec-positive':sla>=75?'exec-warning':'exec-danger');
             const targetsBody = document.getElementById('execTargetsBody');
             if (targetsBody) {
-                const teamKeys = ['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+                const teamKeys = getChavesEquipe();
                 targetsBody.innerHTML = teamKeys.map(k => {
                     const m = metasEquipe[k] || {tarefasDia:0, tempoMedioMetaMin:0};
                     const tm = execEmployeeTimeMetrics(cur.completed,k,start,end);
@@ -3105,7 +3172,7 @@
         function inicializarRelatorioIndividual() {
             const select=document.getElementById('execIndividualEmployee');
             if(!select) return;
-            const keys=['admin','usuario_1','usuario_2','usuario_3','usuario_4','usuario_5'];
+            const keys=getChavesEquipe();
             const atual = (currentUser !== 'admin' && currentUser !== 'visitante') ? currentUser : (select.value || 'admin');
             select.innerHTML=keys.map(k=>`<option value="${k}">${nomesExibicao[k]||k}</option>`).join('');
             select.value=keys.includes(atual)?atual:'admin';
@@ -3265,7 +3332,7 @@
             tbody.innerHTML = '';
             
             let labelsTime = []; let dataWork = []; const hojeStr = new Date().toISOString().split('T')[0]; const agoraMs = new Date().getTime();
-            const chavesEquipe = ['admin', 'usuario_1', 'usuario_2', 'usuario_3', 'usuario_4', 'usuario_5'];
+            const chavesEquipe = getChavesEquipe();
 
             chavesEquipe.forEach(userKey => {
                 let totalTrabalhoMin = 0;
@@ -3427,7 +3494,7 @@
                 currentY += 4;
 
                 const rowsTempo = [];
-                const chavesEquipe = ['admin', 'usuario_1', 'usuario_2', 'usuario_3', 'usuario_4', 'usuario_5'];
+                const chavesEquipe = getChavesEquipe();
                 const metrics = getFilteredMetrics();
                 const hojeStr = new Date().toISOString().split('T')[0];
                 const agoraMs = new Date().getTime();
@@ -3593,30 +3660,10 @@
         }
 
         function salvarConfiguracaoEquipe() {
-            const configEquipe = {};
-            for(let i=1; i<=5; i++) {
-                const uKey = `usuario_${i}`;
-                configEquipe[uKey] = {
-                    nome: document.getElementById(`cfg_user${i}`).value,
-                    jornada: { in: document.getElementById(`cfg_in${i}`).value, out: document.getElementById(`cfg_out${i}`).value },
-                    almoco: { in: document.getElementById(`cfg_meal_in${i}`).value, out: document.getElementById(`cfg_meal_out${i}`).value },
-                    metas: {
-                        tarefasDia: Number(document.getElementById(`cfg_meta${i}`).value) || 0,
-                        tempoMedioMetaMin: Math.round((Number(document.getElementById(`cfg_tempo_meta${i}`).value) || 0) * 60)
-                    },
-                    senha: document.getElementById(`cfg_pass${i}`).value || "123", podeLancar: document.getElementById(`cfg_perm${i}`).checked
-                };
-            }
-            configEquipe['admin'] = {
-                nome: document.getElementById('cfg_admin_nome').value || nomesExibicao['admin'],
-                jornada: { in: document.getElementById('cfg_admin_in').value, out: document.getElementById('cfg_admin_out').value },
-                almoco: { in: document.getElementById('cfg_admin_meal_in').value, out: document.getElementById('cfg_admin_meal_out').value },
-                metas: {
-                    tarefasDia: Number(document.getElementById('cfg_admin_meta').value) || 0,
-                    tempoMedioMetaMin: Math.round((Number(document.getElementById('cfg_admin_tempo_meta').value) || 0) * 60)
-                }
-            };
-            if (database) database.ref('configuracoes/equipe').set(configEquipe).then(() => alert("Configuração gravada!"));
+            if(currentUser!=='admin'){alert('Somente o Administrador pode alterar a equipe e as permissões.');return;}
+            const configEquipe=coletarEGravarGestaoAvancada();
+            if(database){ database.ref('configuracoes/equipe').set(configEquipe).then(()=>{ alert('Equipe, funções, atribuições e permissões gravadas com sucesso!'); renderizarGestaoColaboradores(); atualizarNomesNoSeletorLogin(); }).catch(e=>alert('Erro ao gravar equipe: '+e.message)); }
+            else { alert('Firebase não está conectado. A configuração não foi gravada no servidor.'); }
         }
 
         function salvarSenhaAdmin() {
@@ -3648,7 +3695,7 @@
                 database.ref('tasks/ativas/' + taskId).set({
                     id: taskId, title: document.getElementById('taskTitle').value, requester: solicitante, category: document.getElementById('taskCategory').value,
                     action: acao, priority: document.getElementById('taskPriority').value, deadline: document.getElementById('taskDeadline').value,
-                    desc: document.getElementById('taskDesc').value, responsibles: roteamentoUsuarios[acao] || [], timestampCreated: new Date().getTime(), timeLogs: []
+                    desc: document.getElementById('taskDesc').value, responsibles: obterResponsaveisAcao(acao), timestampCreated: new Date().getTime(), timeLogs: []
                 });
             }
             document.getElementById('taskForm').reset(); alert("Tarefa enviada!");
@@ -4092,7 +4139,7 @@
                 <td>${item.tipoKit}</td>
                 <td>${item.dataAtualizacao || '-'}</td>
                 <td class="cc-text-center">
-                    <button class="cc-btn-action cc-btn-load" style="height:24px; font-size:10px; display:inline-flex;" onclick="cc_carregarItemDoBanco('${item.id}')">Carregar</button>
+                    <button class="cc-btn-action cc-btn-load" style="height:24px; font-size:10px; display:inline-flex;" onclick="cc_mostrarDetalhesProduto('${encodeURIComponent(item.id)}')">Ver / Carregar</button>
                 </td>
             </tr>`;
         });
@@ -4101,13 +4148,29 @@
         container.innerHTML = html;
     }
 
+
+    function cc_escaparHTML(valor) {
+        return String(valor ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function cc_formatarVersaoProduto(item) {
+        const cor = item.padraoCor || 'Sem padrão de cor';
+        const tipoKit = item.tipoKit || 'Sem personalização';
+        return `${cor} / ${tipoKit}`;
+    }
+
     function cc_renderizarRelatorioAba3() {
         const banco = cc_obterBancoLocal();
         const tbodyGeral = document.getElementById('cc_tabelaRelatorioGeralBody');
         const tbodyMedias = document.getElementById('cc_tabelaMediasBody');
 
-        tbodyGeral.innerHTML = "";
-        tbodyMedias.innerHTML = "";
+        tbodyGeral.innerHTML = '';
+        tbodyMedias.innerHTML = '';
 
         if (banco.length === 0) {
             tbodyGeral.innerHTML = `<tr><td colspan="7" class="cc-text-center">Nenhum registro no banco.</td></tr>`;
@@ -4115,69 +4178,171 @@
             return;
         }
 
-        // 1. Preenche Listagem Detalhada Geral
+        // 1. Cada cadastro/versão aparece separadamente. Nenhum produto é escondido por agrupamento.
         banco.forEach(item => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td style="font-weight:bold">${item.codigo}</td>
-                <td>${item.descricao}</td>
-                <td>${item.tipoCategoria || 'Kit'}</td>
-                <td>${item.padraoCor} / ${item.tipoKit}</td>
-                <td class="cc-text-right">${cc_formatVal(item.totalLiquido || 0)}</td>
-                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(item.totalBruto || 0)}</td>
-                <td class="cc-text-center">${item.dataAtualizacao || '-'}</td>
+                <td style="font-weight:bold">${cc_escaparHTML(item.codigo)}</td>
+                <td style="font-weight:600">${cc_escaparHTML(item.descricao || '-')}</td>
+                <td>${cc_escaparHTML(item.tipoCategoria || 'Kit')}</td>
+                <td>${cc_escaparHTML(cc_formatarVersaoProduto(item))}</td>
+                <td class="cc-text-right" style="font-weight:bold;">${cc_formatVal(item.totalLiquido || 0)} m²</td>
+                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(item.totalBruto || 0)} m²</td>
+                <td class="cc-text-center">${cc_escaparHTML(item.dataAtualizacao || '-')}</td>
             `;
             tbodyGeral.appendChild(tr);
         });
 
-        // 2. Agrupa por Nome/Descrição do Produto e calcula as MÉDIAS
+        // 2. A média é feita somente entre versões/cadastros que possuem o MESMO NOME.
         const gruposPorNome = {};
-
         banco.forEach(item => {
-            const nomeNormalizado = item.descricao.trim().toUpperCase();
+            const nomeNormalizado = String(item.descricao || '').trim().toUpperCase();
             if (!gruposPorNome[nomeNormalizado]) {
-                gruposPorNome[nomeNormalizado] = {
-                    nomeOriginal: item.descricao,
-                    itens: []
-                };
+                gruposPorNome[nomeNormalizado] = { nomeOriginal: item.descricao || 'Sem nome', itens: [] };
             }
             gruposPorNome[nomeNormalizado].itens.push(item);
         });
 
-        Object.keys(gruposPorNome).forEach(chave => {
+        Object.keys(gruposPorNome).sort().forEach(chave => {
             const grupo = gruposPorNome[chave];
-            const qtd = grupo.itens.length;
-            
+            // Produto com apenas uma versão não entra na média entre versões.
+            if (grupo.itens.length < 2) return;
+
             let somaLiquido = 0;
             let somaBruto = 0;
-            let codigosUnicos = new Set();
-
             grupo.itens.forEach(item => {
-                somaLiquido += (item.totalLiquido || 0);
-                somaBruto += (item.totalBruto || 0);
-                codigosUnicos.add(item.codigo);
+                somaLiquido += Number(item.totalLiquido || 0);
+                somaBruto += Number(item.totalBruto || 0);
             });
 
-            const mediaLiquida = somaLiquido / qtd;
-            const mediaBruta = somaBruto / qtd;
+            const mediaLiquida = somaLiquido / grupo.itens.length;
+            const mediaBruta = somaBruto / grupo.itens.length;
+            const referencias = grupo.itens.map(item => {
+                const versao = cc_formatarVersaoProduto(item);
+                return `${item.codigo} (${versao})`;
+            }).join(' | ');
 
             const tr = document.createElement('tr');
+            tr.className = 'cc-report-average';
             tr.innerHTML = `
-                <td style="font-weight:bold">${grupo.nomeOriginal}</td>
-                <td class="cc-text-center"><span style="background:#e7f1ff; padding:2px 8px; border-radius:10px; font-weight:bold; color:#0d6efd;">${qtd}</span></td>
+                <td style="font-weight:bold">${cc_escaparHTML(grupo.nomeOriginal)}</td>
+                <td class="cc-text-center"><span style="background:#e7f1ff; padding:2px 8px; border-radius:10px; font-weight:bold; color:#0d6efd;">${grupo.itens.length}</span></td>
                 <td class="cc-text-right" style="font-weight:bold;">${cc_formatVal(mediaLiquida)} m²</td>
                 <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(mediaBruta)} m²</td>
-                <td>${Array.from(codigosUnicos).join(', ')}</td>
+                <td>${cc_escaparHTML(referencias)}</td>
             `;
             tbodyMedias.appendChild(tr);
         });
+
+        if (!tbodyMedias.children.length) {
+            tbodyMedias.innerHTML = `<tr><td colspan="5" class="cc-text-center">Não existem, neste momento, produtos com duas ou mais versões para calcular uma média.</td></tr>`;
+        }
     }
 
-    function cc_carregarItemDoBanco(id) {
+    function cc_mostrarDetalhesProduto(idCodificado) {
+        const id = decodeURIComponent(idCodificado);
+        const banco = cc_obterBancoLocal();
+        const config = banco.find(item => item.id === id);
+        if (!config) {
+            alert('Produto não encontrado no Banco de Dados.');
+            return;
+        }
+
+        const materiais = typeof materiaisPrincipais !== 'undefined' ? materiaisPrincipais : [];
+        const linhasTabela = (config.tabelaPrincipal || []).map(row => {
+            const celulas = materiais.map(mat => {
+                const vals = (row.materiais && row.materiais[mat]) || [];
+                return `<td>${vals.length ? vals.map(v => cc_escaparHTML(v)).join('<br>') : '-'}</td>`;
+            }).join('');
+            return `<tr><td><strong>${cc_escaparHTML(row.composicao || '-')}</strong></td>${celulas}</tr>`;
+        }).join('');
+
+        const cabecalhosMateriais = materiais.map(mat => `<th>${cc_escaparHTML(mat)}</th>`).join('');
+
+        let insumosHTML = '';
+        const insumos = config.insumos || {};
+        if (typeof listaInsumos !== 'undefined' && Array.isArray(listaInsumos)) {
+            listaInsumos.forEach(insumo => {
+                const itens = insumos[insumo.id] || [];
+                if (!itens.length) {
+                    insumosHTML += `<tr><td><strong>${cc_escaparHTML(insumo.id)}</strong></td><td colspan="3">Nenhum insumo/aplicação cadastrado.</td></tr>`;
+                } else {
+                    itens.forEach((item, idx) => {
+                        insumosHTML += `<tr>
+                            <td>${idx === 0 ? `<strong>${cc_escaparHTML(insumo.id)}</strong>` : ''}</td>
+                            <td>${cc_escaparHTML(item.peca || '-')}</td>
+                            <td>${cc_escaparHTML(item.metro || '-')}</td>
+                            <td>${cc_escaparHTML(item.qtd || '-')}</td>
+                        </tr>`;
+                    });
+                }
+            });
+        }
+
+        if (!insumosHTML) insumosHTML = '<tr><td colspan="4">Nenhum insumo cadastrado.</td></tr>';
+
+        const params = config.params || {};
+        const body = document.getElementById('cc_produtoModalBody');
+        body.innerHTML = `
+            <div class="cc-product-info-grid">
+                <div class="cc-product-info-card"><small>Código</small><strong>${cc_escaparHTML(config.codigo)}</strong></div>
+                <div class="cc-product-info-card"><small>Produto / Nome</small><strong>${cc_escaparHTML(config.descricao)}</strong></div>
+                <div class="cc-product-info-card"><small>Tipo</small><strong>${cc_escaparHTML(config.tipoCategoria || 'Kit')}</strong></div>
+                <div class="cc-product-info-card"><small>Versão / Personalização</small><strong>${cc_escaparHTML(cc_formatarVersaoProduto(config))}</strong></div>
+                <div class="cc-product-info-card"><small>Consumo Líquido Total</small><strong>${cc_formatVal(config.totalLiquido || 0)} m²</strong></div>
+                <div class="cc-product-info-card"><small>Consumo Bruto Total</small><strong>${cc_formatVal(config.totalBruto || 0)} m²</strong></div>
+                <div class="cc-product-info-card"><small>Atualizado em</small><strong>${cc_escaparHTML(config.dataAtualizacao || '-')}</strong></div>
+                <div class="cc-product-info-card"><small>ID do Cadastro</small><strong>${cc_escaparHTML(config.id || '-')}</strong></div>
+            </div>
+
+            <div class="cc-product-modal-section">
+                <h4><i class="fa-solid fa-sliders"></i> Parâmetros Globais</h4>
+                <table class="cc-product-modal-table">
+                    <thead><tr><th>Largura</th><th>Quebra do Couro</th><th>Quebra do Vinil</th></tr></thead>
+                    <tbody><tr><td>${cc_escaparHTML(params.largura || '-')}</td><td>${cc_escaparHTML(params.quebraCouro || '-')}</td><td>${cc_escaparHTML(params.quebraVinil || '-')}</td></tr></tbody>
+                </table>
+            </div>
+
+            <div class="cc-product-modal-section">
+                <h4><i class="fa-solid fa-layer-group"></i> Composição e Consumo de Matérias-Primas</h4>
+                <div class="cc-table-responsive" style="margin:0;">
+                    <table class="cc-product-modal-table">
+                        <thead><tr><th>Composição</th>${cabecalhosMateriais}<th>Líquido</th><th>Bruto</th></tr></thead>
+                        <tbody>${linhasTabela || '<tr><td colspan="99">Nenhuma composição registrada.</td></tr>'}</tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="cc-product-modal-section">
+                <h4><i class="fa-solid fa-scissors"></i> Insumos / Aplicações por Peça</h4>
+                <div class="cc-table-responsive" style="margin:0;">
+                    <table class="cc-product-modal-table">
+                        <thead><tr><th>Insumo</th><th>Peça / Local</th><th>Metro Linear</th><th>Quantidade</th></tr></thead>
+                        <tbody>${insumosHTML}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('cc_btnConfirmarCarregamento').onclick = function() {
+            cc_carregarItemDoBanco(idCodificado, true);
+        };
+        document.getElementById('cc_produtoModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cc_fecharModalProduto() {
+        document.getElementById('cc_produtoModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function cc_carregarItemDoBanco(idCodificado, fecharModal = false) {
+        const id = decodeURIComponent(idCodificado);
         cc_trocarAba('cc_abaEdicao', document.querySelectorAll('.cc-nav-tab')[0]);
         cc_atualizarSelectVariacoes();
         document.getElementById('cc_selectVariacao').value = id;
         cc_carregarConfiguracaoSelecionada();
+        if (fecharModal) cc_fecharModalProduto();
     }
 
     function cc_trocarAba(abaId, element) {
