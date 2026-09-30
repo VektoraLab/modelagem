@@ -186,7 +186,11 @@
             display: none; /* Inicia oculta */
             gap: 20px; align-items: center; flex-wrap: wrap;
         }
-        .cc-params-bar.visible { display: flex; }
+        .cc-params-bar.visible, .cc-params-bar.cc-visible { display: flex; }
+        .cc-param-help { flex: 1 1 100%; font-size: 11px; color: #084298; background: #fff; border: 1px solid #b6d4fe; border-radius: 4px; padding: 6px 8px; }
+        .cc-cell-result { margin-top: 5px; padding-top: 4px; border-top: 1px dashed #c9d7ea; font-size: 10px; line-height: 1.35; color: #333; }
+        .cc-cell-result span { display:block; }
+        .cc-cell-result-bruto { color:#0d6efd; }
         .cc-params-bar h4 { font-size: 12px; color: #084298; display: flex; align-items: center; gap: 5px; }
         .cc-param-group { display: flex; align-items: center; gap: 6px; }
         .cc-param-group label { font-size: 11px; font-weight: 600; color: #084298; }
@@ -282,6 +286,13 @@
         .team-card-header strong { color:#1f4e79; font-size:14px; }
         .team-permissions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-top:8px; padding-top:8px; border-top:1px dashed #d5dbe3; }
         .team-permissions label, .team-assignments label { font-size:11px; color:#344054; display:flex; gap:5px; align-items:center; }
+        .team-goals-by-task { display:flex; flex-direction:column; gap:7px; margin-top:8px; }
+        .team-goal-row { display:grid; grid-template-columns:minmax(180px,1.5fr) 90px 145px minmax(220px,2fr); gap:7px; align-items:center; padding:7px; border:1px solid #e2e8f0; border-radius:7px; background:#fafcff; }
+        .team-goal-name { display:flex; flex-direction:column; gap:2px; }
+        .team-goal-name small { color:#7b8794; font-size:10px; }
+        .team-goal-projection { font-size:11px; color:#344054; line-height:1.35; }
+        .team-goal-projection strong { color:#0d6efd; }
+        @media (max-width:900px){ .team-goal-row { grid-template-columns:1fr 80px 130px; } .team-goal-projection { grid-column:1/-1; } }
         .team-assignments { max-height:150px; overflow:auto; border:1px solid #e4e7ec; border-radius:5px; padding:7px; margin-top:6px; background:#fafafa; }
         .team-remove { background:#e74c3c !important; }
         .team-add { background:#198754 !important; }
@@ -487,29 +498,7 @@
                     </div>
                     <div class="form-group">
                         <label for="taskAction">Especificação da Tarefa</label>
-                        <select id="taskAction" class="form-control">
-                            <optgroup label="Operações da Equipe">
-                                <option value="Fazer modelo novo">Fazer modelo novo</option>
-                                <option value="Alterar modelo existente">Alterar modelo existente</option>
-                                <option value="Cadastrar modelo novo">Cadastrar modelo novo</option>
-                                <option value="Alterar cadastro de um modelo existente">Alterar cadastro de um modelo existente</option>
-                                <option value="Digitalizar modelo novo">Digitalizar modelo novo</option>
-                                <option value="Alterar modelo ja digitalizado">Alterar modelo ja digitalizado</option>
-                                <option value="Fazer personalizado">Fazer personalizado</option>
-                                <option value="Desenvolver nova arte personalizada">Desenvolver nova arte personalizada</option>
-                                <option value="alterar personalizado existente">alterar personalizado existente</option>
-                                <option value="Criar bordado a partir da imagem disponibilizada">Criar bordado a partir da imagem disponibilizada</option>
-                            </optgroup>
-                            <optgroup label="Atividades do Líder/Gestor">
-                                <option value="Treinamento e Alinhamento da equipe">Treinamento e Alinhamento da equipe</option>
-                                <option value="Desenvolvimento de ferramentas e softwares setoriais">Desenvolvimento de ferramentas e softwares setoriais</option>
-                                <option value="Auxílio técnico aos setores de produção">Auxílio técnico aos setores de produção</option>
-                                <option value="Organização, planejamento e metas do setor">Organização, planejamento e metas do setor</option>
-                                <option value="Medição de consumo">Medição de consumo</option>
-                                <option value="Fazer croqui">Fazer croqui</option>
-                                <option value="Alteração em croqui já existente">Alteração em croqui já existente</option>
-                            </optgroup>
-                        </select>
+                        <select id="taskAction" class="form-control"></select>
                     </div>
                     <div class="form-group">
                         <label for="taskPriority">Sequência de Prioridade</label>
@@ -732,6 +721,17 @@
             </div>
 
             <div class="exec-panel" style="margin-top:16px;">
+                <h3>🎯 Metas por tipo de tarefa e balanceamento</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead><tr><th>Tipo de tarefa</th><th class="num">Meta cadastrada</th><th class="num">Diária equivalente</th><th class="num">Semana</th><th class="num">15 dias</th><th class="num">Mês</th><th class="num">Tempo base</th><th class="num">Carga diária</th><th class="num">Concluídas no período</th><th class="num">Atingimento</th></tr></thead>
+                        <tbody id="execIndividualTaskGoalsBody"></tbody>
+                    </table>
+                </div>
+                <div id="execIndividualTaskGoalsNote" class="exec-note">O balanceamento considera as metas por tipo, a jornada útil cadastrada, almoço e os descansos automáticos. Quando há déficit de capacidade, o sistema pode apresentar uma sugestão operacional de hora extra limitada a 1 hora por dia; isso não é uma regra trabalhista.</div>
+            </div>
+
+            <div class="exec-panel" style="margin-top:16px;">
                 <h3>📋 Detalhamento das tarefas do funcionário</h3>
                 <div style="overflow-x:auto;">
                     <table class="exec-table">
@@ -846,21 +846,18 @@
 </div>
 
 <div id="cc_abaEdicao" class="cc-view-section active">
-    <!-- BARRA DE PARÂMETROS OCULTA POR PADRÃO -->
+    <!-- PARÂMETROS GLOBAIS: LARGURA E QUEBRA POR MATERIAL -->
     <div class="cc-params-bar" id="cc_barParametros">
-        <h4><i class="fa-solid fa-sliders"></i> Parâmetros Globais de Cálculo:</h4>
-        <div class="cc-param-group">
-            <label for="paramLargura">Largura Material (m):</label>
-            <input type="number" id="cc_paramLargura" value="1.38" step="0.01" onchange="cc_recalcularTabelaPrincipal()">
-        </div>
-        <div class="cc-param-group">
-            <label for="paramQuebraCouro">Quebra Couro (%):</label>
-            <input type="number" id="cc_paramQuebraCouro" value="7" step="0.5" onchange="cc_recalcularTabelaPrincipal()">
-        </div>
-        <div class="cc-param-group">
-            <label for="paramQuebraVinil">Quebra Vinil (%):</label>
-            <input type="number" id="cc_paramQuebraVinil" value="5" step="0.5" onchange="cc_recalcularTabelaPrincipal()">
-        </div>
+        <h4><i class="fa-solid fa-sliders"></i> Parâmetros Globais de Cálculo (m²):</h4>
+        <div class="cc-param-group"><label for="cc_paramLarguraCouro">Couro — largura (m):</label><input type="number" id="cc_paramLarguraCouro" value="1.38" min="0.01" step="0.01" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramQuebraCouro">Couro — quebra (%):</label><input type="number" id="cc_paramQuebraCouro" value="7" min="0" step="0.5" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramLarguraVinil">Vinil — largura (m):</label><input type="number" id="cc_paramLarguraVinil" value="1.38" min="0.01" step="0.01" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramQuebraVinil">Vinil — quebra (%):</label><input type="number" id="cc_paramQuebraVinil" value="5" min="0" step="0.5" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramLarguraEspuma">Espuma — largura (m):</label><input type="number" id="cc_paramLarguraEspuma" value="1.38" min="0.01" step="0.01" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramQuebraEspuma">Espuma — quebra (%):</label><input type="number" id="cc_paramQuebraEspuma" value="0" min="0" step="0.5" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramLarguraCarpete">Carpete — largura (m):</label><input type="number" id="cc_paramLarguraCarpete" value="1.38" min="0.01" step="0.01" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-group"><label for="cc_paramQuebraCarpete">Carpete — quebra (%):</label><input type="number" id="cc_paramQuebraCarpete" value="0" min="0" step="0.5" onchange="cc_recalcularTabelaPrincipal()"></div>
+        <div class="cc-param-help">Na tabela abaixo, informe somente o <strong>comprimento em metros</strong>. O sistema calcula automaticamente <strong>comprimento × largura = m² líquido</strong> e aplica a quebra para o <strong>m² bruto</strong>.</div>
     </div>
 
     <div class="cc-container">
@@ -921,15 +918,15 @@
                 <thead>
                     <tr>
                         <th style="width: 120px;">Composição</th>
-                        <th class="cc-text-right">Couro (m²)</th>
-                        <th class="cc-text-right cc-highlight-espuma-carpete">Espuma (Sep/m²)</th>
-                        <th class="cc-text-right cc-highlight-espuma-carpete">Carpete (Sep/m²)</th>
-                        <th class="cc-text-right">Vinil S/Espuma</th>
-                        <th class="cc-text-right">Vinil+Esp Fina</th>
-                        <th class="cc-text-right">Vinil+Esp Média</th>
-                        <th class="cc-text-right">Vinil+EVA</th>
-                        <th class="cc-text-right cc-col-total" style="width: 110px;">Líquido (Couro+Vinil)</th>
-                        <th class="cc-text-right cc-col-total" style="width: 110px; color: #0d6efd;">Bruto (Com Quebra)</th>
+                        <th class="cc-text-right">Couro<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right cc-highlight-espuma-carpete">Espuma<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right cc-highlight-espuma-carpete">Carpete<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right">Vinil S/Espuma<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right">Vinil+Esp Fina<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right">Vinil+Esp Média<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right">Vinil+EVA<br><small>comprimento → m²</small></th>
+                        <th class="cc-text-right cc-col-total" style="width: 125px;">Couro + Vinil<br><small>m² líquido</small></th>
+                        <th class="cc-text-right cc-col-total" style="width: 125px; color: #0d6efd;">Área total<br><small>m² com quebra</small></th>
                     </tr>
                 </thead>
                 <tbody id="cc_mainTableBody"></tbody>
@@ -979,8 +976,12 @@
                         <th>Produto / Nome</th>
                         <th>Tipo</th>
                         <th>Versão (Cor / Personalização)</th>
-                        <th class="cc-text-right">Consumo Líquido (m²)</th>
-                        <th class="cc-text-right" style="color:#0d6efd;">Consumo Bruto (m²)</th>
+                        <th class="cc-text-right">Couro (m²)</th>
+                        <th class="cc-text-right">Vinil (m²)</th>
+                        <th class="cc-text-right">Espuma (m²)</th>
+                        <th class="cc-text-right">Carpete (m²)</th>
+                        <th class="cc-text-right">Couro + Vinil (m²)</th>
+                        <th class="cc-text-right" style="color:#0d6efd;">Total c/ Quebra (m²)</th>
                         <th class="cc-text-center">Cadastrado / Atualizado</th>
                     </tr>
                 </thead>
@@ -997,8 +998,12 @@
                     <tr>
                         <th>Produto / Nome</th>
                         <th class="cc-text-center">Qtd. de Versões</th>
-                        <th class="cc-text-right">Média Líquida (m²)</th>
-                        <th class="cc-text-right" style="color:#0d6efd;">Média Bruta (m²)</th>
+                        <th class="cc-text-right">Média Couro (m²)</th>
+                        <th class="cc-text-right">Média Vinil (m²)</th>
+                        <th class="cc-text-right">Média Espuma (m²)</th>
+                        <th class="cc-text-right">Média Carpete (m²)</th>
+                        <th class="cc-text-right">Média Couro + Vinil (m²)</th>
+                        <th class="cc-text-right" style="color:#0d6efd;">Média Total c/ Quebra (m²)</th>
                         <th>Versões / Códigos Considerados</th>
                     </tr>
                 </thead>
@@ -1020,6 +1025,16 @@
                 <div class="team-help">
                     Cadastre novos colaboradores, altere nome e função, defina jornada e metas, escolha quais atribuições cada pessoa pode receber e determine exatamente quais módulos e ações do sistema ela poderá visualizar ou editar.
                     <strong>O Administrador Master continua com acesso total.</strong>
+                </div>
+                <div class="panel-box" style="margin:0 0 14px 0; border:1px solid #dfe6e9; background:#fbfcfd;">
+                    <h3 style="margin-bottom:8px;">🧩 Cadastro de Tipos de Tarefas</h3>
+                    <p style="font-size:12px;color:#666;margin-bottom:10px;">Cadastre quantos tipos de tarefas forem necessários. Depois, marque em cada colaborador quais tipos ele pode receber.</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                        <input id="novoTipoTarefa" class="form-control" style="max-width:420px;" placeholder="Ex.: Conferência de medidas, Revisão técnica..." onkeydown="if(event.key==='Enter'){event.preventDefault();adicionarTipoTarefa();}">
+                        <button type="button" class="btn-submit" onclick="adicionarTipoTarefa()">➕ Adicionar tipo</button>
+                        <button type="button" class="btn-submit" style="background:#0d6efd;" onclick="salvarTiposTarefasFirebase()">💾 Salvar tipos</button>
+                    </div>
+                    <div id="listaTiposTarefasGerenciamento" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;"></div>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
                     <button type="button" class="btn-submit team-add" onclick="adicionarNovoColaborador()">➕ Novo Colaborador</button>
@@ -1277,7 +1292,7 @@
             console.warn("Firebase não inicializado. Chaves fictícias detectadas.");
         }
 
-        const roteamentoUsuarios = {
+        let roteamentoUsuarios = {
             "Fazer modelo novo": ["usuario_1"],
             "Alterar modelo existente": ["usuario_1"],
             "Cadastrar modelo novo": ["usuario_2"],
@@ -1341,8 +1356,24 @@
         let atribuicoesEquipe = {};
         let funcoesEquipe = {};
         let equipeAtiva = {};
+        // Metas específicas por colaborador e por tipo de tarefa.
+        // Formato: { usuario: { 'Tipo de tarefa': {quantidade, periodo} } }
+        let metasTarefasEquipe = {};
+        // Tipos de tarefa são cadastráveis pelo Administrador. Os tipos antigos
+        // continuam sendo carregados para preservar o funcionamento do sistema.
+        let tiposTarefas = Object.keys(roteamentoUsuarios);
         const permissoesPadrao = { painel:true, lancamento:false, relatorios:true, consumo:false, gerenciamento:false, editarTarefas:false, pausarTarefas:true, concluirTarefas:true };
-        const acoesEquipe = Object.keys(roteamentoUsuarios);
+        function getTiposTarefas() {
+            return Array.isArray(tiposTarefas) ? tiposTarefas.filter(Boolean) : Object.keys(roteamentoUsuarios);
+        }
+
+        // Migração inicial: transforma o roteamento antigo em atribuições explícitas.
+        Object.keys(roteamentoUsuarios).forEach(tipo => {
+            (roteamentoUsuarios[tipo] || []).forEach(k => {
+                if (!Array.isArray(atribuicoesEquipe[k])) atribuicoesEquipe[k] = [];
+                if (!atribuicoesEquipe[k].includes(tipo)) atribuicoesEquipe[k].push(tipo);
+            });
+        });
 
         function getChavesEquipe() {
             const chaves = Object.keys(nomesExibicao || {}).filter(k => k !== 'visitante');
@@ -1357,8 +1388,53 @@
         function podeUsuario(acao) { return currentUser === 'admin' || !!getPermissoesUsuario(currentUser)[acao]; }
 
         function obterResponsaveisAcao(acao) {
-            const cadastrados = getChavesEquipe().filter(k => Array.isArray(atribuicoesEquipe[k]) && atribuicoesEquipe[k].includes(acao));
-            return cadastrados.length ? cadastrados : (roteamentoUsuarios[acao] || []);
+            // A fila é definida somente pelas atribuições marcadas na Gestão de Colaboradores.
+            return getChavesEquipe().filter(k => Array.isArray(atribuicoesEquipe[k]) && atribuicoesEquipe[k].includes(acao));
+        }
+
+        function atualizarSeletorTiposTarefa() {
+            const select = document.getElementById('taskAction');
+            if (select) {
+                const atual = select.value;
+                select.innerHTML = getTiposTarefas().map(a => `<option value="${escHtml(a)}">${escHtml(a)}</option>`).join('');
+                if (getTiposTarefas().includes(atual)) select.value = atual;
+            }
+            const filtro = document.getElementById('filterActionSelect');
+            if (filtro) {
+                const atualFiltro = filtro.value;
+                filtro.innerHTML = `<option value="todos">Todas as Especificações</option>` + getTiposTarefas().map(a => `<option value="${escHtml(a)}">${escHtml(a)}</option>`).join('');
+                if (getTiposTarefas().includes(atualFiltro)) filtro.value = atualFiltro;
+            }
+        }
+
+        function adicionarTipoTarefa() {
+            if (currentUser !== 'admin') { alert('Somente o Administrador pode cadastrar tipos de tarefas.'); return; }
+            const input = document.getElementById('novoTipoTarefa');
+            const nome = (input?.value || '').trim();
+            if (!nome) { alert('Digite o nome do tipo de tarefa.'); return; }
+            if (getTiposTarefas().some(x => x.toLowerCase() === nome.toLowerCase())) { alert('Esse tipo de tarefa já está cadastrado.'); return; }
+            tiposTarefas.push(nome);
+            roteamentoUsuarios[nome] = [];
+            renderizarGestaoColaboradores();
+            atualizarSeletorTiposTarefa();
+            if (input) input.value = '';
+        }
+
+        function removerTipoTarefa(nome) {
+            nome = decodeURIComponent(nome);
+            if (currentUser !== 'admin') { alert('Somente o Administrador pode remover tipos de tarefas.'); return; }
+            if (!confirm(`Remover o tipo de tarefa "${nome}" do cadastro? As tarefas já lançadas não serão apagadas.`)) return;
+            tiposTarefas = getTiposTarefas().filter(x => x !== nome);
+            delete roteamentoUsuarios[nome];
+            Object.keys(atribuicoesEquipe).forEach(k => {
+                atribuicoesEquipe[k] = (atribuicoesEquipe[k] || []).filter(x => x !== nome);
+            });
+            renderizarGestaoColaboradores();
+            atualizarSeletorTiposTarefa();
+        }
+
+        function salvarTiposTarefasFirebase() {
+            salvarConfiguracaoEquipe();
         }
 
         function novoIdColaborador() { return 'usuario_' + Date.now(); }
@@ -1370,6 +1446,7 @@
             jornadas[id] = {in:'07:12',out:'17:00'};
             almocosPadrao[id] = {in:'12:00',out:'13:00'};
             metasEquipe[id] = {tarefasDia:0,tempoMedioMetaMin:0};
+            metasTarefasEquipe[id] = {};
             senhasEquipe[id] = '123';
             permissoesLancar[id] = false;
             permissoesSistema[id] = Object.assign({}, permissoesPadrao);
@@ -1385,10 +1462,126 @@
             renderizarGestaoColaboradores();
         }
 
+        function normalizarMetasTarefas(obj){
+            const out={};
+            if(!obj || typeof obj!=='object') return out;
+            Object.keys(obj).forEach(tipo=>{
+                const m=obj[tipo]||{};
+                const q=Number(m.quantidade)||0;
+                const periodo=['diaria','semanal','quinzenal','mensal'].includes(m.periodo)?m.periodo:'diaria';
+                if(q>0) out[tipo]={quantidade:q,periodo};
+            });
+            return out;
+        }
+
+        function diasUteisPadraoPeriodo(periodo, referenceDate=new Date()){
+            const ref=execDateOnly(referenceDate);
+            if(periodo==='diaria') return 1;
+            if(periodo==='semanal') return 5;
+            if(periodo==='quinzenal'){
+                const ini=ref.getDate()<=15 ? new Date(ref.getFullYear(),ref.getMonth(),1) : new Date(ref.getFullYear(),ref.getMonth(),16);
+                const fim=ref.getDate()<=15 ? new Date(ref.getFullYear(),ref.getMonth(),15) : new Date(ref.getFullYear(),ref.getMonth()+1,0);
+                return Math.max(1,execBusinessDaysInclusive(ini,fim));
+            }
+            if(periodo==='mensal') return Math.max(1,execBusinessDaysInclusive(new Date(ref.getFullYear(),ref.getMonth(),1),new Date(ref.getFullYear(),ref.getMonth()+1,0)));
+            return 1;
+        }
+
+        function obterMetaDiariaEquivalente(meta, referenceDate=new Date()){
+            if(!meta || !(Number(meta.quantidade)>0)) return 0;
+            return Number(meta.quantidade)/diasUteisPadraoPeriodo(meta.periodo||'diaria',referenceDate);
+        }
+
+        function calcularProjecoesMetaTarefa(meta, referenceDate=new Date()){
+            const diaria=obterMetaDiariaEquivalente(meta,referenceDate);
+            const ref=execDateOnly(referenceDate);
+            const diasSemana=diasUteisPadraoPeriodo('semanal',ref);
+            const diasQuinzena=diasUteisPadraoPeriodo('quinzenal',ref);
+            const diasMes=diasUteisPadraoPeriodo('mensal',ref);
+            return {diaria,semanal:diaria*diasSemana,quinzenal:diaria*diasQuinzena,mensal:diaria*diasMes};
+        }
+
+        function obterMediaMinutosTipoColaborador(userKey,tipo){
+            const all=[...(Array.isArray(historicTasks)?historicTasks:[]),...(Array.isArray(tasks)?tasks:[])];
+            let total=0,n=0;
+            const seen=new Set();
+            all.forEach(t=>{
+                if(!t || seen.has(t.id) || t.action!==tipo || t.userWhoFinished!==userKey || !t.dateFinished) return;
+                seen.add(t.id);
+                const d=execTaskDurationForUser(t,userKey);
+                if(d.exact && d.minutes>0){total+=d.minutes;n++;}
+            });
+            if(n) return Math.round(total/n);
+            // Se o tipo ainda não possui histórico próprio, usa primeiro a meta de tempo
+            // do colaborador e, se ela também não existir, a média real geral do colaborador.
+            const global=Number(metasEquipe[userKey]?.tempoMedioMetaMin)||0;
+            if(global>0) return global;
+            let totalGeral=0,nGeral=0;
+            const vistosGerais=new Set();
+            all.forEach(t=>{
+                if(!t || vistosGerais.has(t.id) || t.userWhoFinished!==userKey || !t.dateFinished) return;
+                vistosGerais.add(t.id);
+                const d=execTaskDurationForUser(t,userKey);
+                if(d.exact && d.minutes>0){ totalGeral+=d.minutes; nGeral++; }
+            });
+            return nGeral ? Math.round(totalGeral/nGeral) : 0;
+        }
+
+        function calcularResumoMetaTarefa(userKey,tipo,meta){
+            const p=calcularProjecoesMetaTarefa(meta,new Date());
+            const tempo=obterMediaMinutosTipoColaborador(userKey,tipo);
+            const capacidade=execCapacidadeDiariaUtilMin(userKey);
+            const cargaDiaria=tempo>0 ? p.diaria*tempo : 0;
+            const ocupacao=capacidade>0 && cargaDiaria>0 ? Math.round((cargaDiaria/capacidade)*100) : null;
+            const tempoTxt=tempo>0?fmtHorasDecimais(tempo):'tempo ainda não medido';
+            return `<strong>${p.diaria.toFixed(2).replace('.',',')}/dia</strong> · ${Math.round(p.semanal*100)/100} sem. · ${Math.round(p.quinzenal*100)/100} /15d · ${Math.round(p.mensal*100)/100} mês<br><span>Base de tempo: ${tempoTxt} por tarefa${ocupacao!==null?` · carga estimada ${ocupacao}% da capacidade diária`:''}</span>`;
+        }
+
+        function obterPlanejamentoMetasColaborador(userKey,referenceDate=new Date()){
+            const metas=normalizarMetasTarefas(metasTarefasEquipe[userKey]||{});
+            const capacidadeDiaria=execCapacidadeDiariaUtilMin(userKey);
+            let cargaDiaria=0;
+            const itens=[];
+            Object.keys(metas).forEach(tipo=>{
+                const meta=metas[tipo];
+                const diaria=obterMetaDiariaEquivalente(meta,referenceDate);
+                const tempo=obterMediaMinutosTipoColaborador(userKey,tipo);
+                const carga=tempo>0?diaria*tempo:0;
+                cargaDiaria+=carga;
+                const proj=calcularProjecoesMetaTarefa(meta,referenceDate);
+                itens.push({tipo,meta,diaria,tempo,cargaDiaria:carga,projecoes:proj});
+            });
+            const excesso=Math.max(0,cargaDiaria-capacidadeDiaria);
+            return {itens,capacidadeDiaria,cargaDiaria,excesso,ocupacao:capacidadeDiaria?Math.round(cargaDiaria/capacidadeDiaria*100):0};
+        }
+
+        function sugestaoHorasExtrasSaudavel(userKey,referenceDate=new Date()){
+            const plan=obterPlanejamentoMetasColaborador(userKey,referenceDate);
+            // Limite configurável/recomendado do sistema: evita transformar o déficit em uma ordem automática.
+            // O valor é uma sugestão operacional, não uma regra trabalhista.
+            const limiteDiario=60;
+            const minutosSugeridos=Math.min(Math.max(0,plan.excesso),limiteDiario);
+            return {minutos:minutosSugeridos,excesso:plan.excesso,limiteDiario,plan};
+        }
+
+        function atualizarResumoMetasCard(card,userKey){
+            if(!card) return;
+            const plan=obterPlanejamentoMetasColaborador(userKey,new Date());
+            const sug=sugestaoHorasExtrasSaudavel(userKey,new Date());
+            const el=card.querySelector('[data-smart-summary]');
+            if(!el) return;
+            const carga=plan.cargaDiaria>0?`${plan.cargaDiaria.toFixed(0)} min/dia`:'tempo não estimado';
+            const cap=`${plan.capacidadeDiaria} min/dia úteis`;
+            const extra=sug.minutos>0?`Sugestão de hora extra: ${Math.floor(sug.minutos/60)}h ${sug.minutos%60}min/dia (máx. configurado de 1h).`:(plan.excesso>0?'Há déficit de capacidade, mas o sistema não recomenda compensar tudo com hora extra.':'Capacidade compatível com as metas cadastradas.');
+            el.innerHTML=`<strong>Balanceamento inteligente:</strong> carga estimada ${carga} | capacidade ${cap} | ocupação ${plan.ocupacao}%.<br>${extra}`;
+        }
+
         function renderizarGestaoColaboradores() {
             const box=document.getElementById('advancedTeamContainer');
             const admin=document.getElementById('adminTeamCard');
             if(!box || !admin) return;
+            const tiposBox=document.getElementById('listaTiposTarefasGerenciamento');
+            if (tiposBox) tiposBox.innerHTML=getTiposTarefas().map(a=>`<span style="display:inline-flex;align-items:center;gap:5px;background:#eef3f7;border:1px solid #d5dde5;border-radius:14px;padding:4px 8px;font-size:11px;">${escHtml(a)} <button type="button" title="Remover" onclick="removerTipoTarefa('${encodeURIComponent(a)}')" style="border:0;background:transparent;color:#c0392b;cursor:pointer;font-weight:bold;">×</button></span>`).join('');
             const adminPerm=getPermissoesUsuario('admin');
             admin.innerHTML=`<div class="team-card-header"><strong>👑 ${nomesExibicao.admin || 'Administrador'}</strong><span style="font-size:11px;color:#198754;font-weight:bold;">ACESSO TOTAL</span></div>
                 <div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;">
@@ -1417,8 +1610,37 @@
                     <div class="team-section-title">👁️ O que pode acessar</div>
                     <div class="team-permissions">${Object.entries({painel:'Painel',lancamento:'Lançar tarefas',relatorios:'Relatórios',consumo:'Composição e Consumo',gerenciamento:'Gerenciar equipe',editarTarefas:'Editar tarefas',pausarTarefas:'Pausar/retomar',concluirTarefas:'Concluir tarefas'}).map(([p,l])=>`<label><input type="checkbox" data-perm="${p}" ${perms[p]?'checked':''}>${l}</label>`).join('')}</div>
                     <div class="team-section-title">🎯 Atribuições que pode receber</div>
-                    <div class="team-assignments">${acoesEquipe.map(a=>`<label><input type="checkbox" data-acao="${escHtml(a)}" ${atribs.includes(a)?'checked':''}>${escHtml(a)}</label>`).join('')}</div>`;
+                    <div class="team-assignments">${getTiposTarefas().map(a=>`<label><input type="checkbox" data-acao="${escHtml(a)}" ${atribs.includes(a)?'checked':''}>${escHtml(a)}</label>`).join('')}</div>
+                    <div class="team-section-title">🎯 Metas por tipo de tarefa</div>
+                    <div class="team-goals-by-task">${getTiposTarefas().map(a=>{
+                        const meta=(metasTarefasEquipe[k]||{})[a]||{};
+                        const ativo=atribs.includes(a);
+                        return `<div class="team-goal-row" data-goal-row="${escHtml(a)}">
+                            <div class="team-goal-name"><strong>${escHtml(a)}</strong><small>${ativo?'Atribuída':'Marque a atribuição acima para ativar'}</small></div>
+                            <input data-meta-tipo="${escHtml(a)}" data-meta-field="quantidade" type="number" min="0" step="1" class="form-control" value="${meta.quantidade||0}" placeholder="Qtd.">
+                            <select data-meta-tipo="${escHtml(a)}" data-meta-field="periodo" class="form-control">
+                                <option value="diaria" ${(meta.periodo||'diaria')==='diaria'?'selected':''}>Diária</option>
+                                <option value="semanal" ${meta.periodo==='semanal'?'selected':''}>Semanal</option>
+                                <option value="quinzenal" ${meta.periodo==='quinzenal'?'selected':''}>Quinzenal (15 dias)</option>
+                                <option value="mensal" ${meta.periodo==='mensal'?'selected':''}>Mensal</option>
+                            </select>
+                            <div class="team-goal-projection" data-goal-projection="${escHtml(a)}">${meta.quantidade>0 && ativo ? calcularResumoMetaTarefa(k,a,meta) : '—'}</div>
+                        </div>`;
+                    }).join('')}</div>
+                    <div data-smart-summary style="margin-top:8px;padding:8px 10px;border-radius:7px;background:#eef6ff;border:1px solid #cfe2ff;font-size:11px;color:#344054;"></div>`;
                 box.appendChild(card);
+                atualizarResumoMetasCard(card,k);
+                card.querySelectorAll('[data-acao]').forEach(cb=>{
+                    const aplicarEstado=()=>{
+                        const tipo=cb.dataset.acao;
+                        const row=card.querySelector('[data-goal-row="'+CSS.escape(tipo)+'"]');
+                        if(row){ row.style.opacity=cb.checked?'1':'0.55'; row.querySelectorAll('[data-meta-field]').forEach(x=>x.disabled=!cb.checked); }
+                        atualizarResumoMetasCard(card,k);
+                    };
+                    cb.addEventListener('change',aplicarEstado);
+                    aplicarEstado();
+                });
+                card.querySelectorAll('[data-meta-field]').forEach(inp=>inp.addEventListener('input',()=>atualizarResumoMetasCard(card,k)));
             });
         }
 
@@ -1433,7 +1655,7 @@
             Object.keys(nomesExibicao).filter(k=>k!=='visitante').forEach(k=>{
                 const card=document.querySelector('[data-team-card="'+k+'"]');
                 if(k!=='admin' && !card) {
-                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k]||'',jornada:jornadas[k]||{in:'07:12',out:'17:00'},almoco:almocosPadrao[k]||{in:'12:00',out:'13:00'},metas:metasEquipe[k]||{tarefasDia:0,tempoMedioMetaMin:0},senha:senhasEquipe[k]||'123',podeLancar:!!permissoesLancar[k],permissoes:getPermissoesUsuario(k),atribuicoes:atribuicoesEquipe[k]||[],ativo:false};
+                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k]||'',jornada:jornadas[k]||{in:'07:12',out:'17:00'},almoco:almocosPadrao[k]||{in:'12:00',out:'13:00'},metas:metasEquipe[k]||{tarefasDia:0,tempoMedioMetaMin:0},metasTarefas:metasTarefasEquipe[k]||{},senha:senhasEquipe[k]||'123',podeLancar:!!permissoesLancar[k],permissoes:getPermissoesUsuario(k),atribuicoes:atribuicoesEquipe[k]||[],ativo:false};
                     return;
                 }
                 if(k!=='admin') {
@@ -1444,13 +1666,23 @@
                     jornadas[k]={in:q('in')?.value||'07:12',out:q('out')?.value||'17:00'};
                     almocosPadrao[k]={in:q('mealIn')?.value||'12:00',out:q('mealOut')?.value||'13:00'};
                     metasEquipe[k]={tarefasDia:Number(q('meta')?.value)||0,tempoMedioMetaMin:Math.round((Number(q('tempoMeta')?.value)||0)*60)};
+                    metasTarefasEquipe[k]={};
+                    card.querySelectorAll('[data-meta-tipo]').forEach(el=>{
+                        if(el.dataset.metaField!=='quantidade') return;
+                        const tipo=el.dataset.metaTipo;
+                        const row=card.querySelector('[data-goal-row="'+CSS.escape(tipo)+'"]');
+                        const atrib=card.querySelector('[data-acao="'+CSS.escape(tipo)+'"]');
+                        const quantidade=Number(el.value)||0;
+                        const periodo=row?.querySelector('[data-meta-field="periodo"]')?.value||'diaria';
+                        if(atrib?.checked && quantidade>0) metasTarefasEquipe[k][tipo]={quantidade,periodo};
+                    });
                     permissoesSistema[k]={}; card.querySelectorAll('[data-perm]').forEach(el=>permissoesSistema[k][el.dataset.perm]=el.checked);
                     permissoesLancar[k]=!!permissoesSistema[k].lancamento;
                     atribuicoesEquipe[k]=Array.from(card.querySelectorAll('[data-acao]:checked')).map(el=>el.dataset.acao);
-                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k],jornada:jornadas[k],almoco:almocosPadrao[k],metas:metasEquipe[k],senha:senhasEquipe[k],podeLancar:permissoesLancar[k],permissoes:permissoesSistema[k],atribuicoes:atribuicoesEquipe[k],ativo:equipeAtiva[k]!==false};
+                    dados[k]={nome:nomesExibicao[k],funcao:funcoesEquipe[k],jornada:jornadas[k],almoco:almocosPadrao[k],metas:metasEquipe[k],metasTarefas:metasTarefasEquipe[k]||{},senha:senhasEquipe[k],podeLancar:permissoesLancar[k],permissoes:permissoesSistema[k],atribuicoes:atribuicoesEquipe[k],ativo:equipeAtiva[k]!==false};
                 }
             });
-            dados.admin={nome:nomesExibicao.admin,funcao:funcoesEquipe.admin||'Administrador / Gestor',jornada:jornadas.admin,almoco:almocosPadrao.admin,metas:metasEquipe.admin,permissoes:getPermissoesUsuario('admin'),ativo:true};
+            dados.admin={nome:nomesExibicao.admin,funcao:funcoesEquipe.admin||'Administrador / Gestor',jornada:jornadas.admin,almoco:almocosPadrao.admin,metas:metasEquipe.admin,metasTarefas:metasTarefasEquipe.admin||{},permissoes:getPermissoesUsuario('admin'),ativo:true};
             return dados;
         }
 
@@ -1709,6 +1941,7 @@
         }
 
         renderizarGestaoColaboradores();
+        atualizarSeletorTiposTarefa();
 
         if (database) {
             database.ref('configuracoes/equipe').on('value', (snapshot) => {
@@ -1720,6 +1953,7 @@
                         if(d.jornada) jornadas[k]=d.jornada;
                         if(d.almoco) almocosPadrao[k]=d.almoco;
                         if(d.metas) metasEquipe[k]={tarefasDia:Number(d.metas.tarefasDia)||0,tempoMedioMetaMin:Number(d.metas.tempoMedioMetaMin)||0};
+                        if(d.metasTarefas && typeof d.metasTarefas==='object') metasTarefasEquipe[k]=normalizarMetasTarefas(d.metasTarefas);
                         if(k!=='admin') {
                             senhasEquipe[k]=d.senha||'123';
                             permissoesLancar[k]=!!d.podeLancar;
@@ -1731,6 +1965,17 @@
                     });
                     renderizarGestaoColaboradores();
                     atualizarNomesNoSeletorLogin(); renderTasks(); renderizarStatusEquipeTempoReal();
+                }
+            });
+
+            database.ref('configuracoes/tiposTarefas').on('value', (snapshot) => {
+                const data=snapshot.val();
+                if(data && typeof data==='object') {
+                    tiposTarefas=Object.keys(data);
+                    tiposTarefas.forEach(tipo=>{ roteamentoUsuarios[tipo]=Array.isArray(data[tipo])?data[tipo]:[]; });
+                    Object.keys(roteamentoUsuarios).filter(tipo=>!tiposTarefas.includes(tipo)).forEach(tipo=>delete roteamentoUsuarios[tipo]);
+                    renderizarGestaoColaboradores();
+                    atualizarSeletorTiposTarefa();
                 }
             });
 
@@ -3155,6 +3400,30 @@
                 }).join('');
             }
 
+            const goalsBody=document.getElementById('execIndividualTaskGoalsBody');
+            const goalsNote=document.getElementById('execIndividualTaskGoalsNote');
+            if(goalsBody){
+                const metas=normalizarMetasTarefas(metasTarefasEquipe[userKey]||{});
+                const rowsGoals=Object.keys(metas).map(tipo=>{
+                    const m=metas[tipo];
+                    const proj=calcularProjecoesMetaTarefa(m,new Date());
+                    const tempo=obterMediaMinutosTipoColaborador(userKey,tipo);
+                    const carga=tempo>0?proj.diaria*tempo:0;
+                    const conclu=completed.filter(t=>t.action===tipo).length;
+                    const metaNoPeriodo=proj[periodo==='quinzenal'?'quinzenal':periodo==='mensal'?'mensal':periodo==='semanal'?'semanal':'diaria'];
+                    const ating=metaNoPeriodo>0?Math.round((conclu/metaNoPeriodo)*100):null;
+                    const tempoTxt=tempo>0?fmtMin(tempo):'—';
+                    return `<tr><td><strong>${escHtml(tipo)}</strong></td><td class="num">${m.quantidade} / ${m.periodo==='quinzenal'?'15 dias':m.periodo==='diaria'?'dia':m.periodo==='semanal'?'semana':'mês'}</td><td class="num">${proj.diaria.toFixed(2).replace('.',',')}</td><td class="num">${proj.semanal.toFixed(2).replace('.',',')}</td><td class="num">${proj.quinzenal.toFixed(2).replace('.',',')}</td><td class="num">${proj.mensal.toFixed(2).replace('.',',')}</td><td class="num">${tempoTxt}</td><td class="num">${carga>0?Math.round(carga)+' min':'—'}</td><td class="num">${conclu}</td><td class="num">${ating!==null?ating+'%':'—'}</td></tr>`;
+                });
+                goalsBody.innerHTML=rowsGoals.length?rowsGoals.join(''):`<tr><td colspan="10">Nenhuma meta por tipo de tarefa cadastrada para este colaborador.</td></tr>`;
+                const sug=sugestaoHorasExtrasSaudavel(userKey,new Date());
+                if(goalsNote){
+                    goalsNote.innerHTML=sug.minutos>0
+                        ? `O planejamento estima ${sug.plan.cargaDiaria.toFixed(0)} min/dia de carga para as metas, contra ${sug.plan.capacidadeDiaria} min/dia de capacidade útil. <strong>Sugestão operacional:</strong> até ${Math.floor(sug.minutos/60)}h ${sug.minutos%60}min de hora extra/dia, limitada a 1h/dia pelo sistema para preservar os intervalos e evitar transformar todo déficit em extensão da jornada.`
+                        : `O planejamento estima ${sug.plan.cargaDiaria.toFixed(0)} min/dia de carga para as metas, contra ${sug.plan.capacidadeDiaria} min/dia de capacidade útil. A capacidade cadastrada é compatível com as metas atuais; o sistema mantém almoço e descansos automáticos fora do tempo produtivo.`;
+                }
+            }
+
             const body=document.getElementById('execIndividualTasksBody');
             if(!body) return;
             const rows=assigned.slice().sort((a,b)=>(execTaskCreatedDate(b)?.getTime()||0)-(execTaskCreatedDate(a)?.getTime()||0));
@@ -3662,7 +3931,11 @@
         function salvarConfiguracaoEquipe() {
             if(currentUser!=='admin'){alert('Somente o Administrador pode alterar a equipe e as permissões.');return;}
             const configEquipe=coletarEGravarGestaoAvancada();
-            if(database){ database.ref('configuracoes/equipe').set(configEquipe).then(()=>{ alert('Equipe, funções, atribuições e permissões gravadas com sucesso!'); renderizarGestaoColaboradores(); atualizarNomesNoSeletorLogin(); }).catch(e=>alert('Erro ao gravar equipe: '+e.message)); }
+            if(database){
+                const tiposConfig={};
+                getTiposTarefas().forEach(tipo=>{ tiposConfig[tipo]=Array.isArray(roteamentoUsuarios[tipo])?roteamentoUsuarios[tipo]:[]; });
+                database.ref('configuracoes/equipe').set(configEquipe).then(()=>database.ref('configuracoes/tiposTarefas').set(tiposConfig)).then(()=>{ alert('Equipe, funções, atribuições, permissões e tipos de tarefas gravados com sucesso!'); renderizarGestaoColaboradores(); atualizarNomesNoSeletorLogin(); atualizarSeletorTiposTarefa(); }).catch(e=>alert('Erro ao gravar configuração: '+e.message));
+            }
             else { alert('Firebase não está conectado. A configuração não foi gravada no servidor.'); }
         }
 
@@ -3688,17 +3961,69 @@
 
         function deleteTask(id) { if(database && confirm("Deseja deletar permanentemente?")) database.ref('tasks/ativas/' + id).remove(); }
         
+        function obterTarefasAbertasColaborador(userKey){
+            const all=[...(Array.isArray(tasks)?tasks:[])];
+            return all.filter(t=>!t.dateFinished && Array.isArray(t.responsibles) && t.responsibles.includes(userKey));
+        }
+
+        function calcularDeficitMetaTipo(userKey,tipo,referenceDate=new Date()){
+            const meta=(metasTarefasEquipe[userKey]||{})[tipo];
+            if(!meta || !(Number(meta.quantidade)>0)) return 0;
+            const {start,end}=execStartEnd(meta.periodo||'diaria',referenceDate);
+            const esperado=Number(meta.quantidade)||0;
+            // No meio do período, considera apenas a parcela da meta que já deveria ter sido cumprida.
+            // Isso evita que uma meta mensal seja tratada como se todo o volume já estivesse atrasado no primeiro dia.
+            const hoje=execDateOnly(referenceDate);
+            const periodoInicio=execDateOnly(start);
+            const periodoFim=execDateOnly(end);
+            const fimDecorrido=hoje<periodoFim?hoje:periodoFim;
+            const diasTotais=Math.max(1,execBusinessDaysInclusive(periodoInicio,periodoFim));
+            const diasDecorridos=hoje<periodoInicio?0:Math.min(diasTotais,Math.max(0,execBusinessDaysInclusive(periodoInicio,fimDecorrido)));
+            const esperadoAteAgora=esperado*(diasDecorridos/diasTotais);
+            const all=[...(Array.isArray(historicTasks)?historicTasks:[]),...(Array.isArray(tasks)?tasks:[])];
+            const seen=new Set();
+            const conclu=all.filter(t=>{
+                if(!t || seen.has(t.id) || t.action!==tipo || t.userWhoFinished!==userKey) return false;
+                seen.add(t.id); const d=execTaskFinishedDate(t); return d && d>=start && d<=end;
+            }).length;
+            return esperadoAteAgora-conclu;
+        }
+
+        function escolherResponsavelBalanceado(acao){
+            const elegiveis=obterResponsaveisAcao(acao);
+            if(!elegiveis.length) return {escolhido:null,elegiveis:[]};
+            const agora=new Date();
+            const avaliados=elegiveis.map(k=>{
+                const deficit=calcularDeficitMetaTipo(k,acao,agora);
+                const plan=obterPlanejamentoMetasColaborador(k,agora);
+                const abertas=obterTarefasAbertasColaborador(k).length;
+                const ocupacaoApos=plan.capacidadeDiaria>0 ? (plan.cargaDiaria/plan.capacidadeDiaria) : 0;
+                return {k,deficit,abertas,ocupacaoApos};
+            });
+            // Primeiro atende quem está mais distante da própria meta; em empate,
+            // prioriza menor fila e menor ocupação estimada.
+            avaliados.sort((a,b)=>b.deficit-a.deficit || a.abertas-b.abertas || a.ocupacaoApos-b.ocupacaoApos || a.k.localeCompare(b.k));
+            return {escolhido:avaliados[0].k,elegiveis,avaliados};
+        }
+
         document.getElementById('taskForm').addEventListener('submit', (e) => {
             e.preventDefault(); const acao = document.getElementById('taskAction').value; const taskId = '_' + Math.random().toString(36).substr(2, 9);
             const solicitante = document.getElementById('taskRequester').value;
+            const balanceamento = escolherResponsavelBalanceado(acao);
+            const responsaveis = balanceamento.elegiveis;
+            const responsavelEscolhido = balanceamento.escolhido;
+            if (!responsaveis.length) {
+                alert(`Nenhum colaborador está atribuído ao tipo de tarefa "${acao}". Vá em Gerenciar Equipe e marque quem pode receber esta tarefa.`);
+                return;
+            }
             if (database) {
                 database.ref('tasks/ativas/' + taskId).set({
                     id: taskId, title: document.getElementById('taskTitle').value, requester: solicitante, category: document.getElementById('taskCategory').value,
                     action: acao, priority: document.getElementById('taskPriority').value, deadline: document.getElementById('taskDeadline').value,
-                    desc: document.getElementById('taskDesc').value, responsibles: obterResponsaveisAcao(acao), timestampCreated: new Date().getTime(), timeLogs: []
+                    desc: document.getElementById('taskDesc').value, responsibles: responsavelEscolhido ? [responsavelEscolhido] : responsaveis, availableResponsibles: responsaveis, allocationReason: 'Balanceamento por meta, fila e capacidade', timestampCreated: new Date().getTime(), timeLogs: []
                 });
             }
-            document.getElementById('taskForm').reset(); alert("Tarefa enviada!");
+            document.getElementById('taskForm').reset(); alert(`Tarefa enviada e alocada para ${nomesExibicao[responsavelEscolhido] || responsavelEscolhido}.`);
         });
 
         /* --- NOVA LÓGICA DA FERRAMENTA DE COMPOSIÇÃO E CONSUMO --- */
@@ -3762,6 +4087,11 @@
         return num.toFixed(2).replace('.', ','); 
     }
 
+    // Formatação específica para consumos em m²: mantém 3 casas para não perder precisão.
+    function cc_formatM2(num) {
+        return Number(num || 0).toFixed(3).replace('.', ',');
+    }
+
     function cc_criarCellHTML(matClass, callbackCalculo, valor = "0,00", ePrimeiro = true) {
         return `
             <div class="cc-input-row">
@@ -3805,6 +4135,44 @@
         });
     }
 
+    function cc_obterParametro(id, fallback = 0) {
+        const el = document.getElementById(id);
+        if (!el) return fallback;
+        const n = parseFloat(String(el.value || '').replace(',', '.'));
+        return Number.isFinite(n) ? n : fallback;
+    }
+
+    function cc_parametrosMateriais() {
+        const larguraLegada = cc_obterParametro('cc_paramLargura', 1.38);
+        return {
+            couro: { largura: cc_obterParametro('cc_paramLarguraCouro', larguraLegada), quebra: cc_obterParametro('cc_paramQuebraCouro', 7) / 100 },
+            vinil: { largura: cc_obterParametro('cc_paramLarguraVinil', larguraLegada), quebra: cc_obterParametro('cc_paramQuebraVinil', 5) / 100 },
+            espuma: { largura: cc_obterParametro('cc_paramLarguraEspuma', larguraLegada), quebra: cc_obterParametro('cc_paramQuebraEspuma', 0) / 100 },
+            carpete: { largura: cc_obterParametro('cc_paramLarguraCarpete', larguraLegada), quebra: cc_obterParametro('cc_paramQuebraCarpete', 0) / 100 }
+        };
+    }
+
+    function cc_calcularMaterialM2(row, seletor, parametro) {
+        let comprimento = 0;
+        row.querySelectorAll(seletor).forEach(inp => comprimento += cc_parseVal(inp.value));
+        const liquido = comprimento * parametro.largura;
+        const bruto = liquido * (1 + parametro.quebra);
+        return { comprimento, liquido, bruto };
+    }
+
+    function cc_atualizarResultadoCelula(row, mat, resultado) {
+        const inp = row.querySelector(`.val-${mat}`);
+        const celula = inp ? inp.closest('td') : null;
+        if (!celula) return;
+        let out = celula.querySelector('.cc-cell-result');
+        if (!out) {
+            out = document.createElement('div');
+            out.className = 'cc-cell-result';
+            celula.appendChild(out);
+        }
+        out.innerHTML = `<span>Líquido: <strong>${cc_formatM2(resultado.liquido)} m²</strong></span><span class="cc-cell-result-bruto">Bruto: <strong>${cc_formatM2(resultado.bruto)} m²</strong></span>`;
+    }
+
     function cc_inicializarTabelaPrincipal() {
         const mainTbody = document.getElementById('cc_mainTableBody');
         mainTbody.innerHTML = "";
@@ -3814,7 +4182,7 @@
             let colsHTML = `<td style="font-weight: 600;">${comp}</td>`;
             materiaisPrincipais.forEach(mat => {
                 const bgExtra = (mat === 'espuma' || mat === 'carpete') ? 'cc-highlight-espuma-carpete' : '';
-                colsHTML += `<td class="${bgExtra}"><div class="cc-multi-input-container">${cc_criarCellHTML('val-' + mat, 'cc_recalcularTabelaPrincipal', '0,00', true)}</div></td>`;
+                colsHTML += `<td class="${bgExtra}"><div class="cc-multi-input-container">${cc_criarCellHTML('val-' + mat, 'cc_recalcularTabelaPrincipal', '0,00', true)}</div><div class="cc-cell-result"><span>Líquido: <strong>0,000 m²</strong></span><span class="cc-cell-result-bruto">Bruto: <strong>0,000 m²</strong></span></div></td>`;
             });
             colsHTML += `<td class="cc-text-right cc-col-total col-calc-liquido">0,00</td>`;
             colsHTML += `<td class="cc-text-right cc-col-total col-calc-bruto" style="color: #0d6efd;">0,00</td>`;
@@ -3825,22 +4193,27 @@
     }
 
     function cc_recalcularTabelaPrincipal() {
-        const qCouro = (parseFloat(document.getElementById('cc_paramQuebraCouro').value) || 0) / 100;
-        const qVinil = (parseFloat(document.getElementById('cc_paramQuebraVinil').value) || 0) / 100;
-
+        const p = cc_parametrosMateriais();
         document.querySelectorAll('#cc_mainTable tbody tr').forEach(row => {
-            let somaCouro = 0, somaVinil = 0;
-            row.querySelectorAll('.val-couro').forEach(inp => somaCouro += cc_parseVal(inp.value));
-            
+            const rCouro = cc_calcularMaterialM2(row, '.val-couro', p.couro);
+            const rEspuma = cc_calcularMaterialM2(row, '.val-espuma', p.espuma);
+            const rCarpete = cc_calcularMaterialM2(row, '.val-carpete', p.carpete);
+            let rVinil = { comprimento: 0, liquido: 0, bruto: 0 };
             ["v1", "v2", "v3", "v4"].forEach(mat => {
-                row.querySelectorAll(`.val-${mat}`).forEach(inp => somaVinil += cc_parseVal(inp.value));
+                const r = cc_calcularMaterialM2(row, `.val-${mat}`, p.vinil);
+                rVinil.comprimento += r.comprimento;
+                rVinil.liquido += r.liquido;
+                rVinil.bruto += r.bruto;
+                cc_atualizarResultadoCelula(row, mat, r);
             });
+            cc_atualizarResultadoCelula(row, 'couro', rCouro);
+            cc_atualizarResultadoCelula(row, 'espuma', rEspuma);
+            cc_atualizarResultadoCelula(row, 'carpete', rCarpete);
 
-            let totalLiquido = somaCouro + somaVinil;
-            let totalBruto = (somaCouro * (1 + qCouro)) + (somaVinil * (1 + qVinil));
-
-            row.querySelector('.col-calc-liquido').innerText = cc_formatVal(totalLiquido);
-            row.querySelector('.col-calc-bruto').innerText = cc_formatVal(totalBruto);
+            const totalLiquidoCouroVinil = rCouro.liquido + rVinil.liquido;
+            const totalBrutoTodosMateriais = rCouro.bruto + rVinil.bruto + rEspuma.bruto + rCarpete.bruto;
+            row.querySelector('.col-calc-liquido').innerText = cc_formatVal(totalLiquidoCouroVinil);
+            row.querySelector('.col-calc-bruto').innerText = cc_formatVal(totalBrutoTodosMateriais);
         });
     }
 
@@ -3959,6 +4332,20 @@
             tabelaPrincipal.push(rowData);
         });
 
+        const totaisMateriais = { couroLiquido: 0, couroBruto: 0, vinilLiquido: 0, vinilBruto: 0, espumaLiquida: 0, espumaBruta: 0, carpeteLiquido: 0, carpeteBruto: 0 };
+        document.querySelectorAll('#cc_mainTable tbody tr').forEach(row => {
+            const p = cc_parametrosMateriais();
+            const rc = cc_calcularMaterialM2(row, '.val-couro', p.couro);
+            const re = cc_calcularMaterialM2(row, '.val-espuma', p.espuma);
+            const rca = cc_calcularMaterialM2(row, '.val-carpete', p.carpete);
+            let rv = {liquido:0, bruto:0};
+            ["v1","v2","v3","v4"].forEach(mat => { const r = cc_calcularMaterialM2(row, `.val-${mat}`, p.vinil); rv.liquido += r.liquido; rv.bruto += r.bruto; });
+            totaisMateriais.couroLiquido += rc.liquido; totaisMateriais.couroBruto += rc.bruto;
+            totaisMateriais.vinilLiquido += rv.liquido; totaisMateriais.vinilBruto += rv.bruto;
+            totaisMateriais.espumaLiquida += re.liquido; totaisMateriais.espumaBruta += re.bruto;
+            totaisMateriais.carpeteLiquido += rca.liquido; totaisMateriais.carpeteBruto += rca.bruto;
+        });
+
         // Insumos
         const insumosData = {};
         listaInsumos.forEach(insumo => {
@@ -3986,10 +4373,18 @@
             tipoKit: tipoKit,
             totalLiquido: somaTotalLiquido,
             totalBruto: somaTotalBruto,
+            totaisMateriais: totaisMateriais,
             params: {
-                largura: document.getElementById('cc_paramLargura').value,
-                quebraCouro: document.getElementById('cc_paramQuebraCouro').value,
-                quebraVinil: document.getElementById('cc_paramQuebraVinil').value
+                calculoVersao: 2,
+                largura: document.getElementById('cc_paramLarguraCouro')?.value || '1.38',
+                larguraCouro: document.getElementById('cc_paramLarguraCouro')?.value || '1.38',
+                larguraVinil: document.getElementById('cc_paramLarguraVinil')?.value || '1.38',
+                larguraEspuma: document.getElementById('cc_paramLarguraEspuma')?.value || '1.38',
+                larguraCarpete: document.getElementById('cc_paramLarguraCarpete')?.value || '1.38',
+                quebraCouro: document.getElementById('cc_paramQuebraCouro')?.value || '0',
+                quebraVinil: document.getElementById('cc_paramQuebraVinil')?.value || '0',
+                quebraEspuma: document.getElementById('cc_paramQuebraEspuma')?.value || '0',
+                quebraCarpete: document.getElementById('cc_paramQuebraCarpete')?.value || '0'
             },
             tabelaPrincipal: tabelaPrincipal,
             insumos: insumosData,
@@ -4045,11 +4440,19 @@
         document.getElementById('cc_padraoCor').value = config.padraoCor;
         document.getElementById('cc_tipoKit').value = config.tipoKit;
 
-        // Parâmetros
+        // Parâmetros — versão nova usa largura e quebra por material.
         if (config.params) {
-            document.getElementById('cc_paramLargura').value = config.params.largura;
-            document.getElementById('cc_paramQuebraCouro').value = config.params.quebraCouro;
-            document.getElementById('cc_paramQuebraVinil').value = config.params.quebraVinil;
+            const p = config.params;
+            const larguraLegada = p.largura || '1.38';
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null && val !== '') el.value = val; };
+            setVal('cc_paramLarguraCouro', p.larguraCouro || larguraLegada);
+            setVal('cc_paramLarguraVinil', p.larguraVinil || larguraLegada);
+            setVal('cc_paramLarguraEspuma', p.larguraEspuma || larguraLegada);
+            setVal('cc_paramLarguraCarpete', p.larguraCarpete || larguraLegada);
+            setVal('cc_paramQuebraCouro', p.quebraCouro ?? 7);
+            setVal('cc_paramQuebraVinil', p.quebraVinil ?? 5);
+            setVal('cc_paramQuebraEspuma', p.quebraEspuma ?? 0);
+            setVal('cc_paramQuebraCarpete', p.quebraCarpete ?? 0);
         }
 
         // Tabela 1
@@ -4058,7 +4461,12 @@
             const tr = document.querySelector(`#cc_mainTable tbody tr[data-comp="${rowData.composicao}"]`);
             if (tr) {
                 materiaisPrincipais.forEach(mat => {
-                    const vals = rowData.materiais[mat] || ["0,00"];
+                    let vals = rowData.materiais[mat] || ["0,00"];
+                    // Cadastros antigos guardavam m². Converte para comprimento (m) para preservar o valor anterior.
+                    if (!config.params || Number(config.params.calculoVersao || 0) < 2) {
+                        const larguraLegacy = parseFloat(String((config.params && config.params.largura) || '1.38').replace(',', '.')) || 1.38;
+                        vals = vals.map(v => cc_formatVal(cc_parseVal(v) / larguraLegacy));
+                    }
                     const container = tr.querySelector(`.val-${mat}`).closest('.cc-multi-input-container');
                     container.innerHTML = "";
                     vals.forEach((v, idx) => {
@@ -4168,172 +4576,93 @@
         const banco = cc_obterBancoLocal();
         const tbodyGeral = document.getElementById('cc_tabelaRelatorioGeralBody');
         const tbodyMedias = document.getElementById('cc_tabelaMediasBody');
-
         tbodyGeral.innerHTML = '';
         tbodyMedias.innerHTML = '';
 
         if (banco.length === 0) {
-            tbodyGeral.innerHTML = `<tr><td colspan="7" class="cc-text-center">Nenhum registro no banco.</td></tr>`;
-            tbodyMedias.innerHTML = `<tr><td colspan="5" class="cc-text-center">Nenhum registro para calcular médias.</td></tr>`;
+            tbodyGeral.innerHTML = `<tr><td colspan="11" class="cc-text-center">Nenhum registro no banco.</td></tr>`;
+            tbodyMedias.innerHTML = `<tr><td colspan="9" class="cc-text-center">Nenhum registro para calcular médias.</td></tr>`;
             return;
         }
 
-        // 1. Cada cadastro/versão aparece separadamente. Nenhum produto é escondido por agrupamento.
+        const num = v => Number(v || 0);
+        const f = v => `${cc_formatVal(num(v))} m²`;
+        const obterTotaisMateriaisRelatorio = item => {
+            if (item.totaisMateriais) return item.totaisMateriais;
+            // Compatibilidade: cadastros antigos já armazenavam os campos da tabela em m².
+            const p = item.params || {};
+            const qC = num(p.quebraCouro) / 100;
+            const qV = num(p.quebraVinil) / 100;
+            const t = {couroLiquido:0,couroBruto:0,vinilLiquido:0,vinilBruto:0,espumaLiquida:0,espumaBruta:0,carpeteLiquido:0,carpeteBruto:0};
+            (item.tabelaPrincipal || []).forEach(row => {
+                const m = row.materiais || {};
+                const sum = key => (m[key] || []).reduce((a,v) => a + num(String(v).replace(',', '.')), 0);
+                t.couroLiquido += sum('couro');
+                t.couroBruto += sum('couro') * (1 + qC);
+                ['v1','v2','v3','v4'].forEach(k => { const x=sum(k); t.vinilLiquido += x; t.vinilBruto += x * (1 + qV); });
+                t.espumaLiquida += sum('espuma');
+                t.espumaBruta += sum('espuma');
+                t.carpeteLiquido += sum('carpete');
+                t.carpeteBruto += sum('carpete');
+            });
+            return t;
+        };
+        const mat = item => obterTotaisMateriaisRelatorio(item);
+
         banco.forEach(item => {
+            const t = mat(item);
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-weight:bold">${cc_escaparHTML(item.codigo)}</td>
                 <td style="font-weight:600">${cc_escaparHTML(item.descricao || '-')}</td>
                 <td>${cc_escaparHTML(item.tipoCategoria || 'Kit')}</td>
                 <td>${cc_escaparHTML(cc_formatarVersaoProduto(item))}</td>
-                <td class="cc-text-right" style="font-weight:bold;">${cc_formatVal(item.totalLiquido || 0)} m²</td>
-                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(item.totalBruto || 0)} m²</td>
-                <td class="cc-text-center">${cc_escaparHTML(item.dataAtualizacao || '-')}</td>
-            `;
+                <td class="cc-text-right">${f(t.couroLiquido)}</td>
+                <td class="cc-text-right">${f(t.vinilLiquido)}</td>
+                <td class="cc-text-right">${f(t.espumaLiquida)}</td>
+                <td class="cc-text-right">${f(t.carpeteLiquido)}</td>
+                <td class="cc-text-right" style="font-weight:bold;">${f(item.totalLiquido)}</td>
+                <td class="cc-text-right" style="color:#0d6efd;font-weight:bold;">${f(t.couroBruto + t.vinilBruto + t.espumaBruta + t.carpeteBruto || item.totalBruto)}</td>
+                <td class="cc-text-center">${cc_escaparHTML(item.dataAtualizacao || '-')}</td>`;
             tbodyGeral.appendChild(tr);
         });
 
-        // 2. A média é feita somente entre versões/cadastros que possuem o MESMO NOME.
         const gruposPorNome = {};
         banco.forEach(item => {
             const nomeNormalizado = String(item.descricao || '').trim().toUpperCase();
-            if (!gruposPorNome[nomeNormalizado]) {
-                gruposPorNome[nomeNormalizado] = { nomeOriginal: item.descricao || 'Sem nome', itens: [] };
-            }
+            if (!gruposPorNome[nomeNormalizado]) gruposPorNome[nomeNormalizado] = { nomeOriginal: item.descricao || 'Sem nome', itens: [] };
             gruposPorNome[nomeNormalizado].itens.push(item);
         });
 
         Object.keys(gruposPorNome).sort().forEach(chave => {
             const grupo = gruposPorNome[chave];
-            // Produto com apenas uma versão não entra na média entre versões.
             if (grupo.itens.length < 2) return;
-
-            let somaLiquido = 0;
-            let somaBruto = 0;
+            const medias = { couroLiquido:0, vinilLiquido:0, espumaLiquida:0, carpeteLiquido:0, totalLiquido:0, totalBruto:0 };
             grupo.itens.forEach(item => {
-                somaLiquido += Number(item.totalLiquido || 0);
-                somaBruto += Number(item.totalBruto || 0);
+                const t = mat(item);
+                medias.couroLiquido += num(t.couroLiquido);
+                medias.vinilLiquido += num(t.vinilLiquido);
+                medias.espumaLiquida += num(t.espumaLiquida);
+                medias.carpeteLiquido += num(t.carpeteLiquido);
+                medias.totalLiquido += num(item.totalLiquido);
+                medias.totalBruto += num(t.couroBruto) + num(t.vinilBruto) + num(t.espumaBruta) + num(t.carpeteBruta);
             });
-
-            const mediaLiquida = somaLiquido / grupo.itens.length;
-            const mediaBruta = somaBruto / grupo.itens.length;
-            const referencias = grupo.itens.map(item => {
-                const versao = cc_formatarVersaoProduto(item);
-                return `${item.codigo} (${versao})`;
-            }).join(' | ');
-
+            Object.keys(medias).forEach(k => medias[k] /= grupo.itens.length);
+            const referencias = grupo.itens.map(item => `${item.codigo} (${cc_formatarVersaoProduto(item)})`).join(' | ');
             const tr = document.createElement('tr');
             tr.className = 'cc-report-average';
             tr.innerHTML = `
                 <td style="font-weight:bold">${cc_escaparHTML(grupo.nomeOriginal)}</td>
-                <td class="cc-text-center"><span style="background:#e7f1ff; padding:2px 8px; border-radius:10px; font-weight:bold; color:#0d6efd;">${grupo.itens.length}</span></td>
-                <td class="cc-text-right" style="font-weight:bold;">${cc_formatVal(mediaLiquida)} m²</td>
-                <td class="cc-text-right" style="color:#0d6efd; font-weight:bold;">${cc_formatVal(mediaBruta)} m²</td>
-                <td>${cc_escaparHTML(referencias)}</td>
-            `;
+                <td class="cc-text-center"><span style="background:#e7f1ff;padding:2px 8px;border-radius:10px;font-weight:bold;color:#0d6efd;">${grupo.itens.length}</span></td>
+                <td class="cc-text-right">${f(medias.couroLiquido)}</td>
+                <td class="cc-text-right">${f(medias.vinilLiquido)}</td>
+                <td class="cc-text-right">${f(medias.espumaLiquida)}</td>
+                <td class="cc-text-right">${f(medias.carpeteLiquido)}</td>
+                <td class="cc-text-right" style="font-weight:bold;">${f(medias.totalLiquido)}</td>
+                <td class="cc-text-right" style="color:#0d6efd;font-weight:bold;">${f(medias.totalBruto)}</td>
+                <td>${cc_escaparHTML(referencias)}</td>`;
             tbodyMedias.appendChild(tr);
         });
-
-        if (!tbodyMedias.children.length) {
-            tbodyMedias.innerHTML = `<tr><td colspan="5" class="cc-text-center">Não existem, neste momento, produtos com duas ou mais versões para calcular uma média.</td></tr>`;
-        }
-    }
-
-    function cc_mostrarDetalhesProduto(idCodificado) {
-        const id = decodeURIComponent(idCodificado);
-        const banco = cc_obterBancoLocal();
-        const config = banco.find(item => item.id === id);
-        if (!config) {
-            alert('Produto não encontrado no Banco de Dados.');
-            return;
-        }
-
-        const materiais = typeof materiaisPrincipais !== 'undefined' ? materiaisPrincipais : [];
-        const linhasTabela = (config.tabelaPrincipal || []).map(row => {
-            const celulas = materiais.map(mat => {
-                const vals = (row.materiais && row.materiais[mat]) || [];
-                return `<td>${vals.length ? vals.map(v => cc_escaparHTML(v)).join('<br>') : '-'}</td>`;
-            }).join('');
-            return `<tr><td><strong>${cc_escaparHTML(row.composicao || '-')}</strong></td>${celulas}</tr>`;
-        }).join('');
-
-        const cabecalhosMateriais = materiais.map(mat => `<th>${cc_escaparHTML(mat)}</th>`).join('');
-
-        let insumosHTML = '';
-        const insumos = config.insumos || {};
-        if (typeof listaInsumos !== 'undefined' && Array.isArray(listaInsumos)) {
-            listaInsumos.forEach(insumo => {
-                const itens = insumos[insumo.id] || [];
-                if (!itens.length) {
-                    insumosHTML += `<tr><td><strong>${cc_escaparHTML(insumo.id)}</strong></td><td colspan="3">Nenhum insumo/aplicação cadastrado.</td></tr>`;
-                } else {
-                    itens.forEach((item, idx) => {
-                        insumosHTML += `<tr>
-                            <td>${idx === 0 ? `<strong>${cc_escaparHTML(insumo.id)}</strong>` : ''}</td>
-                            <td>${cc_escaparHTML(item.peca || '-')}</td>
-                            <td>${cc_escaparHTML(item.metro || '-')}</td>
-                            <td>${cc_escaparHTML(item.qtd || '-')}</td>
-                        </tr>`;
-                    });
-                }
-            });
-        }
-
-        if (!insumosHTML) insumosHTML = '<tr><td colspan="4">Nenhum insumo cadastrado.</td></tr>';
-
-        const params = config.params || {};
-        const body = document.getElementById('cc_produtoModalBody');
-        body.innerHTML = `
-            <div class="cc-product-info-grid">
-                <div class="cc-product-info-card"><small>Código</small><strong>${cc_escaparHTML(config.codigo)}</strong></div>
-                <div class="cc-product-info-card"><small>Produto / Nome</small><strong>${cc_escaparHTML(config.descricao)}</strong></div>
-                <div class="cc-product-info-card"><small>Tipo</small><strong>${cc_escaparHTML(config.tipoCategoria || 'Kit')}</strong></div>
-                <div class="cc-product-info-card"><small>Versão / Personalização</small><strong>${cc_escaparHTML(cc_formatarVersaoProduto(config))}</strong></div>
-                <div class="cc-product-info-card"><small>Consumo Líquido Total</small><strong>${cc_formatVal(config.totalLiquido || 0)} m²</strong></div>
-                <div class="cc-product-info-card"><small>Consumo Bruto Total</small><strong>${cc_formatVal(config.totalBruto || 0)} m²</strong></div>
-                <div class="cc-product-info-card"><small>Atualizado em</small><strong>${cc_escaparHTML(config.dataAtualizacao || '-')}</strong></div>
-                <div class="cc-product-info-card"><small>ID do Cadastro</small><strong>${cc_escaparHTML(config.id || '-')}</strong></div>
-            </div>
-
-            <div class="cc-product-modal-section">
-                <h4><i class="fa-solid fa-sliders"></i> Parâmetros Globais</h4>
-                <table class="cc-product-modal-table">
-                    <thead><tr><th>Largura</th><th>Quebra do Couro</th><th>Quebra do Vinil</th></tr></thead>
-                    <tbody><tr><td>${cc_escaparHTML(params.largura || '-')}</td><td>${cc_escaparHTML(params.quebraCouro || '-')}</td><td>${cc_escaparHTML(params.quebraVinil || '-')}</td></tr></tbody>
-                </table>
-            </div>
-
-            <div class="cc-product-modal-section">
-                <h4><i class="fa-solid fa-layer-group"></i> Composição e Consumo de Matérias-Primas</h4>
-                <div class="cc-table-responsive" style="margin:0;">
-                    <table class="cc-product-modal-table">
-                        <thead><tr><th>Composição</th>${cabecalhosMateriais}<th>Líquido</th><th>Bruto</th></tr></thead>
-                        <tbody>${linhasTabela || '<tr><td colspan="99">Nenhuma composição registrada.</td></tr>'}</tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="cc-product-modal-section">
-                <h4><i class="fa-solid fa-scissors"></i> Insumos / Aplicações por Peça</h4>
-                <div class="cc-table-responsive" style="margin:0;">
-                    <table class="cc-product-modal-table">
-                        <thead><tr><th>Insumo</th><th>Peça / Local</th><th>Metro Linear</th><th>Quantidade</th></tr></thead>
-                        <tbody>${insumosHTML}</tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('cc_btnConfirmarCarregamento').onclick = function() {
-            cc_carregarItemDoBanco(idCodificado, true);
-        };
-        document.getElementById('cc_produtoModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function cc_fecharModalProduto() {
-        document.getElementById('cc_produtoModal').classList.remove('active');
-        document.body.style.overflow = '';
     }
 
     function cc_carregarItemDoBanco(idCodificado, fecharModal = false) {
