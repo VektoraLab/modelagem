@@ -4429,6 +4429,43 @@
         });
     }
 
+    function cc_excluirItemDoBanco(idCodificado) {
+        if (currentUser !== 'admin') {
+            alert('Apenas o Administrador pode apagar registros do Banco de Dados.');
+            return;
+        }
+
+        const id = decodeURIComponent(idCodificado);
+        const banco = cc_obterBancoLocal();
+        const item = banco.find(reg => reg.id === id);
+
+        if (!item) {
+            alert('Registro não encontrado no Banco de Dados.');
+            cc_renderizarBancoNaAba2();
+            return;
+        }
+
+        const identificacao = `${item.codigo || ''} - ${item.descricao || 'Produto sem descrição'}`;
+        const confirmar = confirm(
+            `ATENÇÃO!\n\nDeseja realmente apagar este registro?\n\n${identificacao}\n\nEsta ação remove somente este cadastro do Banco de Dados de Composição e Consumo.\nEla não apaga tarefas, colaboradores ou outros dados do sistema.\n\nDeseja continuar?`
+        );
+
+        if (!confirmar) return;
+
+        const novoBanco = banco.filter(reg => reg.id !== id);
+        cc_salvarBancoLocal(novoBanco);
+
+        const select = document.getElementById('cc_selectVariacao');
+        if (select && select.value === id) select.value = '';
+
+        // Se o registro excluído estiver aberto no popup, fecha a visualização.
+        if (window._ccProdutoModalAtual && window._ccProdutoModalAtual.id === id) {
+            cc_fecharModalProduto();
+        }
+
+        alert(`Registro "${identificacao}" apagado com sucesso.`);
+    }
+
     function cc_carregarConfiguracaoSelecionada() {
         const idSelect = document.getElementById('cc_selectVariacao').value;
         if (!idSelect) return;
@@ -4550,8 +4587,9 @@
                 <td>${item.padraoCor}</td>
                 <td>${item.tipoKit}</td>
                 <td>${item.dataAtualizacao || '-'}</td>
-                <td class="cc-text-center">
+                <td class="cc-text-center" style="white-space:nowrap;">
                     <button class="cc-btn-action cc-btn-load" style="height:24px; font-size:10px; display:inline-flex;" onclick="cc_mostrarDetalhesProduto('${encodeURIComponent(item.id)}')">Ver / Carregar</button>
+                    <button class="cc-btn-action" style="height:24px; font-size:10px; display:inline-flex; background:#dc3545; color:#fff; margin-left:4px;" onclick="cc_excluirItemDoBanco('${encodeURIComponent(item.id)}')"><i class="fa-solid fa-trash"></i> Apagar</button>
                 </td>
             </tr>`;
         });
