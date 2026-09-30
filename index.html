@@ -733,6 +733,17 @@
             </div>
 
             <div class="exec-panel" style="margin-top:16px;">
+                <h3>📊 Quantidade concluída por tipo de tarefa</h3>
+                <div style="overflow-x:auto;">
+                    <table class="exec-table">
+                        <thead><tr><th>Tipo de tarefa</th><th class="num">Concluídas</th></tr></thead>
+                        <tbody id="execIndividualCompletedByTaskBody"></tbody>
+                    </table>
+                </div>
+                <div class="exec-note">Exemplo: <strong>FAZER PERSONALIZADO — 4 concluídas</strong>. A contagem considera somente as tarefas concluídas pelo funcionário selecionado no período escolhido.</div>
+            </div>
+
+            <div class="exec-panel" style="margin-top:16px;">
                 <h3>📋 Detalhamento das tarefas do funcionário</h3>
                 <div style="overflow-x:auto;">
                     <table class="exec-table">
@@ -3428,6 +3439,19 @@
                 }
             }
 
+            const byTaskBody = document.getElementById('execIndividualCompletedByTaskBody');
+            if (byTaskBody) {
+                const grupos = {};
+                completed.forEach(t => {
+                    const tipo = String(t.action || t.taskType || t.title || 'Sem tipo de tarefa').trim() || 'Sem tipo de tarefa';
+                    grupos[tipo] = (grupos[tipo] || 0) + 1;
+                });
+                const linhas = Object.entries(grupos).sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0], 'pt-BR'));
+                byTaskBody.innerHTML = linhas.length
+                    ? linhas.map(([tipo,qtd]) => `<tr><td><strong>${escHtml(tipo)}</strong></td><td class="num">${qtd}</td></tr>`).join('')
+                    : '<tr><td colspan="2" style="text-align:center;color:#777;">Nenhuma tarefa concluída no período selecionado.</td></tr>';
+            }
+
             const body=document.getElementById('execIndividualTasksBody');
             if(!body) return;
             const rows=assigned.slice().sort((a,b)=>(execTaskCreatedDate(b)?.getTime()||0)-(execTaskCreatedDate(a)?.getTime()||0));
@@ -4015,7 +4039,7 @@
             const solicitante = document.getElementById('taskRequester').value;
             const balanceamento = escolherResponsavelBalanceado(acao);
             const responsaveis = balanceamento.elegiveis;
-            const responsavelEscolhido = balanceamento.escolhido;
+            const responsavelEscolhido = balanceamento.escolhido; // Mantido para compatibilidade, mas a tarefa será atribuída a TODOS os elegíveis.
             if (!responsaveis.length) {
                 alert(`Nenhum colaborador está atribuído ao tipo de tarefa "${acao}". Vá em Gerenciar Equipe e marque quem pode receber esta tarefa.`);
                 return;
@@ -4024,10 +4048,10 @@
                 database.ref('tasks/ativas/' + taskId).set({
                     id: taskId, title: document.getElementById('taskTitle').value, requester: solicitante, category: document.getElementById('taskCategory').value,
                     action: acao, priority: document.getElementById('taskPriority').value, deadline: document.getElementById('taskDeadline').value,
-                    desc: document.getElementById('taskDesc').value, responsibles: responsavelEscolhido ? [responsavelEscolhido] : responsaveis, availableResponsibles: responsaveis, allocationReason: 'Balanceamento por meta, fila e capacidade', timestampCreated: new Date().getTime(), timeLogs: []
+                    desc: document.getElementById('taskDesc').value, responsibles: [...responsaveis], availableResponsibles: [...responsaveis], allocationReason: 'Tarefa direcionada a todos os colaboradores que possuem esta atribuição', timestampCreated: new Date().getTime(), timeLogs: []
                 });
             }
-            document.getElementById('taskForm').reset(); alert(`Tarefa enviada e alocada para ${nomesExibicao[responsavelEscolhido] || responsavelEscolhido}.`);
+            document.getElementById('taskForm').reset(); alert(`Tarefa enviada e alocada para todos os colaboradores com a atribuição \"${acao}\": ${responsaveis.map(u => nomesExibicao[u] || u).join(', ')}.`);
         });
 
         /* --- NOVA LÓGICA DA FERRAMENTA DE COMPOSIÇÃO E CONSUMO --- */
@@ -4728,19 +4752,47 @@
         const params = item.params || {};
         const larg = v => `${String(v ?? '0').replace('.', ',')} m`;
         const perc = v => `${String(v ?? '0').replace('.', ',')}%`;
-        const t = item.totaisMateriais || {};
+        const numero = v => {
+            const n = Number(String(v ?? '').replace(/\s/g,'').replace(',', '.'));
+            return Number.isFinite(n) ? n : 0;
+        };
+        const pMat = {
+            couro: { largura: numero(params.larguraCouro || params.largura || 1.38), quebra: numero(params.quebraCouro) / 100 },
+            vinil: { largura: numero(params.larguraVinil || params.largura || 1.38), quebra: numero(params.quebraVinil) / 100 },
+            espuma: { largura: numero(params.larguraEspuma || params.largura || 1.38), quebra: numero(params.quebraEspuma) / 100 },
+            carpete: { largura: numero(params.larguraCarpete || params.largura || 1.38), quebra: numero(params.quebraCarpete) / 100 }
+        };
+        const calcM2 = (row, keys, tipo) => {
+            const m = row.materiais || {};
+            const comprimento = keys.reduce((total, key) => total + (m[key] || []).reduce((a,v) => a + numero(v), 0), 0);
+            const liquido = comprimento * pMat[tipo].largura;
+            return { comprimento, liquido, bruto: liquido * (1 + pMat[tipo].quebra) };
+        };
+        const fM2 = v => `${numero(v).toFixed(3).replace('.', ',')} m²`;
+        const celulaM2 = r => r.comprimento > 0
+            ? `${fM2(r.liquido)}<br><small style="color:#666">Bruto: ${fM2(r.bruto)}</small>`
+            : '-';
 
         let tabela = '';
         (item.tabelaPrincipal || []).forEach(row => {
-            const m = row.materiais || {};
-            const vals = key => (m[key] || []).filter(v => String(v).trim() !== '').map(v => esc(v)).join('<br>') || '-';
+            const couro = calcM2(row, ['couro'], 'couro');
+            const espuma = calcM2(row, ['espuma'], 'espuma');
+            const carpete = calcM2(row, ['carpete'], 'carpete');
+            const v1 = calcM2(row, ['v1'], 'vinil');
+            const v2 = calcM2(row, ['v2'], 'vinil');
+            const v3 = calcM2(row, ['v3'], 'vinil');
+            const v4 = calcM2(row, ['v4'], 'vinil');
             tabela += `<tr>
                 <td><strong>${esc(row.composicao || '-')}</strong></td>
-                <td>${vals('couro')}</td><td>${vals('espuma')}</td><td>${vals('carpete')}</td>
-                <td>${vals('v1')}</td><td>${vals('v2')}</td><td>${vals('v3')}</td><td>${vals('v4')}</td>
+                <td>${celulaM2(couro)}</td>
+                <td>${celulaM2(espuma)}</td>
+                <td>${celulaM2(carpete)}</td>
+                <td>${celulaM2(v1)}</td>
+                <td>${celulaM2(v2)}</td>
+                <td>${celulaM2(v3)}</td>
+                <td>${celulaM2(v4)}</td>
             </tr>`;
         });
-
         let insumos = '';
         if (typeof listaInsumos !== 'undefined') {
             listaInsumos.forEach(insumo => {
@@ -4777,22 +4829,15 @@
             <div class="cc-product-modal-section">
                 <h4>Composição e consumo por comprimento informado</h4>
                 <table class="cc-product-modal-table">
-                    <thead><tr><th>Composição</th><th>Couro (m)</th><th>Espuma (m)</th><th>Carpete (m)</th><th>Vinil S/Esp.</th><th>Vinil + Esp. Fina</th><th>Vinil + Esp. Média</th><th>Vinil + EVA</th></tr></thead>
+                    <thead><tr><th>Composição</th><th>Couro (m²)</th><th>Espuma (m²)</th><th>Carpete (m²)</th><th>Vinil S/Esp. (m²)</th><th>Vinil + Esp. Fina (m²)</th><th>Vinil + Esp. Média (m²)</th><th>Vinil + EVA (m²)</th></tr></thead>
                     <tbody>${tabela || '<tr><td colspan="8">Nenhuma composição cadastrada.</td></tr>'}</tbody>
                 </table>
             </div>
             <div class="cc-product-modal-section">
-                <h4>Totais calculados</h4>
-                <table class="cc-product-modal-table">
-                    <thead><tr><th>Material</th><th>Líquido</th><th>Bruto com quebra</th></tr></thead>
-                    <tbody>
-                        <tr><td>Couro</td><td>${f(t.couroLiquido)}</td><td>${f(t.couroBruto)}</td></tr>
-                        <tr><td>Vinil</td><td>${f(t.vinilLiquido)}</td><td>${f(t.vinilBruto)}</td></tr>
-                        <tr><td>Espuma</td><td>${f(t.espumaLiquida)}</td><td>${f(t.espumaBruta)}</td></tr>
-                        <tr><td>Carpete</td><td>${f(t.carpeteLiquida)}</td><td>${f(t.carpeteBruta)}</td></tr>
-                        <tr><th>Total geral</th><th>${f(item.totalLiquido)}</th><th>${f(item.totalBruto)}</th></tr>
-                    </tbody>
-                </table>
+                <h4>Leitura dos valores em m²</h4>
+                <div style="background:#f6f9fc;border:1px solid #d9e4ef;border-radius:8px;padding:10px;font-size:12px;line-height:1.5;">
+                    Cada linha acima representa uma <strong>alternativa de composição</strong>. O sistema calcula o m² de cada material usando o comprimento informado × a largura cadastrada. O valor <strong>Bruto</strong> já considera a quebra configurada. <strong>As alternativas de composição não são somadas entre si</strong>; isso evita apresentar um consumo artificialmente alto, como 68,750 m², quando os valores pertencem a composições diferentes.
+                </div>
             </div>
             <div class="cc-product-modal-section">
                 <h4>Insumos por peça / aplicação</h4>
