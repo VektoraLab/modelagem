@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
@@ -1268,6 +1269,9 @@
         <div id="cc_produtoModalBody" class="cc-product-modal-body"></div>
         <div class="cc-product-modal-footer">
             <button type="button" class="cc-btn-action cc-btn-secondary" onclick="cc_fecharModalProduto()"><i class="fa-solid fa-xmark"></i> Fechar</button>
+            <button type="button" class="cc-btn-action" onclick="cc_imprimirProdutoModal()"><i class="fa-solid fa-print"></i> Imprimir</button>
+            <button type="button" class="cc-btn-action" onclick="cc_salvarProdutoModalPDF()"><i class="fa-solid fa-file-pdf"></i> Salvar PDF</button>
+            <button type="button" class="cc-btn-action" onclick="cc_salvarProdutoModalImagem()"><i class="fa-solid fa-image"></i> Salvar imagem</button>
             <button type="button" class="cc-btn-action cc-btn-primary" id="cc_btnConfirmarCarregamento"><i class="fa-solid fa-folder-open"></i> Carregar produto na edição</button>
         </div>
     </div>
@@ -4662,6 +4666,185 @@
                 <td class="cc-text-right" style="color:#0d6efd;font-weight:bold;">${f(medias.totalBruto)}</td>
                 <td>${cc_escaparHTML(referencias)}</td>`;
             tbodyMedias.appendChild(tr);
+        });
+    }
+
+    // Abre o produto completo em um popup a partir do Banco de Dados.
+    function cc_mostrarDetalhesProduto(idCodificado) {
+        const id = decodeURIComponent(idCodificado);
+        const banco = cc_obterBancoLocal();
+        const item = banco.find(x => String(x.id) === String(id));
+        if (!item) {
+            alert('Produto não encontrado no Banco de Dados.');
+            return;
+        }
+
+        window._ccProdutoModalAtual = item;
+        const body = document.getElementById('cc_produtoModalBody');
+        const modal = document.getElementById('cc_produtoModal');
+        if (!body || !modal) return;
+
+        const esc = cc_escaparHTML;
+        const n = v => Number(v || 0);
+        const f = v => `${n(v).toFixed(3).replace('.', ',')} m²`;
+        const params = item.params || {};
+        const larg = v => `${String(v ?? '0').replace('.', ',')} m`;
+        const perc = v => `${String(v ?? '0').replace('.', ',')}%`;
+        const t = item.totaisMateriais || {};
+
+        let tabela = '';
+        (item.tabelaPrincipal || []).forEach(row => {
+            const m = row.materiais || {};
+            const vals = key => (m[key] || []).filter(v => String(v).trim() !== '').map(v => esc(v)).join('<br>') || '-';
+            tabela += `<tr>
+                <td><strong>${esc(row.composicao || '-')}</strong></td>
+                <td>${vals('couro')}</td><td>${vals('espuma')}</td><td>${vals('carpete')}</td>
+                <td>${vals('v1')}</td><td>${vals('v2')}</td><td>${vals('v3')}</td><td>${vals('v4')}</td>
+            </tr>`;
+        });
+
+        let insumos = '';
+        if (typeof listaInsumos !== 'undefined') {
+            listaInsumos.forEach(insumo => {
+                const itens = (item.insumos && item.insumos[insumo.id]) || [];
+                if (!itens.length) return;
+                itens.forEach(x => {
+                    insumos += `<tr><td>${esc(insumo.nome || insumo.label || insumo.id)}</td><td>${esc(x.peca || '-')}</td><td>${esc(x.metro || '-')}</td><td>${esc(x.qtd || '-')}</td></tr>`;
+                });
+            });
+        }
+        if (!insumos) insumos = '<tr><td colspan="4">Nenhum insumo adicional cadastrado.</td></tr>';
+
+        body.innerHTML = `
+            <div class="cc-product-modal-section" style="margin-top:0">
+                <h4>Identificação do produto</h4>
+                <table class="cc-product-modal-table">
+                    <tr><th>Código</th><td>${esc(item.codigo || '-')}</td><th>Descrição / Nome</th><td>${esc(item.descricao || '-')}</td></tr>
+                    <tr><th>Tipo</th><td>${esc(item.tipoCategoria || 'Kit')}</td><th>Padrão de cor</th><td>${esc(item.padraoCor || '-')}</td></tr>
+                    <tr><th>Personalização</th><td>${esc(item.tipoKit || '-')}</td><th>Atualizado em</th><td>${esc(item.dataAtualizacao || '-')}</td></tr>
+                </table>
+            </div>
+            <div class="cc-product-modal-section">
+                <h4>Parâmetros globais utilizados no cálculo</h4>
+                <table class="cc-product-modal-table">
+                    <thead><tr><th>Material</th><th>Largura</th><th>Quebra</th></tr></thead>
+                    <tbody>
+                        <tr><td>Couro</td><td>${larg(params.larguraCouro || params.largura || 0)}</td><td>${perc(params.quebraCouro || 0)}</td></tr>
+                        <tr><td>Vinil</td><td>${larg(params.larguraVinil || params.largura || 0)}</td><td>${perc(params.quebraVinil || 0)}</td></tr>
+                        <tr><td>Espuma</td><td>${larg(params.larguraEspuma || params.largura || 0)}</td><td>${perc(params.quebraEspuma || 0)}</td></tr>
+                        <tr><td>Carpete</td><td>${larg(params.larguraCarpete || params.largura || 0)}</td><td>${perc(params.quebraCarpete || 0)}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="cc-product-modal-section">
+                <h4>Composição e consumo por comprimento informado</h4>
+                <table class="cc-product-modal-table">
+                    <thead><tr><th>Composição</th><th>Couro (m)</th><th>Espuma (m)</th><th>Carpete (m)</th><th>Vinil S/Esp.</th><th>Vinil + Esp. Fina</th><th>Vinil + Esp. Média</th><th>Vinil + EVA</th></tr></thead>
+                    <tbody>${tabela || '<tr><td colspan="8">Nenhuma composição cadastrada.</td></tr>'}</tbody>
+                </table>
+            </div>
+            <div class="cc-product-modal-section">
+                <h4>Totais calculados</h4>
+                <table class="cc-product-modal-table">
+                    <thead><tr><th>Material</th><th>Líquido</th><th>Bruto com quebra</th></tr></thead>
+                    <tbody>
+                        <tr><td>Couro</td><td>${f(t.couroLiquido)}</td><td>${f(t.couroBruto)}</td></tr>
+                        <tr><td>Vinil</td><td>${f(t.vinilLiquido)}</td><td>${f(t.vinilBruto)}</td></tr>
+                        <tr><td>Espuma</td><td>${f(t.espumaLiquida)}</td><td>${f(t.espumaBruta)}</td></tr>
+                        <tr><td>Carpete</td><td>${f(t.carpeteLiquida)}</td><td>${f(t.carpeteBruta)}</td></tr>
+                        <tr><th>Total geral</th><th>${f(item.totalLiquido)}</th><th>${f(item.totalBruto)}</th></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="cc-product-modal-section">
+                <h4>Insumos por peça / aplicação</h4>
+                <table class="cc-product-modal-table">
+                    <thead><tr><th>Insumo</th><th>Peça / aplicação</th><th>Metro linear</th><th>Quantidade</th></tr></thead>
+                    <tbody>${insumos}</tbody>
+                </table>
+            </div>`;
+
+        document.getElementById('cc_btnConfirmarCarregamento').onclick = () => cc_carregarItemDoBanco(encodeURIComponent(item.id), true);
+        modal.classList.add('active');
+    }
+
+    function cc_fecharModalProduto() {
+        const modal = document.getElementById('cc_produtoModal');
+        if (modal) modal.classList.remove('active');
+        window._ccProdutoModalAtual = null;
+    }
+
+    async function cc_comCapturaProduto(callback) {
+        if (!window.html2canvas) {
+            alert('A biblioteca para salvar a imagem/PDF ainda não foi carregada. Verifique sua conexão com a internet e tente novamente.');
+            return;
+        }
+        const card = document.querySelector('#cc_produtoModal .cc-product-modal-card');
+        const body = document.getElementById('cc_produtoModalBody');
+        if (!card || !body) return;
+        const old = { cardMax: card.style.maxHeight, bodyMax: body.style.maxHeight, bodyOverflow: body.style.overflowY, cardOverflow: card.style.overflow };
+        try {
+            card.style.maxHeight = 'none';
+            card.style.overflow = 'visible';
+            body.style.maxHeight = 'none';
+            body.style.overflowY = 'visible';
+            const canvas = await html2canvas(card, {scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false});
+            await callback(canvas);
+        } finally {
+            card.style.maxHeight = old.cardMax;
+            body.style.maxHeight = old.bodyMax;
+            body.style.overflowY = old.bodyOverflow;
+            card.style.overflow = old.cardOverflow;
+        }
+    }
+
+    function cc_imprimirProdutoModal() {
+        const card = document.querySelector('#cc_produtoModal .cc-product-modal-card');
+        if (!card) return;
+        const titulo = (window._ccProdutoModalAtual && window._ccProdutoModalAtual.codigo) || 'produto';
+        const w = window.open('', '_blank');
+        if (!w) { alert('O navegador bloqueou a janela de impressão. Permita pop-ups para este sistema.'); return; }
+        const estilos = Array.from(document.querySelectorAll('style')).map(x => x.innerHTML).join('\n');
+        w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Produto ${cc_escaparHTML(titulo)}</title><style>${estilos}<\/style><style>@page{size:A4;margin:10mm}body{background:#fff!important}.cc-product-modal-card{max-height:none!important;overflow:visible!important;box-shadow:none!important;width:100%!important}.cc-product-modal-body{max-height:none!important;overflow:visible!important}.cc-product-modal-footer,.cc-product-modal-close{display:none!important}</style></head><body>${card.outerHTML}</body></html>`);
+        w.document.close();
+        w.focus();
+        setTimeout(() => { w.print(); }, 400);
+    }
+
+    function cc_salvarProdutoModalImagem() {
+        cc_comCapturaProduto(async canvas => {
+            const item = window._ccProdutoModalAtual || {};
+            const nome = String(item.codigo || 'produto').replace(/[^a-z0-9_-]+/gi, '_');
+            const link = document.createElement('a');
+            link.download = `produto_${nome}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
+    function cc_salvarProdutoModalPDF() {
+        cc_comCapturaProduto(async canvas => {
+            if (!window.jspdf) { alert('Biblioteca PDF não carregada.'); return; }
+            const {jsPDF} = window.jspdf;
+            const item = window._ccProdutoModalAtual || {};
+            const nome = String(item.codigo || 'produto').replace(/[^a-z0-9_-]+/gi, '_');
+            const img = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p','mm','a4');
+            const margem = 8;
+            const pageW = pdf.internal.pageSize.getWidth() - margem * 2;
+            const pageH = pdf.internal.pageSize.getHeight() - margem * 2;
+            const imgH = canvas.height * pageW / canvas.width;
+            let y = margem;
+            let restante = imgH;
+            pdf.addImage(img, 'PNG', margem, y, pageW, imgH);
+            restante -= pageH;
+            while (restante > 0) {
+                y = margem - (imgH - restante);
+                pdf.addPage();
+                pdf.addImage(img, 'PNG', margem, y, pageW, imgH);
+                restante -= pageH;
+            }
+            pdf.save(`produto_${nome}.pdf`);
         });
     }
 
