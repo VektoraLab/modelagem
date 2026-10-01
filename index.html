@@ -211,6 +211,7 @@
         .cc-btn-action { height: 32px; color: white; border: none; border-radius: 4px; padding: 0 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
         .cc-btn-toggle-params { background-color: #6c757d; }
         .cc-btn-load { background-color: #0d6efd; }
+        .cc-btn-new { background-color: #6c757d; }
         .cc-btn-save-db { background-color: #198754; }
         .cc-btn-print { background-color: #0dcaf0; color: #000; font-weight: bold; }
 
@@ -919,6 +920,7 @@
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end;">
                 <button type="button" class="cc-btn-action cc-btn-toggle-params" onclick="cc_toggleParametros()"><i class="fa-solid fa-sliders"></i> Parâmetros Globais</button>
                 <button type="button" class="cc-btn-action cc-btn-load" onclick="cc_buscarKitsPeloCodigo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                <button type="button" class="cc-btn-action cc-btn-new" onclick="cc_novoProduto()"><i class="fa-solid fa-file-circle-plus"></i> Novo</button>
                 <button type="button" class="cc-btn-action cc-btn-save-db" onclick="cc_salvarConfiguracaoAtual()"><i class="fa-solid fa-floppy-disk"></i> Salvar Este Produto</button>
             </div>
         </div>
@@ -4323,6 +4325,55 @@
         cc_atualizarSelectVariacoes();
         cc_renderizarBancoNaAba2();
         cc_renderizarRelatorioAba3();
+    }
+
+    function cc_novoProduto() {
+        const confirmar = confirm(
+            'Iniciar um NOVO cadastro?\n\n' +
+            'Os dados atualmente digitados/carregados nesta Ficha de Edição serão limpos para você cadastrar outro produto.\n\n' +
+            'O que já foi salvo no Banco de Dados não será apagado.'
+        );
+
+        if (!confirmar) return;
+
+        // Limpa a identificação do produto.
+        document.getElementById('cc_codigo').value = '';
+        document.getElementById('cc_descricao').value = '';
+        document.getElementById('cc_tipoCategoria').value = 'Kit';
+        document.getElementById('cc_padraoCor').value = 'MONOCOLOR';
+        document.getElementById('cc_tipoKit').value = 'PADRAO';
+
+        // Desmarca qualquer produto que tenha sido carregado.
+        const select = document.getElementById('cc_selectVariacao');
+        if (select) select.value = '';
+
+        // Novo cadastro começa com os parâmetros padrão da ferramenta.
+        const parametrosPadrao = {
+            cc_paramLarguraCouro: '1.38',
+            cc_paramQuebraCouro: '7',
+            cc_paramLarguraVinil: '1.38',
+            cc_paramQuebraVinil: '5',
+            cc_paramLarguraEspuma: '1.38',
+            cc_paramQuebraEspuma: '0',
+            cc_paramLarguraCarpete: '1.38',
+            cc_paramQuebraCarpete: '0'
+        };
+        Object.entries(parametrosPadrao).forEach(([id, valor]) => {
+            const el = document.getElementById(id);
+            if (el) el.value = valor;
+        });
+
+        // Recria a tabela de matérias-primas com uma única linha/campo vazio em cada composição.
+        cc_inicializarTabelaPrincipal();
+
+        // Recria os insumos com uma linha inicial vazia para cada material.
+        cc_inicializarInsumos();
+
+        // Garante que todos os cálculos/visuais estejam zerados.
+        cc_recalcularTabelaPrincipal();
+        listaInsumos.forEach(insumo => cc_calcularTotalInsumo(insumo.id));
+
+        document.getElementById('cc_codigo').focus();
     }
 
     function cc_salvarConfiguracaoAtual() {
