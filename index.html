@@ -392,6 +392,19 @@
             display: none !important;
         }
         body.pre-login { background: #f4f6f8; }
+    
+        /* ===== RELATÓRIO PERSONALIZADO DO COLABORADOR ===== */
+        .relp-overlay{position:fixed;inset:0;background:rgba(15,23,42,.62);display:none;align-items:center;justify-content:center;z-index:5000;padding:18px}
+        .relp-modal{background:#fff;width:min(1180px,98vw);max-height:94vh;overflow:auto;border-radius:12px;box-shadow:0 18px 55px rgba(0,0,0,.28)}
+        .relp-head{position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 20px;display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
+        .relp-head h2{margin:0;color:#2c3e50;font-size:1.2rem}.relp-head p{margin:5px 0 0;color:#6b7280;font-size:.85rem}
+        .relp-body{padding:18px 20px}.relp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.relp-box{border:1px solid #dfe5ec;border-radius:9px;padding:14px;background:#fafbfd}.relp-box h3{font-size:.95rem;color:#2c3e50;margin-bottom:10px}
+        .relp-controls{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px}.relp-field label{display:block;font-weight:700;font-size:.8rem;margin-bottom:5px;color:#475569}.relp-field input,.relp-field select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}
+        .relp-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.relp-check{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;font-size:.84rem}.relp-check input{width:16px;height:16px}
+        .relp-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.relp-btn{border:0;border-radius:6px;padding:9px 13px;font-weight:700;cursor:pointer}.relp-btn.primary{background:#2980b9;color:#fff}.relp-btn.success{background:#198754;color:#fff}.relp-btn.dark{background:#34495e;color:#fff}.relp-btn.warning{background:#e67e22;color:#fff}.relp-btn.light{background:#e9ecef;color:#333}
+        .relp-preview-wrap{margin-top:18px;border-top:2px solid #e9ecef;padding-top:16px}.relp-preview{background:#fff;max-width:1050px;margin:auto;padding:26px;color:#202733}.relp-report-title{font-size:22px;font-weight:800;color:#2c3e50;margin-bottom:3px}.relp-report-sub{font-size:12px;color:#64748b;margin-bottom:18px}.relp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.relp-kpi{border:1px solid #e2e8f0;border-radius:7px;padding:11px;text-align:center}.relp-kpi .v{font-size:21px;font-weight:800;color:#2c3e50}.relp-kpi .l{font-size:11px;color:#64748b;margin-top:3px}.relp-section{margin-top:18px}.relp-section h3{font-size:14px;color:#2c3e50;border-bottom:2px solid #e8edf2;padding-bottom:6px;margin-bottom:8px}.relp-table{width:100%;border-collapse:collapse;font-size:10px}.relp-table th{background:#2c3e50;color:#fff;padding:6px;text-align:left}.relp-table td{border-bottom:1px solid #e5e7eb;padding:6px;vertical-align:top}.relp-table tr:nth-child(even) td{background:#f8fafc}.relp-chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.relp-chart{border:1px solid #e2e8f0;border-radius:7px;padding:8px;height:300px}.relp-empty{padding:14px;text-align:center;color:#64748b;background:#f8fafc;border-radius:6px}.relp-close{border:0;background:#e5e7eb;color:#334155;border-radius:6px;padding:8px 11px;cursor:pointer;font-weight:700}
+        @media(max-width:850px){.relp-grid,.relp-controls{grid-template-columns:1fr}.relp-kpis{grid-template-columns:repeat(2,1fr)}.relp-checks{grid-template-columns:1fr}.relp-chart-grid{grid-template-columns:1fr}}
+
     </style>
 </head>
 <body class="pre-login">
@@ -532,7 +545,7 @@
                 <p style="font-size: 0.85rem; color: #666;">Métricas baseadas em tarefas concluídas, tempo rastreado e jornada útil de 07:12 às 17:00, de segunda a sexta-feira.</p>
             </div>
             <div>
-                <select id="reportPeriod" class="form-control" style="width: 200px;" onchange="updateReportDashboard()">
+                <select id="reportPeriod" class="form-control" style="width: 200px;" onchange="updateReportDashboard(); updateExecutiveIndividualReport();">
                     <option value="hoje">Apenas Hoje</option>
                     <option value="semanal">Esta Semana (7 dias)</option>
                     <option value="quinzenal">Quinzena (15 dias)</option>
@@ -682,6 +695,7 @@
                 </div>
                 <div style="min-width:240px;">
                     <select id="execIndividualEmployee" class="form-control" onchange="updateExecutiveIndividualReport()"></select>
+                    <button class="relp-btn primary" style="margin-top:8px;width:100%;" onclick="abrirRelatorioPersonalizado()">📑 Relatório personalizado</button>
                 </div>
             </div>
             <div class="exec-kpis">
@@ -753,6 +767,65 @@
                     </table>
                 </div>
                 <div class="exec-note">“Demandas recebidas” considera tarefas atribuídas ao funcionário no período selecionado. O tempo produtivo considera somente registros rastreáveis de início até pausa/fim, dentro da jornada útil. Almoço e descanso continuam registrados para os cálculos automáticos, mas não aparecem como botões ou barra de status.</div>
+            </div>
+        </div>
+
+
+        <!-- ===== RELATÓRIO PERSONALIZADO DO COLABORADOR ===== -->
+        <div id="relpModal" class="relp-overlay" aria-hidden="true">
+            <div class="relp-modal">
+                <div class="relp-head">
+                    <div><h2>📑 Relatório Personalizado do Colaborador</h2><p>Escolha o colaborador, o período e exatamente quais informações e gráficos devem aparecer no relatório.</p></div>
+                    <button class="relp-close" onclick="fecharRelatorioPersonalizado()">✕ Fechar</button>
+                </div>
+                <div class="relp-body">
+                    <div class="relp-grid">
+                        <div class="relp-box">
+                            <h3>1. Quem e qual período?</h3>
+                            <div class="relp-controls">
+                                <div class="relp-field"><label>Colaborador</label><select id="relpEmployee"></select></div>
+                                <div class="relp-field"><label>Período</label><select id="relpPeriod" onchange="relpAlternarDatas()">
+                                    <option value="hoje">Hoje</option><option value="7dias">Últimos 7 dias</option><option value="15dias">Últimos 15 dias</option><option value="1mes">Último 1 mês</option><option value="2meses">Últimos 2 meses</option><option value="3meses">Últimos 3 meses</option><option value="6meses">Últimos 6 meses</option><option value="1ano">Último 1 ano</option><option value="personalizado">Período personalizado</option>
+                                </select></div>
+                                <div class="relp-field"><label>Data inicial</label><input type="date" id="relpStart"></div>
+                                <div class="relp-field"><label>Data final</label><input type="date" id="relpEnd"></div>
+                            </div>
+                        </div>
+                        <div class="relp-box">
+                            <h3>2. O que deve aparecer?</h3>
+                            <div class="relp-checks">
+                                <label class="relp-check"><input type="checkbox" id="relpResumo" checked> Resumo e indicadores</label>
+                                <label class="relp-check"><input type="checkbox" id="relpAlocadas" checked> Tarefas alocadas</label>
+                                <label class="relp-check"><input type="checkbox" id="relpConcluidas" checked> Tarefas concluídas</label>
+                                <label class="relp-check"><input type="checkbox" id="relpAbertas"> Tarefas em aberto</label>
+                                <label class="relp-check"><input type="checkbox" id="relpAtrasadas"> Tarefas em atraso</label>
+                                <label class="relp-check"><input type="checkbox" id="relpPausas"> Pausas e motivos</label>
+                                <label class="relp-check"><input type="checkbox" id="relpTempos"> Tempos das tarefas</label>
+                                <label class="relp-check"><input type="checkbox" id="relpExtras"> Horas extras</label>
+                                <label class="relp-check"><input type="checkbox" id="relpMetas"> Metas e atingimento</label>
+                                <label class="relp-check"><input type="checkbox" id="relpTipos"> Concluídas por tipo</label>
+                                <label class="relp-check"><input type="checkbox" id="relpDetalhes"> Detalhamento completo das tarefas</label>
+                            </div>
+                            <div class="relp-actions"><button class="relp-btn light" onclick="relpMarcarDados(true)">Selecionar tudo</button><button class="relp-btn light" onclick="relpMarcarDados(false)">Limpar seleção</button></div>
+                        </div>
+                    </div>
+                    <div class="relp-box" style="margin-top:16px;">
+                        <h3>3. Gráficos</h3>
+                        <div class="relp-checks">
+                            <label class="relp-check"><input type="checkbox" id="relpGraficos"> Gerar gráficos</label>
+                            <label class="relp-check"><input type="checkbox" id="relpGraficoEvolucao" checked> Evolução das conclusões</label>
+                            <label class="relp-check"><input type="checkbox" id="relpGraficoTipos" checked> Concluídas por tipo</label>
+                            <label class="relp-check"><input type="checkbox" id="relpGraficoStatus"> Situação das tarefas</label>
+                        </div>
+                    </div>
+                    <div class="relp-actions">
+                        <button class="relp-btn primary" onclick="gerarRelatorioPersonalizado()">🔄 Gerar / Atualizar relatório</button>
+                        <button class="relp-btn success" onclick="salvarRelatorioPersonalizadoPDF()">📄 Salvar PDF</button>
+                        <button class="relp-btn dark" onclick="salvarRelatorioPersonalizadoExcel()">📊 Salvar Excel</button>
+                        <button class="relp-btn warning" onclick="salvarRelatorioPersonalizadoJPG()">🖼️ Salvar JPG</button>
+                    </div>
+                    <div class="relp-preview-wrap"><div id="relpPreview" class="relp-preview"><div class="relp-empty">Configure o relatório e clique em <strong>Gerar / Atualizar relatório</strong>.</div></div></div>
+                </div>
             </div>
         </div>
 
@@ -3467,6 +3540,133 @@
                 return `<tr><td><strong>${safeTitle}</strong></td><td>${t.deadline?execDateOnly(t.deadline).toLocaleDateString('pt-BR'):'—'}</td><td>${t.dateFinished?execDateOnly(t.dateFinished).toLocaleDateString('pt-BR'):'—'}</td><td class="${statusClass}"><strong>${status}</strong></td><td class="num">${dur.exact?fmtMin(dur.minutes):'—'}</td></tr>`;
             }).join(''):`<tr><td colspan="5" style="text-align:center;color:#777;">Não há tarefas atribuídas a ${userName} no período selecionado.</td></tr>`;
         }
+
+
+        /* =========================================================
+           RELATÓRIO PERSONALIZADO POR COLABORADOR
+           ========================================================= */
+        let relpCharts = [];
+        const relpDataIds = ['relpResumo','relpAlocadas','relpConcluidas','relpAbertas','relpAtrasadas','relpPausas','relpTempos','relpExtras','relpMetas','relpTipos','relpDetalhes'];
+
+        function abrirRelatorioPersonalizado(){
+            const modal=document.getElementById('relpModal'); if(!modal) return;
+            const sel=document.getElementById('relpEmployee');
+            const keys=getChavesEquipe();
+            const atual=(document.getElementById('execIndividualEmployee')?.value)||currentUser;
+            sel.innerHTML=keys.map(k=>`<option value="${k}">${escHtml(nomesExibicao[k]||k)}</option>`).join('');
+            sel.value=keys.includes(atual)?atual:(keys[0]||'');
+            sel.disabled=currentUser!=='admin';
+            const hoje=new Date(); const iso=d=>{const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`};
+            document.getElementById('relpPeriod').value='1mes';
+            document.getElementById('relpStart').value=iso(new Date(hoje.getFullYear(),hoje.getMonth(),1));
+            document.getElementById('relpEnd').value=iso(hoje);
+            relpAlternarDatas();
+            modal.style.display='flex'; modal.setAttribute('aria-hidden','false');
+            gerarRelatorioPersonalizado();
+        }
+        function fecharRelatorioPersonalizado(){const m=document.getElementById('relpModal');if(m){m.style.display='none';m.setAttribute('aria-hidden','true');}}
+        function relpMarcarDados(valor){relpDataIds.forEach(id=>{const el=document.getElementById(id);if(el)el.checked=valor;});}
+        function relpAlternarDatas(){
+            const p=document.getElementById('relpPeriod')?.value; if(!p)return;
+            const hoje=new Date(); hoje.setHours(23,59,59,999); let ini=new Date(hoje); const fim=hoje;
+            if(p==='hoje') ini=new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+            else if(p==='7dias'||p==='15dias') ini.setDate(hoje.getDate()-(p==='7dias'?6:14));
+            else if(p==='1mes'||p==='2meses'||p==='3meses'||p==='6meses'||p==='1ano'){
+                const n=p==='1mes'?1:p==='2meses'?2:p==='3meses'?3:p==='6meses'?6:12;
+                ini=new Date(hoje.getFullYear(),hoje.getMonth()-n,hoje.getDate()); ini.setHours(0,0,0,0);
+            }
+            const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            const si=document.getElementById('relpStart'), ei=document.getElementById('relpEnd');
+            if(p!=='personalizado'){si.value=iso(ini);ei.value=iso(fim);si.disabled=true;ei.disabled=true;}else{si.disabled=false;ei.disabled=false;}
+        }
+        function relpGetRange(){
+            const si=document.getElementById('relpStart').value, ei=document.getElementById('relpEnd').value;
+            const start=new Date(`${si}T00:00:00`), end=new Date(`${ei}T23:59:59.999`);
+            if(!si||!ei||isNaN(start)||isNaN(end)||start>end) throw new Error('Informe um período válido.');
+            return {start,end};
+        }
+        function relpAllTasks(){
+            const all=[...(Array.isArray(tasks)?tasks:[]),...(Array.isArray(historicTasks)?historicTasks:[])]; const map=new Map();
+            all.forEach(t=>{if(t&&t.id)map.set(t.id,t);}); return [...map.values()];
+        }
+        function relpCreatedDate(t){return execTaskCreatedDate(t)}
+        function relpFinishedDate(t){return execTaskFinishedDate(t)}
+        function relpAssignedInPeriod(all,user,start,end){return all.filter(t=>Array.isArray(t.responsibles)&&t.responsibles.includes(user)&&((relpCreatedDate(t)||0)>=start&&(relpCreatedDate(t)||0)<=end));}
+        function relpCompletedInPeriod(all,user,start,end){return all.filter(t=>t.userWhoFinished===user&&((relpFinishedDate(t)||0)>=start&&(relpFinishedDate(t)||0)<=end));}
+        function relpOpenAtEnd(all,user,end){return all.filter(t=>Array.isArray(t.responsibles)&&t.responsibles.includes(user)&&!t.dateFinished&&relpCreatedDate(t)&&relpCreatedDate(t)<=end);}
+        function relpOverdueAtEnd(all,user,end){const day=execDateOnly(end);return relpOpenAtEnd(all,user,end).filter(t=>t.deadline&&execDateOnly(t.deadline)<day);}
+        function relpSafe(v){return escHtml(String(v??''));}
+        function relpTaskTime(t,user){const r=execTaskDurationForUser(t,user);return r.exact?Number(r.minutes||0)/60:null;}
+        function relpTaskPauses(t,user){return (Array.isArray(t.timeLogs)?t.timeLogs:[]).filter(l=>l&&l.type==='pause'&&(l.by===user||!l.by));}
+        function relpOvertimeForTasks(arr,user,start,end){return arr.reduce((s,t)=>s+execTaskOvertimeMinutes(t,user,start,end)/60,0);}
+        function relpFmtH(h){return `${Number(h||0).toFixed(2).replace('.',',')} h`;}
+        function relpDate(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString('pt-BR');}
+        function relpStatus(t,user){if(t.userWhoFinished===user&&t.dateFinished)return t.onTime===true?'Concluída no prazo':'Concluída fora do prazo';if(t.deadline&&execDateOnly(t.deadline)<execDateOnly(new Date()))return 'Em atraso';return 'Em aberto';}
+        function relpBuildData(){
+            const user=document.getElementById('relpEmployee').value; const {start,end}=relpGetRange(); const all=relpAllTasks();
+            const assigned=relpAssignedInPeriod(all,user,start,end); const completed=relpCompletedInPeriod(all,user,start,end); const open=relpOpenAtEnd(all,user,end); const overdue=relpOverdueAtEnd(all,user,end);
+            const on=completed.filter(t=>t.onTime===true), late=completed.filter(t=>t.onTime===false); const exact=completed.map(t=>relpTaskTime(t,user)).filter(v=>v!==null); const totalH=exact.reduce((a,b)=>a+b,0); const avgH=exact.length?totalH/exact.length:0;
+            const capacidade=execCapacityMinutes(start,end,user)/60; const ocup=capacidade?Math.round(totalH/capacidade*100):0;
+            const meta=metasEquipe[user]||{tarefasDia:0,tempoMedioMetaMin:0}; const dias=execBusinessDaysInclusive(start,end); const metaPeriodo=Number(meta.tarefasDia||0)*dias; const ating=metaPeriodo?Math.round(completed.length/metaPeriodo*100):null;
+            const byType={}; completed.forEach(t=>{const k=String(t.action||t.taskType||'Sem tipo').trim()||'Sem tipo';byType[k]=(byType[k]||0)+1;});
+            const pauseRows=[]; [...new Set([...assigned,...completed,...open])].forEach(t=>relpTaskPauses(t,user).forEach(p=>pauseRows.push({t,p})));
+            const overtimeH=relpOvertimeForTasks([...new Set([...completed,...open])],user,start,end);
+            return {user,start,end,all,assigned,completed,open,overdue,on,late,exact,totalH,avgH,capacidade,ocup,meta,dias,metaPeriodo,ating,byType,pauseRows,overtimeH};
+        }
+        function relpTable(headers,rows){
+            if(!rows.length)return '<div class="relp-empty">Nenhum registro encontrado para este item no período selecionado.</div>';
+            return `<table class="relp-table"><thead><tr>${headers.map(h=>`<th>${relpSafe(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+        function relpSection(title,body){return `<div class="relp-section"><h3>${title}</h3>${body}</div>`;}
+        function relpKpi(label,value){return `<div class="relp-kpi"><div class="v">${value}</div><div class="l">${label}</div></div>`;}
+        function relpChartCanvas(id,title){return `<div class="relp-chart"><div style="font-weight:700;font-size:12px;color:#475569;margin:3px 3px 8px">${title}</div><div style="height:255px"><canvas id="${id}"></canvas></div></div>`;}
+        function gerarRelatorioPersonalizado(){
+            try{
+                const d=relpBuildData(); const preview=document.getElementById('relpPreview'); if(!preview)return;
+                relpCharts.forEach(c=>{try{c.destroy()}catch(e){}});relpCharts=[];
+                const nome=nomesExibicao[d.user]||d.user; const periodo=`${d.start.toLocaleDateString('pt-BR')} a ${d.end.toLocaleDateString('pt-BR')}`;
+                let html=`<div class="relp-report-title">RELATÓRIO INDIVIDUAL — ${relpSafe(nome)}</div><div class="relp-report-sub">Período: ${periodo} | Gerado em ${new Date().toLocaleString('pt-BR')}</div>`;
+                if(document.getElementById('relpResumo').checked){html+=`<div class="relp-kpis">${relpKpi('Tarefas alocadas',d.assigned.length)}${relpKpi('Concluídas',d.completed.length)}${relpKpi('No prazo',`${d.on.length} (${execPercent(d.on.length,d.completed.length)}%)`)}${relpKpi('Em aberto',d.open.length)}${relpKpi('Em atraso',d.overdue.length)}${relpKpi('Tempo em tarefas',relpFmtH(d.totalH))}${relpKpi('Tempo médio',relpFmtH(d.avgH))}${relpKpi('Ocupação',`${d.ocup}%`)}</div>`;}
+                if(document.getElementById('relpAlocadas').checked){const rows=d.assigned.map(t=>[`<strong>${relpSafe(t.title||'Sem título')}</strong>`,relpSafe(t.action||'—'),relpDate(t.deadline),relpDate(t.dateFinished),relpSafe(relpStatus(t,d.user))]);html+=relpSection('Tarefas alocadas no período',relpTable(['Tarefa','Tipo','Prazo','Conclusão','Status'],rows));}
+                if(document.getElementById('relpConcluidas').checked){const rows=d.completed.map(t=>[relpSafe(t.title||'Sem título'),relpSafe(t.action||'—'),relpDate(t.deadline),relpDate(t.dateFinished),t.onTime===true?'Sim':'Não',relpTaskTime(t,d.user)!==null?relpFmtH(relpTaskTime(t,d.user)):'—']);html+=relpSection('Tarefas concluídas no período',relpTable(['Tarefa','Tipo','Prazo','Conclusão','No prazo','Tempo'],rows));}
+                if(document.getElementById('relpAbertas').checked){const rows=d.open.map(t=>[relpSafe(t.title||'Sem título'),relpSafe(t.action||'—'),relpDate(t.deadline),relpStatus(t,d.user)]);html+=relpSection('Tarefas em aberto ao final do período',relpTable(['Tarefa','Tipo','Prazo','Status'],rows));}
+                if(document.getElementById('relpAtrasadas').checked){const rows=d.overdue.map(t=>[relpSafe(t.title||'Sem título'),relpSafe(t.action||'—'),relpDate(t.deadline),'Em atraso']);html+=relpSection('Tarefas em atraso ao final do período',relpTable(['Tarefa','Tipo','Prazo','Status'],rows));}
+                if(document.getElementById('relpTempos').checked){const rows=d.completed.map(t=>{const h=relpTaskTime(t,d.user);return [relpSafe(t.title||'Sem título'),relpDate(t.dateFinished),h===null?'Não rastreável':relpFmtH(h)];});html+=relpSection('Tempos rastreados das tarefas concluídas',relpTable(['Tarefa','Conclusão','Tempo'],rows));}
+                if(document.getElementById('relpPausas').checked){const rows=d.pauseRows.map(x=>[relpSafe(x.t.title||'Sem título'),relpDate(x.p.time),relpSafe(x.p.reason||'Não informado'),relpSafe(x.p.byName||nomesExibicao[x.p.by]||'Sistema'),x.p.autoPause?'Automática':'Manual']);html+=relpSection('Pausas e motivos registrados',relpTable(['Tarefa','Data/hora','Motivo','Solicitada/registrada por','Tipo'],rows));}
+                if(document.getElementById('relpExtras').checked){html+=relpSection('Horas extras',`<div class="relp-kpis">${relpKpi('Horas extras no período',relpFmtH(d.overtimeH))}</div>`);}
+                if(document.getElementById('relpMetas').checked){const tempoMeta=d.meta.tempoMedioMetaMin?relpFmtH(Number(d.meta.tempoMedioMetaMin)/60):'Não definida';html+=relpSection('Metas e atingimento',relpTable(['Indicador','Resultado'],[['Meta diária de tarefas',d.meta.tarefasDia||'Não definida'],['Meta estimada no período',d.metaPeriodo||'Não definida'],['Concluídas',d.completed.length],['Atingimento',d.ating===null?'Não calculado':d.ating+'%'],['Tempo médio alvo',tempoMeta],['Tempo médio real',relpFmtH(d.avgH)]]));}
+                if(document.getElementById('relpTipos').checked){const rows=Object.entries(d.byType).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[relpSafe(k),v]);html+=relpSection('Concluídas por tipo de tarefa',relpTable(['Tipo de tarefa','Quantidade'],rows));}
+                if(document.getElementById('relpDetalhes').checked){const selecionadas=[...new Set([...d.assigned,...d.completed,...d.open,...d.overdue])];const rows=selecionadas.map(t=>[relpSafe(t.title||'Sem título'),relpSafe(t.action||'—'),relpSafe(t.requester||'—'),relpSafe(t.category||'—'),relpSafe(t.priority||t.prioridade||'—'),relpSafe(Array.isArray(t.responsibles)?t.responsibles.map(k=>nomesExibicao[k]||k).join(', '):'—'),relpSafe(t.desc||'—'),relpStatus(t,d.user)]);html+=relpSection('Detalhamento completo das tarefas selecionadas',relpTable(['Tarefa','Tipo','Solicitante','Categoria','Prioridade','Responsáveis','Instruções','Status'],rows));}
+                if(document.getElementById('relpGraficos').checked){let charts='';if(document.getElementById('relpGraficoEvolucao').checked)charts+=relpChartCanvas('relpChartEvolucao','Evolução das conclusões');if(document.getElementById('relpGraficoTipos').checked)charts+=relpChartCanvas('relpChartTipos','Conclusões por tipo');if(document.getElementById('relpGraficoStatus').checked)charts+=relpChartCanvas('relpChartStatus','Situação das tarefas');if(charts)html+=relpSection('Gráficos selecionados',`<div class="relp-chart-grid">${charts}</div>`);}
+                preview.innerHTML=html;
+                if(document.getElementById('relpGraficos').checked && window.Chart){
+                    if(document.getElementById('relpGraficoEvolucao').checked){const c=new Chart(document.getElementById('relpChartEvolucao'),{type:'bar',data:{labels:relpBuildTrendLabels(d.start,d.end),datasets:[{label:'Concluídas',data:relpBuildTrendValues(d.completed,d.start,d.end)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});relpCharts.push(c);}
+                    if(document.getElementById('relpGraficoTipos').checked){const ent=Object.entries(d.byType).sort((a,b)=>b[1]-a[1]);const c=new Chart(document.getElementById('relpChartTipos'),{type:'doughnut',data:{labels:ent.map(x=>x[0]),datasets:[{data:ent.map(x=>x[1])}]},options:{responsive:true,maintainAspectRatio:false}});relpCharts.push(c);}
+                    if(document.getElementById('relpGraficoStatus').checked){const status=[d.completed.length,d.open.length,d.overdue.length];const c=new Chart(document.getElementById('relpChartStatus'),{type:'bar',data:{labels:['Concluídas','Em aberto','Em atraso'],datasets:[{label:'Quantidade',data:status}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});relpCharts.push(c);}
+                }
+                window._relpReportData=d; return d;
+            }catch(e){alert(e.message||'Não foi possível gerar o relatório.');return null;}
+        }
+        function relpBuildTrendLabels(start,end){const labels=[];const total=Math.max(1,Math.round((end-start)/86400000)+1);const step=total>45?7:1;for(let i=0;i<total;i+=step){const d=new Date(start);d.setDate(d.getDate()+i);const e=new Date(d);e.setDate(e.getDate()+step-1);labels.push(step===1?d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}):`${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}–${(e>end?end:e).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}`);}return labels;}
+        function relpBuildTrendValues(arr,start,end){const vals=[];const total=Math.max(1,Math.round((end-start)/86400000)+1);const step=total>45?7:1;for(let i=0;i<total;i+=step){const a=new Date(start);a.setDate(a.getDate()+i);const b=new Date(a);b.setDate(b.getDate()+step-1);b.setHours(23,59,59,999);vals.push(arr.filter(t=>{const d=relpFinishedDate(t);return d&&d>=a&&d<=b;}).length);}return vals;}
+        function relpRequireData(){const d=window._relpReportData||gerarRelatorioPersonalizado();if(!d)throw new Error('Gere o relatório antes de exportar.');return d;}
+        async function relpCapture(){const el=document.getElementById('relpPreview');if(!el||!window.html2canvas)throw new Error('Biblioteca de imagem não carregada.');return await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false});}
+        async function salvarRelatorioPersonalizadoJPG(){try{relpRequireData();const canvas=await relpCapture();const a=document.createElement('a');a.download=`Relatorio_${(nomesExibicao[window._relpReportData.user]||window._relpReportData.user).replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.jpg`;a.href=canvas.toDataURL('image/jpeg',.95);a.click();}catch(e){alert(e.message||'Não foi possível salvar o JPG.');}}
+        async function salvarRelatorioPersonalizadoPDF(){try{relpRequireData();const canvas=await relpCapture();const {jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const pageW=210,pageH=297,margin=8,imgW=pageW-margin*2,imgH=canvas.height*(imgW/canvas.width),usable=pageH-margin*2;let y=margin,offset=0;while(offset<imgH-0.1){const sliceH=Math.min(usable,imgH-offset);const sourceY=Math.round(offset*canvas.width/imgW);const sourceH=Math.max(1,Math.round(sliceH*canvas.width/imgW));const slice=document.createElement('canvas');slice.width=canvas.width;slice.height=sourceH;slice.getContext('2d').drawImage(canvas,0,sourceY,canvas.width,sourceH,0,0,canvas.width,sourceH);if(offset>0)pdf.addPage();pdf.addImage(slice.toDataURL('image/jpeg',.92),'JPEG',margin,margin,imgW,sliceH);offset+=sliceH;}pdf.save(`Relatorio_${(nomesExibicao[window._relpReportData.user]||window._relpReportData.user).replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.pdf`);}catch(e){alert(e.message||'Não foi possível salvar o PDF.');}}
+        function relpRowsForExcel(d){
+            const rows={};
+            rows.alocadas=[['Tarefa','Tipo','Prazo','Conclusão','Status'],...d.assigned.map(t=>[t.title||'',t.action||'',relpDate(t.deadline),relpDate(t.dateFinished),relpStatus(t,d.user)])];
+            rows.concluidas=[['Tarefa','Tipo','Prazo','Conclusão','No prazo','Horas'],...d.completed.map(t=>[t.title||'',t.action||'',relpDate(t.deadline),relpDate(t.dateFinished),t.onTime===true?'Sim':'Não',relpTaskTime(t,d.user)??''])];
+            rows.abertas=[['Tarefa','Tipo','Prazo','Status'],...d.open.map(t=>[t.title||'',t.action||'',relpDate(t.deadline),relpStatus(t,d.user)])];
+            rows.atrasadas=[['Tarefa','Tipo','Prazo','Status'],...d.overdue.map(t=>[t.title||'',t.action||'',relpDate(t.deadline),'Em atraso'])];
+            rows.pausas=[['Tarefa','Data/hora','Motivo','Registrada por','Automática'],...d.pauseRows.map(x=>[x.t.title||'',new Date(x.p.time).toLocaleString('pt-BR'),x.p.reason||'',x.p.byName||nomesExibicao[x.p.by]||'Sistema',x.p.autoPause?'Sim':'Não'])];
+            rows.tempos=[['Tarefa','Conclusão','Horas'],...d.completed.map(t=>[t.title||'',relpDate(t.dateFinished),relpTaskTime(t,d.user)??''])];
+            rows.metas=[['Indicador','Valor'],['Meta diária',d.meta.tarefasDia||'Não definida'],['Meta no período',d.metaPeriodo||'Não definida'],['Concluídas',d.completed.length],['Atingimento',d.ating===null?'Não calculado':d.ating+'%'],['Tempo médio alvo',d.meta.tempoMedioMetaMin?Number(d.meta.tempoMedioMetaMin)/60:'Não definida'],['Tempo médio real',d.avgH]];
+            rows.tipos=[['Tipo de tarefa','Quantidade'],...Object.entries(d.byType).sort((a,b)=>b[1]-a[1])];
+            rows.detalhes=[['Tarefa','Tipo','Solicitante','Categoria','Prioridade','Responsáveis','Instruções','Status'],...[...new Set([...d.assigned,...d.completed,...d.open,...d.overdue])].map(t=>[t.title||'',t.action||'',t.requester||'',t.category||'',t.priority||t.prioridade||'',Array.isArray(t.responsibles)?t.responsibles.map(k=>nomesExibicao[k]||k).join(', '):'',t.desc||'',relpStatus(t,d.user)])];
+            return rows;
+        }
+        function salvarRelatorioPersonalizadoExcel(){try{const d=relpRequireData();if(!window.XLSX)throw new Error('Biblioteca Excel não carregada.');const wb=XLSX.utils.book_new();const add=(name,data)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(data),name.slice(0,31));if(document.getElementById('relpResumo').checked)add('Resumo', [['RELATÓRIO INDIVIDUAL'],['Colaborador',nomesExibicao[d.user]||d.user],['Período',`${relpDate(d.start)} a ${relpDate(d.end)}`],['Tarefas alocadas',d.assigned.length],['Concluídas',d.completed.length],['No prazo',d.on.length],['Em aberto',d.open.length],['Em atraso',d.overdue.length],['Horas em tarefas',d.totalH],['Horas extras',d.overtimeH],['Ocupação',d.ocup/100]]);const r=relpRowsForExcel(d);if(document.getElementById('relpAlocadas').checked)add('Tarefas Alocadas',r.alocadas);if(document.getElementById('relpConcluidas').checked)add('Concluidas',r.concluidas);if(document.getElementById('relpAbertas').checked)add('Em Aberto',r.abertas);if(document.getElementById('relpAtrasadas').checked)add('Em Atraso',r.atrasadas);if(document.getElementById('relpPausas').checked)add('Pausas',r.pausas);if(document.getElementById('relpTempos').checked)add('Tempos',r.tempos);if(document.getElementById('relpMetas').checked)add('Metas',r.metas);if(document.getElementById('relpTipos').checked)add('Por Tipo',r.tipos);if(document.getElementById('relpDetalhes').checked)add('Detalhamento',r.detalhes);if(document.getElementById('relpExtras').checked)add('Horas Extras',[['Colaborador',nomesExibicao[d.user]||d.user],['Período',`${relpDate(d.start)} a ${relpDate(d.end)}`],['Horas extras',d.overtimeH]]);if(document.getElementById('relpGraficos').checked){if(document.getElementById('relpGraficoEvolucao').checked)add('Graf Evolução',[['Período','Concluídas'],...relpBuildTrendLabels(d.start,d.end).map((l,i)=>[l,relpBuildTrendValues(d.completed,d.start,d.end)[i]||0])]);if(document.getElementById('relpGraficoTipos').checked)add('Graf Por Tipo',[['Tipo','Quantidade'],...Object.entries(d.byType)]);if(document.getElementById('relpGraficoStatus').checked)add('Graf Status',[['Status','Quantidade'],['Concluídas',d.completed.length],['Em aberto',d.open.length],['Em atraso',d.overdue.length]]);}XLSX.writeFile(wb,`Relatorio_${(nomesExibicao[d.user]||d.user).replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.xlsx`);}catch(e){alert(e.message||'Não foi possível salvar o Excel.');}}
 
         function inicializarRelatorioIndividual() {
             const select=document.getElementById('execIndividualEmployee');
